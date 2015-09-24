@@ -18,9 +18,7 @@ Step 2: Register
 - Data:
 
     `phonenum` - Phone number
-
     `password` - **MD5 hash** of password
-
     `captcha` - Verification code
 
 - On success:
@@ -38,7 +36,6 @@ Step 2: Register
 - Data:
 
     `phonenum` - Phone number
-
     `password` - **MD5 hash** of password
 
 - On success:
