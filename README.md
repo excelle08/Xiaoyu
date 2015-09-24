@@ -17,17 +17,17 @@ Step 2: Register
 
 - Data:
 
-    `phonenum` - Phone number
-    `password` - **MD5 hash** of password
-    `captcha` - Verification code
+    * `phonenum` - Phone number
+    * `password` - **MD5 hash** of password
+    * `captcha` - Verification code
 
 - On success:
 
-    `data.uid` - User id
+    * `data.uid` - User id
 
 - On failure:
 
-    `data.message` - Error message
+    * `data.message` - Error message
 
 ### Log in
 
@@ -35,13 +35,13 @@ Step 2: Register
 
 - Data:
 
-    `phonenum` - Phone number
-    `password` - **MD5 hash** of password
+    * `phonenum` - Phone number
+    * `password` - **MD5 hash** of password
 
 - On success:
 
-    `data.uid` - User id
+    * `data.uid` - User id
 
 - On failure:
 
-    `data.message` - Error message
+    * `data.message` - Error message
