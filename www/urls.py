@@ -7,16 +7,37 @@ from api import APIError, datetime_filter
 from captcha import generate_captcha
 from config.config import configs
 from model import db
-import api.common
+import api.common, api.user
 import json
 
 app = Flask(__name__)
 db.init_app(app)
 
 
+@app.errorhandler(APIError)
+def handle_api_error(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     return "Hello World"
+
+
+@app.route('/api/user/verify', methods=['POST'])
+def api_send_verification_sms():
+    try:
+        phone = request.form['phone']
+        return api.user.send_message(phone)
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/user/register', methods=['POST'])
+def api_user_register():
+    return 'Hello~'
 
 
 @app.route('/api/common/license', methods=['GET', 'POST'])

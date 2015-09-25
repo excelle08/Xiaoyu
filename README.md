@@ -6,10 +6,14 @@
 
 Step 1: Get verification code
 
-- POST: `/api/get_vcode`
+- POST: `/api/user/verify`
 - Data:
 
-    `phonenum` - Phone number
+    `phone` - Phone number
+
+- Return value:
+    
+    A JSON data. If the operation is successful then `data.code` will be `0` and `data.msg` is `OK`. Otherwise `data.code` is something else and you can get error message in `data.msg` field.
 
 Step 2: Register
 
@@ -19,7 +23,7 @@ Step 2: Register
 
     * `phonenum` - Phone number
     * `password` - **MD5 hash** of password
-    * `captcha` - Verification code
+    * `vcode` - Verification code
 
 - On success:
 

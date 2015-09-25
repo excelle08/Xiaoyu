@@ -3,15 +3,31 @@
 from model import User, UserPermission, db
 from model import UserSchool, UserExt, Wall, FriendGroup
 from flask import session
-from api import APIError, APIValueError
-import re, json
+from api import APIError
+import re, json, requests, random
 
 _PHONENUM = re.compile(r'^[0-9\-]+$')
 _MD5 = re.compile(r'^[0-9A-Fa-f]{32}$')
+sms_apikey = 'c6745a3a14ab7d3227a7adf1a2800dbc'
+sms_url = 'http://yunpian.com/v1/sms/send.json'
 
 
-def send_message(captcha):
-    pass
+def send_message(phone):
+    code = generate_vcode()
+    post_data = {
+        "apikey" : sms_apikey,
+        "mobile" : phone,
+        "text" : "【云片网】您的验证码是%s" % code
+    }
+    resp = requests.post(sms_url, data=post_data)
+    return resp.content
+
+
+def generate_vcode():
+    rand_char = [ chr(random.randint(48, 58)) for i in range(0,4) ]
+    rand_char = str.join('', rand_char)
+    session['vcode'] = rand_char
+    return rand_char
 
 
 def user_register(phone, password, vcode):
