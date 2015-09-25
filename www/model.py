@@ -1,7 +1,15 @@
+# -*- coding: utf-8 -*-
+
 from flask.ext.sqlalchemy import SQLAlchemy
 from time import time
 
 db = SQLAlchemy()
+
+
+def enum(**enums):
+    return type('Enum', (), enums)
+
+UserPermission = enum(Blocked=-1, Unvalidated=0, InProgress=1, Validated=2, Admin=3)
 
 
 class User(db.Model):
@@ -12,7 +20,7 @@ class User(db.Model):
     permission = db.Column('permission', db.Integer, nullable=False)
     online = db.Column('online', db.Integer, nullable=True)
     created_at = db.Column('created_at', db.Float, nullable=False)
-    last_login = db.Cookie('last_login', db.Float, nullable=False)
+    last_login = db.Column('last_login', db.Float, nullable=False)
 
 
 class UserSchool(db.Model):
@@ -126,7 +134,7 @@ class BlackList(db.Model):
 class Notification(db.Model):
     __tablename__ = 'notification'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
-    from = db.Column('from', db.Integer, nullable=False)
+    _from = db.Column('from', db.Integer, nullable=False)
     to = db.Column('to', db.Integer, nullable=False)
     content = db.Column('content', db.Text)
     created_at = db.Column('created_at', db.Float)
@@ -135,7 +143,7 @@ class Notification(db.Model):
 class AbuseReport(db.Model):
     __tablename__ = 'abuse_report'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
-    from = db.Column('from', db.Integer, nullable=False)
+    _from = db.Column('from', db.Integer, nullable=False)
     target = db.Column('target', db.Integer, nullable=False)
     content = db.Column('content', db.Text)
     created_at = db.Column('created_at', db.Float)
@@ -163,11 +171,15 @@ class Province(db.Model):
 class City(db.Model):
     __tablename__ = 'city'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    index = db.Column('index', db.Integer)
     province = db.Column('province', db.Integer, nullable=False)
     name = db.Column('name', db.Text)
 
 
 class School(db.Model):
-    __tablename__ = 'schools'
+    __tablename__ = 'school'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name = db.Column('name', db.Text)
+    location = db.Column('location', db.Text)
+    s_type = db.Column('type', db.Text)
+    s_property = db.Column('properties', db.Text)
