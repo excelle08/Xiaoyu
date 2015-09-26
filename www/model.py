@@ -10,6 +10,7 @@ def enum(**enums):
     return type('Enum', (), enums)
 
 UserPermission = enum(Blocked=-1, Unvalidated=0, InProgress=1, Validated=2, Admin=3)
+UserStatus = enum(Offline=0, Online=1, HideToFriends=2, HideToStrangers=3, HideToAll=4)
 
 
 class User(db.Model):

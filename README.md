@@ -21,7 +21,7 @@ Step 2: Register
 
 - Data:
 
-    * `phonenum` - Phone number
+    * `phone` - Phone number
     * `password` - **MD5 hash** of password
     * `vcode` - Verification code
 
@@ -39,7 +39,7 @@ Step 2: Register
 
 - Data:
 
-    * `phonenum` - Phone number
+    * `phone` - Phone number
     * `password` - **MD5 hash** of password
 
 - On success:

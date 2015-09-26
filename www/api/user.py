@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from model import User, UserPermission, db
-from model import UserSchool, UserExt, Wall, FriendGroup
+from model import User, UserPermission, UserStatus, db
+from model import UserSchool, UserMeta, UserExt, Wall, FriendGroup
 from flask import session
 from api import APIError
-import re, json, requests, random
+import re, json, requests, random, time
 
 _PHONENUM = re.compile(r'^[0-9\-]+$')
 _MD5 = re.compile(r'^[0-9A-Fa-f]{32}$')
@@ -45,6 +45,9 @@ def user_register(phone, password, vcode):
     user.phone = phone.strip()
     user.password = password.strip().lower()
     user.permission = UserPermission.Unvalidated
+    user.created_at = time.time()
+    user.last_login = time.time()
+    user.online = UserStatus.Online
     db.session.add(user)
     db.session.commit()
 
@@ -71,6 +74,7 @@ def user_register(phone, password, vcode):
     db.session.add(wall)
     db.session.add(fgroup)
     db.session.commit()
+    del session['vcode']
 
     return user
 
@@ -86,6 +90,9 @@ def user_login(phone, password, remember):
     if user.password.lower() != password.strip().lower():
         raise APIError('该用户不存在或密码错误')
 
+    user.last_login = time.time()
+    user.online = UserStatus.Online
+
     if remember:
         session.permanent = True
     session['phone'] = phone.strip()
@@ -93,4 +100,15 @@ def user_login(phone, password, remember):
     return user
 
 
+def user_logout():
+    try:
+        user = User.query.filter_by(phone=session['phone']).first()
+        if not user:
+            return
+        user.online = UserStatus.Offline
+        db.session.commit()
+        del session['phone']
+        del session['password']
+    except KeyError, e:
+        raise APIError(e.message)
 

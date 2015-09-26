@@ -37,7 +37,28 @@ def api_send_verification_sms():
 
 @app.route('/api/user/register', methods=['POST'])
 def api_user_register():
-    return 'Hello~'
+    try:
+        phone = request.form['phone']
+        password = request.form['password']
+        vcode = request.form['vcode']
+        
+        user = api.user.user_register(phone, password, vcode)
+        return json.dumps({"uid": user.uid, "created_at": user.created_at})
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/user/login', methods=['POST'])
+def api_user_login():
+    try:
+        phone = request.form['phone']
+        password = request.form['password']
+        remember = request.form['remember']
+
+        user = api.user.user_login(phone, password, remember)
+        return json.dumps({"uid": user.uid})
+    except KeyError, e:
+        raise APIError(e.message)
 
 
 @app.route('/api/common/license', methods=['GET', 'POST'])
