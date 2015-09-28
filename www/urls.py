@@ -7,7 +7,7 @@ from api import APIError, datetime_filter
 from captcha import generate_captcha
 from config.config import configs
 from model import db
-import api.common, api.user
+import api.common, api.user, api.tweets
 import json
 
 app = Flask(__name__)
@@ -101,7 +101,9 @@ def api_get_recent_logins():
 def api_get_user():
     try:
         uid = session['uid']
-        return json.dumps(api.user.get_user(uid))
+        u = api.user.get_user(uid)
+        u.password = ''
+        return json.dumps(u)
     except KeyError, e:
         raise APIError(e.message)
 
@@ -122,7 +124,35 @@ def api_get_user_ext():
     except KeyError, e:
         uid = session['uid']
     return json.dumps(api.user.get_user_extension(uid))
-    
+
+
+@app.route('/api/tweet/add', methods=['POST'])
+def api_add_tweet():
+    try:
+        content = request.form['content']
+        photos = request.form.getlist['photos']
+    except KeyError, e:
+        raise APIError(e.message)
+    try:
+        visibility = request.form['visibility']
+    except KeyError:
+        visibility = 0
+    return json.dumps(api.tweets.write_tweet(content, photos, visibility))
+
+
+@app.route('/api/tweet/reply', methods=['POST'])
+def api_reply_post():
+    try:
+        content = request.form['content']
+        target = request.form['target']
+    except KeyError, e:
+        raise APIError(e.message)
+    try:
+        visibility = request.form['visibility']
+    except KeyError:
+        visibility = 0
+    return json.dumps(api.tweets.reply(target, content, visibility))
+
 
 @app.route('/api/common/license', methods=['GET', 'POST'])
 def get_license():

@@ -82,13 +82,16 @@ class Photo(db.Model):
     desc = db.Column('desc', db.Text)
     created_at = db.Column('created_at', db.Float)
 
+Visibility = enum(All=0, FriendsOnly=1, Mutual=2)
 
 class Tweet(db.Model):
     __tablename__ = 'tweets'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     user = db.Column('user', db.Integer, nullable=False)
     content = db.Column('content', db.Text)
+    photos = db.Column('photos', db.Text)
     visibility = db.Column('visibility', db.Integer)
+    read = db.Column('read', db.Boolean)
     created_at = db.Column('created_at', db.Float)
 
 
@@ -99,6 +102,7 @@ class Reply(db.Model):
     target = db.Column('target', db.Integer, nullable=False)
     content = db.Column('content', db.Text)
     visibility = db.Column('visibility', db.Integer)
+    read = db.Column('read', db.Boolean)
     created_at = db.Column('created_at', db.Float)
 
 
@@ -109,6 +113,18 @@ class Message(db.Model):
     target = db.Column('target', db.Integer, nullable=False)
     content = db.Column('content', db.Text)
     visibility = db.Column('visibility', db.Integer)
+    read = db.Column('read', db.Boolean)
+    created_at = db.Column('created_at', db.Float)
+
+
+class MessageReply(db.Model):
+    __tablename__ = 'msgreplies'
+    id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    user = db.Column('user', db.Integer, nullable=False)
+    target = db.Column('target', db.Integer, nullable=False)
+    content = db.Column('content', db.Text)
+    visibility = db.Column('visibility', db.Integer)
+    read = db.Column('read', db.Boolean)
     created_at = db.Column('created_at', db.Float)
 
 
@@ -140,6 +156,7 @@ class Notification(db.Model):
     _from = db.Column('from', db.Integer, nullable=False)
     to = db.Column('to', db.Integer, nullable=False)
     content = db.Column('content', db.Text)
+    read = db.Column('read', db.Boolean)
     created_at = db.Column('created_at', db.Float)
 
 
@@ -149,6 +166,7 @@ class AbuseReport(db.Model):
     _from = db.Column('from', db.Integer, nullable=False)
     target = db.Column('target', db.Integer, nullable=False)
     content = db.Column('content', db.Text)
+    read = db.Column('read', db.Boolean)
     created_at = db.Column('created_at', db.Float)
 
 

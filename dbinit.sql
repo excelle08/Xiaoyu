@@ -71,6 +71,7 @@ create table tweets (
     `user` int(10) not null,
     `content` text,
     `visibility` tinyint(2),
+    `read` boolean,
     `created_at` real
 ) engine=innodb default charset=utf8;
 
@@ -80,6 +81,7 @@ create table replies (
     `target` int(10) not null,
     `content` text,
     `visibility` tinyint(2),
+    `read` boolean,
     `created_at` real
 ) engine=innodb default charset=utf8;
 
@@ -89,9 +91,20 @@ create table messages (
     `target` int(10) not null,
     `content` text,
     `visibility` tinyint(2),
+    `read` boolean,
     `created_at` real
 ) engine=innodb default charset=utf8;
-    
+
+create table msgreplies (
+    `id` int(10) not null primary key auto_increment,
+    `user` int(10) not null,
+    `target` int(10) not null,
+    `content` text,
+    `visibility` tinyint(2),
+    `read` boolean,
+    `created_at` real
+) engine=innodb default charset=utf8;
+
 create table friends (
     `id` int(10) not null primary key auto_increment,
     `user` int(10) not null,
@@ -116,6 +129,7 @@ create table notification (
     `from` int(10) not null,
     `to` int(10) not null,
     `content` text,
+    `read` boolean,
     `created_at` real
 ) engine=innodb default charset=utf8;
 
@@ -124,6 +138,7 @@ create table abuse_report (
     `from` int(10) not null,
     `target` int(10) not null,
     `content` text,
+    `read` boolean,
     `created_at` real
 ) engine=innodb default charset=utf8;
 

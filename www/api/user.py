@@ -121,11 +121,13 @@ def user_logout():
 
 
 def get_online_users(offset=0, limit=10):
-    return User.query.filter_by(online=UserStatus.Online).offset(offset).limit(limit).all()
+    users = User.query.filter_by(online=UserStatus.Online).offset(offset).limit(limit).all()
+    return [ UserMeta.query.filter_by(uid=item.uid).first() for item in users ]
 
 
 def get_recent_logins(offset=0, limit=10):
     return User.query.filter_by(online=UserStatus.Offline).order_by(User.last_login.desc()).offset(offset).limit(limit).all()
+    return [ UserMeta.query.filter_by(uid=item.uid).first() for item in users ]
 
 
 def get_hot_users(offset=0, limit=10):
