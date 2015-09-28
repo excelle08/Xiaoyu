@@ -61,6 +61,69 @@ def api_user_login():
         raise APIError(e.message)
 
 
+@app.route('/api/user/onlines', methods=['GET', 'POST'])
+def api_get_online_users():
+    try:
+        offset = request.args['offset'].strip()
+        limit = request.args['limit'].strip()
+        if limit == 0:
+            limit = 10;
+        return json.dumps(api.user.get_online_users(offset, limit))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/user/hot', methods=['GET', 'POST'])
+def api_get_hot_users():
+    try:
+        offset = request.args['offset'].strip()
+        limit = request.args['limit'].strip()
+        if limit == 0:
+            limit = 10;
+        return json.dumps(api.user.get_hot_users(offset, limit))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/user/recent_login', methods=['GET', 'POST'])
+def api_get_recent_logins():
+    try:
+        offset = request.args['offset'].strip()
+        limit = request.args['limit'].strip()
+        if limit == 0:
+            limit = 10;
+        return json.dumps(api.user.get_recent_logins(offset, limit))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/user', methods=['GET', 'POST'])
+def api_get_user():
+    try:
+        uid = session['uid']
+        return json.dumps(api.user.get_user(uid))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/user/meta', methods=['GET', 'POST'])
+def api_get_user_meta():
+    try:
+        uid = request.args['uid'].strip()
+    except KeyError, e:
+        uid = session['uid']
+    return json.dumps(api.user.get_user_meta(uid))
+
+
+@app.route('/api/user/ext', methods=['GET', 'POST'])
+def api_get_user_ext():
+    try:
+        uid = request.args['uid'].strip()
+    except KeyError, e:
+        uid = session['uid']
+    return json.dumps(api.user.get_user_extension(uid))
+    
+
 @app.route('/api/common/license', methods=['GET', 'POST'])
 def get_license():
     return json.dumps(api.common.get_license())

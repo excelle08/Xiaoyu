@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from model import User, UserPermission, UserStatus, db
-from model import UserSchool, UserMeta, UserExt, Wall, FriendGroup
+from model import UserSchool, UserMeta, UserExt, Wall, FriendGroup, Friend, BlackList, School
+from model import Tweet
 from flask import session
 from api import APIError
 import re, json, requests, random, time
@@ -76,6 +77,10 @@ def user_register(phone, password, vcode):
     db.session.commit()
     del session['vcode']
 
+    # login
+    session['uid'] = user.uid
+    session['phone'] = phone.strip()
+    session['password'] = password.strip().lower()
     return user
 
 
@@ -95,6 +100,7 @@ def user_login(phone, password, remember):
 
     if remember:
         session.permanent = True
+    session['uid'] = user.uid
     session['phone'] = phone.strip()
     session['password'] = password.strip().lower()
     return user
@@ -109,6 +115,105 @@ def user_logout():
         db.session.commit()
         del session['phone']
         del session['password']
+        del session['uid']
     except KeyError, e:
         raise APIError(e.message)
+
+
+def get_online_users(offset=0, limit=10):
+    return User.query.filter_by(online=UserStatus.Online).offset(offset).limit(limit).all()
+
+
+def get_recent_logins(offset=0, limit=10):
+    return User.query.filter_by(online=UserStatus.Offline).order_by(User.last_login.desc()).offset(offset).limit(limit).all()
+
+
+def get_hot_users(offset=0, limit=10):
+    return Wall.query.order_by(Wall.upvotes.desc()).offset(offset).limit(limit).all()
+
+
+def get_user(uid):
+    return User.query.filter_by(uid=uid).first()
+
+
+def get_user_meta(uid):
+    return UserMeta.query.filter_by(uid=uid).first()
+
+
+def get_user_extension(uid):
+    return json.load(UserExt.query.filter_by(uid=uid).first().content)
+
+
+def get_user_friend_groups(uid):
+    return json.load(FriendGroup.query.filter_by(uid=uid).first().content)
+
+
+def get_friends(uid):
+    return Friend.query.filter_by(user=uid).all()
+
+
+def get_blacklist(uid):
+    return BlackList.query.filter_by(user=uid).all()
+
+
+def get_user_school(uid):
+    return UserSchool.query.filter_by(user=uid).first()
+
+
+def set_user_school(uid, school_id, degree, auth_photo):
+    school = UserSchool()
+    s = School.query.filter_by(id=school_id)
+    if not s:
+        raise APIError('指定的学校不存在')
+    school.uid = uid
+    school.school_name = s.name
+    school.degree = degree
+    school.school_id = school_id
+    school.auth_photo = auth_photo
+    school.auth_pass = False
+    db.session.add(school)
+    db.session.commit()
+    return {"status": "OK"}
+
+
+def pass_user_school(uid):
+    school = UserSchool.query.filter_by(uid=uid).first()
+    school.auth_pass = True
+    db.session.commit()
+    return {"status": "OK"}
+
+
+def set_user_meta(uid, **args):
+    try:
+        umeta = UserMeta.query.filter_by(uid=uid).first()
+        for key, value in args:
+            umeta.__dict__[key] = value
+        db.session.commit()
+        return {"status": "OK"}
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+def set_user_ext(uid, **args):
+    uext = UserExt.query.filter_by(uid=uid).first()
+    uext.content = json.dumps(args)
+    db.session.commit()
+    return {"status": "OK"}
+
+
+def set_user_password(uid, prev, new, vcode):
+    try:
+        user = User.query.filter_by(uid=uid).first()
+        if not vcode == session['vcode']:
+            raise APIError('短信验证码错误')
+        if not _MD5.match(new):
+            raise APIError('密码Hash值格式不正确')
+        if not prev.strip().lower() == user.password:
+            raise APIError('原密码错误')
+        user.password = new
+        db.session.commit()
+        user_logout()
+    except KeyError, e:
+        raise APIError(e.message)
+
 

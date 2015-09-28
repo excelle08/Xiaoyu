@@ -23,6 +23,8 @@ class User(db.Model):
     created_at = db.Column('created_at', db.Float, nullable=False)
     last_login = db.Column('last_login', db.Float, nullable=False)
 
+Degree = enum(Unknown=0, Bachelor=1, Master=2, Phd=3)
+
 
 class UserSchool(db.Model):
     __tablename__ = 'user_school'

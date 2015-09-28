@@ -50,6 +50,13 @@ Step 2: Register
 
     * `data.message` - Error message
 
+### Get current online users
+
+- GET/POST: `/api/user/onlines`
+
+- Return value:
+
+
 ## Common information
 
 ### Horoscopes
