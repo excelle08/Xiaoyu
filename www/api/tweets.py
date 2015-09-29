@@ -3,7 +3,7 @@ from model import Visibility
 from model import db
 from flask import session
 from api import APIError
-import json, time
+import json, time, api.friends
 
 
 def write_tweet(content, photos, visibility=Visibility.All):
@@ -32,6 +32,8 @@ def write_tweet(content, photos, visibility=Visibility.All):
 def reply(target_tweet, content, visibility=Visibility.All):
     if not content:
         raise APIError('内容不能为空')
+    if not Tweet.query.filter_by(id=target_tweet).first():
+        raise APIError('指向的说说不存在')
 
     uid = session['uid']
 
@@ -45,3 +47,68 @@ def reply(target_tweet, content, visibility=Visibility.All):
 
     db.session.add(reply)
     db.session.commit()
+
+
+def get_friends_tweets(offset=0, limit=10, later_than=0):
+    current_uid = session['uid']
+    
+    friends = api.friends.get_friends()
+    tweets = [ Tweet.query.filter(user==item.to, created_at>=later_than).all() for item in friends ]
+    res = []
+    for i in tweets:
+        res.extend(i)
+    res.extend(Tweet.query.filter_by(user=current_uid).all())
+    return res[offset: offset+limit].sort(key=lambda tweet: tweet.created_at, reverse=True)
+
+
+def get_users_tweets(uid, offset=0, limit=10, later_than=0):
+    current_uid = session['uid']
+
+    friends = [ friend.to for friend in Friend.query.filter(user==current_uid, agree=True).all() ]
+    tweets = Tweet.query.filter(user==uid, created_at>=later_than).order_by(Tweet.created_at.desc()).all()
+    for item in tweets:
+        if item.visibility == Visibility.FriendsOnly and not uid in friends:
+            tweets.remove(item)
+    return tweets[offset : offset+limit].sort(key=lambda tweet: tweet.created_at, reverse=True)
+
+
+def get_replies(tweet_id, offset=0, limit=10, later_than=0):
+    current_uid = session['uid']
+
+    this_tweet = Tweet.query.filter_by(id=tweet_id).first()
+    replies = Reply.query.filter(target==tweet_id, created_at>=later_than).all()
+    for item in replies:
+        if item.visibility == Visibility.Mutual and ( current_uid != item.user or current_uid != this_tweet.user):
+            replies.remove(item)
+            continue
+    db.session.commit()
+    
+    return replies[offset: limit+offset]
+
+
+def remove_tweet(id):
+    current_uid = session['uid']
+
+    tweet = Tweet.query.filter_by(id=id).first()
+    if not tweet.user == current_uid:
+        raise APIError('您没有权限删除此说说。必须是自己发的才行。')
+    replies = Reply.query.filter_by(target=tweet.id).all()
+    for r in replies:
+        db.session.delete(r)
+    db.session.delete(tweet)
+    db.session.commit()
+
+    return {"id": id}
+
+
+def remove_reply(id):
+    current_uid = session['uid']
+
+    reply = Reply.query.filter_by(id=id).first()
+    tweet = Tweet.query.filter_by(id=reply.target).first()
+    if reply.user == current_uid or tweet.user == current_uid:
+        db.session.delete(reply)
+        db.session.commit()
+    else:
+        raise APIError('您没有权限删除此条回复')
+    return {"id": id}

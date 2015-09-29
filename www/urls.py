@@ -7,7 +7,7 @@ from api import APIError, datetime_filter
 from captcha import generate_captcha
 from config.config import configs
 from model import db
-import api.common, api.user, api.tweets
+import api.common, api.user, api.tweets, api.message
 import json
 
 app = Flask(__name__)
@@ -63,38 +63,23 @@ def api_user_login():
 
 @app.route('/api/user/onlines', methods=['GET', 'POST'])
 def api_get_online_users():
-    try:
-        offset = request.args['offset'].strip()
-        limit = request.args['limit'].strip()
-        if limit == 0:
-            limit = 10;
-        return json.dumps(api.user.get_online_users(offset, limit))
-    except KeyError, e:
-        raise APIError(e.message)
+    offset = request.args['offset'].strip() if 'offset' in request.args else 0
+    limit = request.args['limit'].strip() if 'limit' in request.args else 10
+    return json.dumps(api.user.get_online_users(offset, limit))
 
 
 @app.route('/api/user/hot', methods=['GET', 'POST'])
 def api_get_hot_users():
-    try:
-        offset = request.args['offset'].strip()
-        limit = request.args['limit'].strip()
-        if limit == 0:
-            limit = 10;
-        return json.dumps(api.user.get_hot_users(offset, limit))
-    except KeyError, e:
-        raise APIError(e.message)
+    offset = request.args['offset'].strip() if 'offset' in request.args else 0
+    limit = request.args['limit'].strip() if 'limit' in request.args else 10
+    return json.dumps(api.user.get_hot_users(offset, limit))
 
 
 @app.route('/api/user/recent_login', methods=['GET', 'POST'])
 def api_get_recent_logins():
-    try:
-        offset = request.args['offset'].strip()
-        limit = request.args['limit'].strip()
-        if limit == 0:
-            limit = 10;
-        return json.dumps(api.user.get_recent_logins(offset, limit))
-    except KeyError, e:
-        raise APIError(e.message)
+    offset = request.args['offset'].strip() if 'offset' in request.args else 0
+    limit = request.args['limit'].strip() if 'limit' in request.args else 10
+    return json.dumps(api.user.get_recent_logins(offset, limit))
 
 
 @app.route('/api/user', methods=['GET', 'POST'])
@@ -110,19 +95,13 @@ def api_get_user():
 
 @app.route('/api/user/meta', methods=['GET', 'POST'])
 def api_get_user_meta():
-    try:
-        uid = request.args['uid'].strip()
-    except KeyError, e:
-        uid = session['uid']
+    uid = request.args['uid'].strip() if "uid" in request.args else session['uid']
     return json.dumps(api.user.get_user_meta(uid))
 
 
 @app.route('/api/user/ext', methods=['GET', 'POST'])
 def api_get_user_ext():
-    try:
-        uid = request.args['uid'].strip()
-    except KeyError, e:
-        uid = session['uid']
+    uid = request.args['uid'].strip() if "uid" in request.args else session['uid']
     return json.dumps(api.user.get_user_extension(uid))
 
 
@@ -133,10 +112,7 @@ def api_add_tweet():
         photos = request.form.getlist['photos']
     except KeyError, e:
         raise APIError(e.message)
-    try:
-        visibility = request.form['visibility']
-    except KeyError:
-        visibility = 0
+    visibility = request.form['visibility'] if 'visibility' in request.form else 0
     return json.dumps(api.tweets.write_tweet(content, photos, visibility))
 
 
@@ -147,11 +123,132 @@ def api_reply_post():
         target = request.form['target']
     except KeyError, e:
         raise APIError(e.message)
-    try:
-        visibility = request.form['visibility']
-    except KeyError:
-        visibility = 0
+    visibility = request.form['visibility'] if 'visibility' in request.form else 0
     return json.dumps(api.tweets.reply(target, content, visibility))
+
+
+@app.route('/api/tweet/getall', methods=['GET', 'POST'])
+def api_get_friends_tweets():
+    offset = request.args['offset'].strip() if 'offset' in request.args else 0
+    limit = request.args['limit'].strip() if 'limit' in request.args else 10
+    later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
+    return json.dumps(api.tweets.get_friends_tweets(offset, limit, later_than))
+
+
+@app.route('/api/tweet/user', methods=['GET', 'POST'])
+def api_get_ones_tweets():
+    try:
+        uid = request.args['uid']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    offset = request.args['offset'].strip() if 'offset' in request.args else 0
+    limit = request.args['limit'].strip() if 'limit' in request.args else 10
+    later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
+    return json.dumps(api.tweets.get_users_tweets(uid, offset, limit, later_than))
+
+
+@app.route('/api/tweet/reply', methods=['POST'])
+def api_reply_tweet():
+    try:
+        target_tweet_id = request.form['id'].strip()
+        content = request.form['content'].strip()
+        visibility = request.form['visibility'].strip() if 'visibility' in request.form else 0
+        return json.dumps(api.tweets.reply(target_tweet_id, content, visibility))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/tweet/reply/get', methods=['GET', 'POST'])
+def api_reply_get():
+    try:
+        tweet_id = request.args['id'].strip()
+    except KeyError, e:
+        raise APIError(e.message)
+    offset = request.args['offset'].strip() if 'offset' in request.args else 0
+    limit = request.args['limit'].strip() if 'limit' in request.args else 10
+    later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
+    return json.dumps(api.tweets.get_replies(tweet_id, offset, limit, later_than))
+
+
+@app.route('/api/tweet/delete', methods=['GET', 'POST'])
+def api_tweet_delete():
+    try:
+        tweet_id = request.args['id'].strip()
+        return json.dumps(api.tweets.remove_tweet(tweet_id))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/tweet/reply/delete', methods=['GET', 'POST'])
+def api_reply_delete():
+    try:
+        reply_id = request.args['id'].strip()
+        return json.dumps(api.tweets.remove_reply(reply_id))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/message/add', methods=['POST'])
+def api_message_add():
+    try:
+        target_uid = request.form['uid']
+        content = request.form['content']
+        visibility = request.form['visibility'] if 'visibility' in request.form else 0
+        return json.dumps(api.message.leave_message(target_uid, content, visibility))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/message/reply/add', methods=['POST'])
+def api_message_reply():
+    try:
+        message_id = request.form['id']
+        content = request.form['content'] 
+        visibility = request.form['visibility'] if 'visibility' in request.form else 0
+        return json.dumps(api.message.reply_message(message_id, content, visibility))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/message/get', methods=['GET', 'POST'])
+def api_message_get():
+    uid = request.args['uid'].strip() if 'uid' in request.args else session['uid']
+    offset = request.args['offset'].strip() if 'offset' in request.args else 0
+    limit = request.args['limit'].strip() if 'limit' in request.args else 10
+    later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
+    return json.dumps(api.message.get_messages(uid, offset, limit, later_than))
+
+
+@app.route('/api/message/reply/get', methods=['GET', 'POST'])
+def api_message_reply_get():
+    try:
+        message_id = request.form['id']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    offset = request.args['offset'].strip() if 'offset' in request.args else 0
+    limit = request.args['limit'].strip() if 'limit' in request.args else 10
+    later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
+    return json.dumps(api.message.get_replies(message_id, offset, limit, later_than))
+
+
+@app.route('/api/message/delete', methods=['GET', 'POST'])
+def api_message_delete():
+    try:
+        message_id = request.form['id']
+        return json.dumps(api.message.remove_message(message_id))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/message/reply/delete', methods=['GET', 'POST'])
+def api_message_Reply_delete():
+    try:
+        reply_id = request.form['id']
+        return json.dumps(api.message.remove_reply(reply_id))
+    except KeyError, e:
+        raise APIError(e.message)
 
 
 @app.route('/api/common/license', methods=['GET', 'POST'])

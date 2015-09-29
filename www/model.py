@@ -134,7 +134,7 @@ class Friend(db.Model):
     user = db.Column('user', db.Integer, nullable=False)
     to = db.Column('to', db.Integer, nullable=False)
     group = db.Column('group', db.Integer)
-    agree = db.Column('agree', db.Integer)
+    agree = db.Column('agree', db.Boolean)
 
 
 class FriendGroup(db.Model):

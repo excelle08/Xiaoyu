@@ -110,7 +110,7 @@ create table friends (
     `user` int(10) not null,
     `to` int(10) not null,
     `group` tinyint(2),
-    `agree` tinyint(2)
+    `agree` boolean
 ) engine=innodb default charset=utf8;
 # A json array.
 create table friend_group (
