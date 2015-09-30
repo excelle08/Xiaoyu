@@ -7,7 +7,8 @@ from api import APIError, datetime_filter
 from captcha import generate_captcha
 from config.config import configs
 from model import db
-import api.common, api.user, api.tweets, api.message
+import api.common, api.user, api.tweets, api.message, api.friends
+import api.photo, api.album 
 import json
 
 app = Flask(__name__)
@@ -105,6 +106,95 @@ def api_get_user_ext():
     return json.dumps(api.user.get_user_extension(uid))
 
 
+@app.route('/api/user/friends/add', methods=['GET', 'POST'])
+def api_add_friend():
+    try:
+        target = request.args['target'].strip()
+        group = request.args['group'].strip() if 'group' in request.args else 0
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return json.dumps(api.friends.add_friends(target, group))
+
+@app.route('/api/user/friends', methods=['GET', 'POST'])
+def api_get_friends():
+    return json.dumps(api.friends.get_friends())
+
+
+@app.route('/api/user/friends/groups', methods=['GET', 'POST'])
+def api_get_friends_group():
+    return json.dumps(api.friends.get_friend_groups())
+
+
+@app.route('/api/user/friends/groups/add', methods=['GET', 'POST'])
+def api_add_friends_group():
+    try:
+        title = request.args['title'].strip()
+        return json.dumps(api.friends.add_friend_group(title))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/user/friends/groups/delete', methods=['GET', 'POST'])
+def api_delete_friends_group():
+    try:
+        g_id = request.args['id'].strip()
+        return json.dumps(api.friends.delete_friend_group(g_id))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/user/friends/groups/modify', methods=['GET', 'POST'])
+def api_modify_friend_group():
+    try:
+        g_id = request.args['id'].strip()
+        title = request.args['title'].strip()
+        return json.dumps(api.friends.rename_friend_group(g_id, title))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/user/friends/agree', methods=['GET', 'POST'])
+def api_agree_friends_request():
+    try:
+        req_id = request.args['req_id'].strip()
+        group = request.args['group'] if 'group' in request.args else 0
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return json.dumps(api.friends.agree_friend(req_id, group))
+
+
+@app.route('/api/user/friends/delete', methods=['GET', 'POST'])
+def api_delete_friend():
+    try:
+        uid = request.args['uid'].strip()
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return json.dumps(api.friends.delete_friend(uid))
+
+
+@app.route('/api/user/blacklist/add', methods=['GET', 'POST'])
+def api_add_to_blacklist():
+    try:
+        uid = request.args['uid'].strip()
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return json.dumps(api.friends.add_to_blacklist(uid))
+
+
+@app.route('/api/user/blacklist/delete', methods=['GET', 'POST'])
+def api_delete_from_blacklist():
+    try:
+        uid = request.args['uid'].strip()
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return json.dumps(api.friends.remove_from_blacklist(uid))
+
+
 @app.route('/api/tweet/add', methods=['POST'])
 def api_add_tweet():
     try:
@@ -114,17 +204,6 @@ def api_add_tweet():
         raise APIError(e.message)
     visibility = request.form['visibility'] if 'visibility' in request.form else 0
     return json.dumps(api.tweets.write_tweet(content, photos, visibility))
-
-
-@app.route('/api/tweet/reply', methods=['POST'])
-def api_reply_post():
-    try:
-        content = request.form['content']
-        target = request.form['target']
-    except KeyError, e:
-        raise APIError(e.message)
-    visibility = request.form['visibility'] if 'visibility' in request.form else 0
-    return json.dumps(api.tweets.reply(target, content, visibility))
 
 
 @app.route('/api/tweet/getall', methods=['GET', 'POST'])
@@ -185,6 +264,41 @@ def api_reply_delete():
     try:
         reply_id = request.args['id'].strip()
         return json.dumps(api.tweets.remove_reply(reply_id))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/photo/upload', methods=['POST'])
+def api_upload_photo():
+    try:
+        photo = request.files['photo']
+        url = api.photo.upload_photo(photo, request.args)
+        return json.dumps({'url': url})
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/album/upload', methods['POST'])
+def api_upload_to_album():
+    try:
+        photo = request.files['photo']
+        desc = request.form['desc'] if 'desc' in request.form else ''
+        return json.dumps(api.album.upload_photo(photo, desc, request.args))
+    except KeyError, e:
+        raise APIError(e.message)
+
+
+@app.route('/api/album/get', methods=['GET', 'POST'])
+def api_get_album_photos():
+    uid = request.args['uid'] if 'uid' in request.args else session['uid']
+    return json.dumps(api.album.get_all_photos(uid))
+
+
+@app.route('/api/album/delete', methods=['GET', 'POST'])
+def api_remove_photo():
+    try:
+        photo_id = request.args['id'].strip()
+        return json.dumps(api.album.remove_photo(photo_id))
     except KeyError, e:
         raise APIError(e.message)
 

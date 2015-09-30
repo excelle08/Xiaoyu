@@ -7,9 +7,52 @@ import json
 def get_friend_groups():
     uid = session['uid']
     group = FriendGroup.query.filter_by(user=uid).first()
-    group = json.load(group.content())
+    group = json.load(group.content)
     return group
 
+
+def add_friend_group(title):
+    uid = session['uid']
+    group = FriendGroup.query.filter_by(user=uid).first()
+    groups = json.load(group.content)
+    groups.append(titie)
+
+    group.content = json.dumps(groups)
+    db.session.commit()
+    return group
+
+
+def delete_friend_group(id):
+    uid = session['uid']
+
+    if id == 0:
+        raise APIError('好友组不能删除')
+
+    friends = Friend.query.filter(user==uid, group==id).all()
+    for i in friends:
+        i.groups = 0
+    db.session.commit()
+
+    group = FriendGroup.query.filter_by(user=uid).first()
+    groups = json.load(group.content)
+    groups.pop(id)
+    group.content = json.dumps(groups)
+
+    db.session.commit()
+    return group
+
+
+def rename_friend_group(id, title):
+    uid = session['uid']
+
+    group = FriendGroup.query.filter(user==uid).first()
+    groups = json.load(group.content)
+    groups[id] = title
+    group.content = json.dumps(groups)
+
+    db.session.commit()
+    return group
+    
 
 def get_friends():
     uid = session['uid']
@@ -21,7 +64,7 @@ def add_friends(target_id, group_id):
     if not User.query.filter_by(uid=target_id).first():
         raise APIError('目标用户不存在')
 
-    if Friend.query.filter(user=u=id, to==target_id).first():
+    if Friend.query.filter(user==uid, to==target_id).first():
         raise APIError('此人已经是好友')
 
     friend = Friend()
@@ -92,3 +135,12 @@ def remove_from_blacklist(target_id):
     db.session.delete(blacklist)
     db.session.commit()
     return {"id": b_id}
+
+
+def am_i_friend(whose):
+    return True if Friend.query.filter(user==whose, to==session['uid']).first() else False
+
+
+def am_i_blocked(whose):
+    return True if BlackList.query.filter(user==whose, to==session['uid']).first() else False
+

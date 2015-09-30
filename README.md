@@ -123,9 +123,9 @@ Step 2: Register
 
 ### User-array related operations
 
-This section shows some user-related APIs that will return an array of data. For these APIs you are supposed to specify these two paramaters via GET method in other to limit the offset and numbers of elements:
+This section shows some user-related APIs that will return an array of data. For these APIs you may specify these two paramaters via GET method in other to limit the offset and numbers of elements:
 
-    * `offset` - Offset. Specify 0 to get data from the beginning.
+    * `offset` - Offset. Specify 0 to get data from the beginning. Defaults to 0.
     * `limit` - Limit. Specify 0 to get 10 elements.
 
 #### Get online users
@@ -171,6 +171,219 @@ This section shows some user-related APIs that will return an array of data. For
     * `visibility` Integer value that represents visibility of this reply.
 
 - Return value: The Reply object.
+
+### Get tweets of my friends (including mine)
+
+- GET/POST: `api/tweet/getall`
+
+- Data:
+
+    * `offset` Offset / Start from. Optional, and defaults to 0.
+    * `limit` The number of tweets to return. Optional, and defaults to 0.
+    * `later_than` **Timestamp** of the earliest tweet to get. In other words, all returned tweets are created later than this time. Optional, and defaults to 0.
+
+- Return value: An array of Tweet objects
+
+### Get tweets of someone
+
+- GET/POST: `/api/tweet/user`
+
+- Data:
+
+    * `uid` The UID of the user.
+    * `offset` Offset / Start from. Optional, and defaults to 0.
+    * `limit` The number of tweets to return. Optional, and defaults to 0.
+    * `later_than` **Timestamp** of the earliest tweet to get. In other words, all returned tweets are created later than this time. Optional, and defaults to 0.
+
+- Return value: An array of his/her Tweet objects
+
+### Get replies of a tweet
+
+- GET/POST: `/api/tweet/reply/get`
+
+- Data:
+
+    * `id` The ID of the tweet
+    * `offset` Offset / Start from. Optional, and defaults to 0.
+    * `limit` The number of tweets to return. Optional, and defaults to 0.
+    * `later_than` **Timestamp** of the earliest tweet to get. In other words, all returned tweets are created later than this time. Optional, and defaults to 0.
+
+- Return value: An array of Reply objects that points to the tweet.
+
+### Delete a tweet
+
+- GET/POST: `/api/tweet/delete`
+
+- Data:
+
+    * `id` The ID of the tweet
+
+- Return value: `data.id` - ID.
+
+- NOTE: You must be the owner of the tweet to delete. After deletion all related replies will be deleted.
+
+### Delete a reply.
+
+- GET/POST: `/api/tweet/reply/delete`
+
+- Data:
+
+    * `id` The ID of the reply
+
+- Return value: `data.id` - ID
+
+- NOTE: You must be the owner of the reply, or owner of the tweet that the reply belongs to, to delete.
+
+## User relationships (Friends, blacklists)
+
+### Add a friend
+
+- GET/POST: `/api/user/friends/add`
+
+- Data:
+    
+    * `target` Target user ID.
+    * `group` The ID of the group to which you want to add the friend. If not specified then this value would be 0 (Means regular friends)
+
+- Return value: The Friend object
+
+### Get all my friends
+
+- GET/POST: `/api/user/friends`
+
+- Return value: An array of all my accepted friends.
+
+### Agree a friend-adding request
+
+- GET/POST: `/api/user/friends/agree`
+
+- Data:
+
+    * `req_id` The friend-adding request ID
+    * `group` The ID of group to which you want add the friend if you agree. Defaults to 0.
+
+- Return value: The Friend object.
+
+### Delete a friend
+
+- GET/POST: `/api/user/friends/delete`
+
+- Data:
+    
+    * `uid` The UID of the friend you want to remove
+
+- Return value: `data.id` - The UID.
+
+### Get my friend groups
+
+- GET/POST: `/api/user/friends/groups`
+
+- Return value: The array of all friend groups
+
+- NOTE: The **index** of each group is very important, which serves as an identifer of the group.
+
+### Add a friend group
+
+- GET/POST: `/api/user/friends/groups/add`
+
+- Data:
+        
+    * `title` - The title/name of the friend group
+
+- Return value: The array of all friend groups
+
+### Rename a friend group
+
+- GET/POST: `/api/user/friends/groups/modify`
+
+- Data:
+    
+    * `title` - The new title
+    * `id` - The ID of the group to be modified
+
+- Return value: The array of all friend groups
+
+### Delete a friend group
+
+- GET/POST: `/api/user/friends/groups/delete`
+
+- Data:
+
+    * `id` The ID of the group to be deleted
+
+- Return value: The array of all friend groups
+
+- NOTE: 
+    
+    * `id` CANNOT be zero, which points to the default friend group.
+    * After deletion all friends belonging to this group will be moved to the **zeroth** default group.
+
+## Photos and album
+
+### Upload a photo
+
+- POST: `/api/photo/upload`
+
+- Data:
+
+    * `photo` The photo file. Accepts only JPEG, GIF, PNG and TIFF formats.
+    * Optional paramaters regarding to cropping and resizing:
+        * `crop_left`, `crop_up`, `crop_right`, `crop_down` - Defines a 4-tuple defining the left, upper, right, and lower pixel coordinate to be cropped.
+        * `resize_x`, `resize_y` - Width and height of resized image.
+
+- Return value: The URL of saved photo.
+
+- NOTE: This is a low-level API that only do the saving operation. You may need this API to upload a user's avatar, but remember that this does not insert to your album.
+
+### Upload to album
+
+- POST: `/api/album/upload`
+
+- Data:
+
+    * `photo` The photo file. Accepts only JPEG, GIF, PNG and TIFF formats.
+    * `desc` Description of the photo
+    * Optional paramaters regarding to cropping and resizing:
+        * `crop_left`, `crop_up`, `crop_right`, `crop_down` - Defines a 4-tuple defining the left, upper, right, and lower pixel coordinate to be cropped.
+        * `resize_x`, `resize_y` - Width and height of resized image.
+
+- Return value: The Photo object
+
+### Get all photos
+
+- POST: `/api/album/get`
+
+- Data: 
+
+    * `uid` The UID of the user. If not specified, defaults to the current logged in user.
+
+- Return value: The array of Photo objects beloging to the user.
+
+### Delete a photo
+
+- POST: `/api/album/delete`
+
+- Data: 
+
+    * `id` The ID of the photo to be deleted.
+
+- Return value: `data.id` ID
+
+- NOTE: You must be the owner to delete.
+
+## Messages
+
+### Leave a message
+
+### Reply to a message
+
+### Get messages
+
+### Get replies of a message
+
+### Delete a message
+
+### Delete a reply
 
 ## Common information
 

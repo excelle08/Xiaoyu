@@ -67,7 +67,7 @@ def user_register(phone, password, vcode):
 
     fgroup = FriendGroup()
     fgroup.uid = user.uid
-    fgroup.content = json.dumps({'1': '好友', '2': '密友'})
+    fgroup.content = json.dumps(['好友', '密友'])
 
     db.session.add(school)
     db.session.add(meta)
