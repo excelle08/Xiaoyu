@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN" ng-app="login">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>login</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/login.css" rel="stylesheet">
+    <script src="js/jq.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-cookies.min.js"></script>
+  </head>
+  <body ng-controller="myController">
+    <div class="login-logo"></div>
+    <form class="b_flame" method="post" ng-submit="submitForm(myForm.$valid)" name="myForm" novalidate>
+        <input type="number" class="flame_disp" name="phone" placeholder="  手机号:" required ng-model="tel" ng-minlength='11' ng-maxlength='11'/>
+        <span ng-show="myForm.tel.$dirty && myForm.tel.$valid"></span>
+        <input type="password" class="flame_disp" name="password" placeholder="  密码:最小长度为8" required ng-minlength='8' ng-model="pass"/>
+        <br><span ng-show="myForm.password.$dirty && myForm.password.$valid"></span>
+      <input type="submit" class="btn btn-default form-control flame_disp" id="submit" ng-disabled="myForm.tel.$invalid || myForm.password.$invalid" style="background:#777;" value="登录">
+    </form>
+    <div style="padding:0 10px;"><button type="submit" class="btn btn-default form-control flame_disp reg" style="background:#999;">注册</button></div>
+    <a class="forget">忘记密码</a>
+  </body>
+  <script type="text/javascript">
+    $(".reg").click(function(){
+      window.location = "reg.html";
+    });
+    var myApp = angular.module('login', ['ngCookies'])
+    myApp.controller('myController', function($scope) {
+      $scope.submitForm = function(isValid) {
+            if (!isValid) {
+                alert('请注意格式');
+            }
+        };
+      }
+    );
+
+    $("#submit").click(function(){
+      $(".b_flame").submit(function(){
+        $.ajax({
+          url: "/api/login",
+          data: $(".b_flame").serialize(),
+          dataType: "application/json",
+          error: function(data){
+            alert(data.message);
+          },
+          success: function(data){
+            alert("登录成功");
+            myApp.controller('cookiescontroller',['cookieStore',function($cookieStore){
+              $cookieStore.put("UID",data.uid);
+            }]);
+            setTimeout(function(){ window.location = "index.html";}, 2000);
+          }
+        });
+      });
+    });
+  </script>
+</html>

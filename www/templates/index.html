@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>index</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/index.css" rel="stylesheet">
+    <script src="js/jq.js"></script>
+    <script src="js/index.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
+      <div class="container row" style="">
+        <div class="col-xs-2 col-md-2" style="padding:0;">
+          <img src="img/test.jpg" class="headicon" ><div class="circle"></div>
+        </div>
+        <div class="col-xs-8 col-md-8" style="text-align:center;">
+          <span class="index_kind">首页</span>
+        </div>
+        <div class="col-xs-2 col-md-2" style="padding:0;">
+          <div class="choose">筛选</div>
+        </div>
+      </div>
+    </nav>
+    <div class="alert" style="height:20px;">最近被<span id="z"></span>人赞过</div>
+    <div class="menu">
+      <div class="b_switch">
+        <div class="switchon">开启</div>
+        <div class="switchoff">关闭</div>
+      </div>
+      <table class="c_">
+        <tr>
+          <td class="td_left">选择学校▼</td><td class="td_right">选择专业▼</td>
+        </tr>
+        <tr>
+          <td class="td_left">选择学历▼</td><td class="td_right">选择身高▼</td>
+        </tr>
+        <tr>
+          <td class="td_left">选择家乡▼</td><td class="td_right">准备工作地▼</td>
+        </tr>
+        <tr>
+          <td class="td_left">选择年龄▼</td><td class="td_right">认证状态▼</td>
+        </tr>
+        <tr>
+          <td class="td_left">星座▼</td><td class="td_right">最近活跃▼</td>
+        </tr>
+      </table>
+      <div class="b_switch2" style="margin-top:15px;">
+        <div class="cancel">取消</div>
+        <div class="verify">确认</div>
+      </div>
+    </div>
+    <div class="friends">
+      <div class="wall">
+        <div class="wall_nav">
+          <span style="float:left;">嘉宾墙</span>
+          <span class="wall_more">></span>
+        </div>
+        <div class="wall_pic">
+          <img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg">
+        </div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="main_nav row" style="margin-right:0;padding-right:0;">
+        <div class="col-xs-4 col-md-4 col1">在线用户♂♀</div>
+        <div class="col-xs-4 col-md-4 col2">最近登录</div>
+        <div class="col-xs-4 col-md-4 col3">周热门</div>
+      </div>
+      <div class="now male">
+
+      </div>
+      <div class="now female">
+
+      </div>
+      <div class="near">
+
+      </div>
+      <div class="weak-hot">
+
+      </div>
+    </div>
+  </body>
+  <script>
+  $(".choose").click(function(){
+      if(!$(this).hasClass("c_active")){
+          $(this).addClass("c_active");
+          $(".menu").slideDown();
+        }
+      else{
+        $(this).removeClass("c_active");
+        $(".menu").slideUp();
+      }
+  });
+  $(".switchon").click(function(){
+    $(this).addClass("s_active");
+    $(".switchoff").removeClass("s_active");
+  });
+  $(".switchoff").click(function(){
+    $(this).addClass("s_active");
+    $(".switchon").removeClass("s_active");
+  });
+  $(".cancel").click(function(){
+    $(".menu").slideUp();
+  });
+  $(".verify").click(function(){
+    $(".menu").slideUp();
+  });
+  var alert_h = $(".navbar").height();
+  var alert_t = (alert_h - $(".choose").height())/2;
+  $(".choose").css("margin-top",alert_t);
+  $(".alert").css("top",alert_h);
+  $(".menu").css("top",alert_h);
+  var line_h = $(".wall_pic").height();
+  $(".wall_pic img").css("margin-top",(line_h-40)/2);
+  var main_nav_w = $(".main_nav").width();
+  $(".main_nav").css("width",main_nav_w+20);
+  $(".col1").click(function(){
+    $(".col2,.col3").css("background","#ccc");
+    $(this).css("background","#fff");
+  });
+  $(".col2").click(function(){
+    $(".col1,.col3").css("background","#ccc");
+    $(this).css("background","#fff");
+    $(".now,.weak-hot").hide();
+    $(".near").show();
+  });
+  $(".col3").click(function(){
+    $(".col2,.col1").css("background","#ccc");
+    $(this).css("background","#fff");
+    $(".now,.near").hide();
+    $(".weak-hot").show();
+  });
+  var c_left = parseInt($(".headicon").css("margin-left")) + 33;
+  alert(c_left);
+  $(".circle").css("left",c_left);
+  </script>
+</html>

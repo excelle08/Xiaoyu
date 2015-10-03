@@ -1,0 +1,66 @@
+html,body{
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+.welcome{
+  height: 25%;
+  width: 100%;
+  background: #000;
+  margin-bottom: 20px;
+  float: left;
+}
+.reg_f1{
+  width: 90%;
+  height:40px;
+  float: left;
+  margin-left: 5%;
+  margin-bottom: 15px;
+}
+.reg-form{
+  width: 100%;
+  height: auto;
+  float: left;
+}
+.reg_f2{
+  width: 47%;
+  height: 40px;
+  margin-left: 5%;
+  margin-bottom: 15px;
+  float: left;
+}
+.check{
+  width: 40%;
+  height: 45px;
+  margin-left:3%;
+  float: left;
+}
+.reg_f3{
+  margin-left: 5%;
+  float: left;
+}
+.reg_f4{
+  vertical-align: bottom;
+  float: left;
+}
+.reg_f5{
+  margin-right: 5%;
+  float: right;
+  vertical-align: bottom;
+}
+.reg_{
+  margin-left: 5%;
+  width: 90%;
+  margin-top: 20px;
+  height: 45px;
+  background: #999;
+  border: 0;
+  float: left;
+}
+.tready{
+  width: 90%;
+  margin-left: 5%;
+  word-wrap:break-word;
+  margin-top: 5px;
+  display: none;
+}

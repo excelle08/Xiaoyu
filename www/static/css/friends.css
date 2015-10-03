@@ -1,0 +1,130 @@
+html,body{
+  background: #ddd;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+ul{
+  list-style-type: none;
+  padding: 0;
+}
+ul li{
+  float: left;
+  margin: 0;
+  width: 100%;
+  height: auto;
+}
+.back{
+  margin: auto;
+  float:left;
+  font-size: 30px;
+  margin-top:4px;
+  margin-left: 20%;
+}
+.index_kind{
+  font-size: 24px;
+  margin: auto;
+  line-height: 2;
+}
+.fri_nav{
+  width: 100%;
+  height: 2em;
+  background: #fff;
+  text-align: center;
+  font-size: 1.5em;
+  line-height: 2em;
+  color: #888;
+}
+.fn_active{
+  background: #555;
+  color: white;
+}
+.group{
+  width: 100%;
+  height: 2em;
+  padding: 3px;
+  font-size: 1em;
+}
+.user{
+  width: 100%;
+  height: auto;
+}
+.user_infor{
+  width: 100%;
+  height: 4.5em;
+  background: #fff;
+}
+.userhead{
+  margin: 0.5em;
+  width: 3.5em;
+  height: 3.5em;
+  border-radius: 100px;
+}
+.username{
+  vertical-align: middle;
+  font-size: 1.3em;
+}
+.user_oper{
+  width: 100%;
+  height: 2em;
+  background: #aaa;
+  text-align: center;
+  font-size: 1.3em;
+  line-height: 2em;
+  display: none;
+}
+.f_trans{
+  border-right:1px solid #666;padding:0;
+}
+.f_index{
+  border-right:1px solid #666;padding:0;
+}
+.chats_list{
+  display: none;
+}
+.chat_{
+  width: 100%;
+  height: auto;
+  font-size: 1em;
+}
+.chat_main{
+  height: 4.5em;
+  width: 100%;
+  background: #fff;
+}
+.chat_user_head{
+  float: left;
+  width: 3.5em;
+  height: 3.5em;
+  border-radius: 100px;
+  margin: 0.5em;
+}
+.chat_time{
+  float: right;
+  font-size: 1em;
+  margin-top: 0.5em;
+}
+.chat_con{
+  width: 60%;
+  height: auto;
+  font-size: 1.3em;
+  vertical-align: middle;
+  float: left;
+  margin-top: 0.5em;
+}
+.chat_content{
+  overflow: hidden;
+  height: 1.5em;
+}
+.chat_oper{
+  width: 100%;
+  height: 2em;
+  background: #aaa;
+  text-align: center;
+  line-height: 2em;
+  font-size: 1.2em;
+  display: none;
+}
+.c_index{
+  border-right:1px solid #666;padding:0;
+}

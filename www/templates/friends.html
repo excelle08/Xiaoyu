@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>index</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/friends.css" rel="stylesheet">
+    <script src="js/jq.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
+      <div class="container row">
+        <div class="col-xs-2 col-md-2" style="padding:0;">
+          <span class="back" ><</span>
+        </div>
+        <div class="col-xs-8 col-md-8" style="text-align:center;">
+          <span class="index_kind">TA的主页</span>
+        </div>
+      </div>
+    </nav>
+    <div class="fri_nav">
+      <div class="col-xs-6 chat_list" style="border-right:1px solid #666;">聊天</div>
+      <div class="col-xs-6 fn_active f_list">好友</div>
+    </div>
+    <ul class="friends_list">
+      <li>
+        <div class="group">a</div>
+        <div class="user">
+          <div class="user_infor">
+            <img src="img/test.jpg" class="userhead">
+            <span class="username"><b>奥莉薇拉</b>♀21</span>
+          </div>
+          <div class="user_oper">
+            <div class="col-xs-4" style="border-right:1px solid #666;padding:0;">转分组</div>
+            <div class="col-xs-4" style="border-right:1px solid #666;padding:0;">Ta的主页</div>
+            <div class="col-xs-4" style="border-right:1px solid #666;padding:0;">删除</div>
+          </div>
+        </div>
+        <div class="user">
+          <div class="user_infor">
+            <img src="img/test.jpg" class="userhead">
+            <span class="username"><b>奥莉薇拉</b>♀21</span>
+          </div>
+          <div class="user_oper">
+            <div class="col-xs-4" style="border-right:1px solid #666;padding:0;">转分组</div>
+            <div class="col-xs-4" style="border-right:1px solid #666;padding:0;">Ta的主页</div>
+            <div class="col-xs-4" style="border-right:1px solid #666;padding:0;">删除</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="group">b</div>
+        <div class="user">
+          <div class="user_infor">
+            <img src="img/test.jpg" class="userhead">
+            <span class="username"><b>奥莉薇拉</b>♀21</span>
+          </div>
+          <div class="user_oper">
+            <div class="col-xs-4 f_trans">转分组</div>
+            <div class="col-xs-4 f_index">Ta的主页</div>
+            <div class="col-xs-4 f_delete">删除</div>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <ul class="chats_list">
+      <li>
+        <div class="chat_">
+          <div class="chat_main">
+            <img src="img/test.jpg" class="chat_user_head">
+            <div class="chat_con">
+              <div class="chat_user"><b>奥莉薇拉</b>♀21</div>
+              <div class="chat_content">奥莉薇拉奥莉薇拉奥莉薇拉奥莉薇拉奥莉薇拉奥莉薇拉奥莉薇拉奥莉薇拉奥莉薇拉奥莉薇拉</div>
+            </div>
+            <div class="chat_time">1分钟前</div>
+          </div>
+          <div class="chat_oper">
+            <div class="col-xs-6 c_index">Ta的主页</div>
+            <div class="col-xs-6 c_delete">删除</div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </body>
+  <script>
+  var alert_h = $(".navbar").height();
+  var alert_t = (alert_h - $(".choose").height())/2;
+  $(".choose").css("margin-top",alert_t);
+  $(".fri_nav").css("margin-top",alert_h);
+  $(".chat_list").click(function(){
+    $(".f_list").removeClass("fn_active");
+    $(this).addClass("fn_active");
+    $(".chats_list").fadeIn();
+    $(".friends_list").hide();
+  });
+  $(".f_list").click(function(){
+    $(".chat_list").removeClass("fn_active");
+    $(this).addClass("fn_active");
+    $(".chats_list").hide();
+    $(".friends_list").fadeIn();
+  });
+  $(".user_infor").click(function(){
+    $(this).next().slideToggle();
+  })
+  $(".chat_main").click(function(){
+    $(this).next().slideToggle();
+  })
+  </script>
+</html>

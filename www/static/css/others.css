@@ -1,0 +1,253 @@
+html,body{
+  background: #ddd;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  color: #777;
+}
+.back{
+  margin: auto;
+  float:left;
+  font-size: 30px;
+  margin-top:4px;
+  margin-left: 20%;
+}
+.choose{
+  width: 50px;
+  height: 22px;
+  font-size: 18px;
+  background: #888;
+  float: right;
+  color:white;
+  text-align: center;
+  line-height: 22px;
+  margin-right: 5%;
+}
+.control{
+  position: absolute;
+  right: 0;
+  float: right;
+  width: 40%;
+  height: 200px;
+  background: rgba(200,200,200,0.5);
+  font-size: 1.5em;
+  color: white;
+  text-align: center;
+  display: none;
+}
+.control div{
+  margin: 0.3em 0.5em;
+  padding: 0.2em;
+  background: #555;
+  text-align: center;
+}
+.c_active{
+  background: #07a;
+}
+.index_kind{
+  font-size: 24px;
+  margin: auto;
+  line-height: 2;
+}
+.main{
+  width: 100%;
+  height: auto;
+  border: 1px solid #999;
+  background: #fff;
+  overflow: hidden;
+  zoom:1;
+  border-bottom: 5px solid #ccc;
+}
+.other_head{
+  width: 30%;
+  height: auto;
+  float: left;
+}
+.head{
+  width: 70%;
+  margin: 15%;
+  border-radius: 100px;
+  height: auto;
+}
+.dz{
+  width: 50%;
+  margin-left: 25%;
+  text-align: center;
+  font-size: 18px;
+  height: auto;
+  color: #000;
+}
+.dz img{
+  width: 90%;
+}
+.other_intro{
+  height: 100%;
+  width: 70%;
+  float: left;
+}
+.user{
+  margin-top: 5%;
+  height: auto;
+  float: left;
+  width: 100%;
+}
+.user_name{
+  font-size: 1.5em;
+  float: left;
+}
+.user_check{
+  font-size: 1.3em;
+  float: right;
+  color: #000;
+}
+.tags{
+  width: 100%;
+  float: left;
+}
+.tags ul{
+  list-style-type: none;
+  padding: 0;
+}
+.tags ul li{
+  float: left;
+  margin: 0;
+  padding: 2px;
+  background: #ccc;
+  color: white;
+  font-size: 16px;
+  margin-right: 0.5em;
+  margin-bottom: 0.3em;
+}
+.motto{
+  width: 100%;
+  height: auto;
+  font-size: 20px;
+  float: left;
+}
+.heads{
+  width: 100%;
+  min-height: 4em;
+  float: left;
+  padding: 1em 1em 0 1em;
+}
+.heads img{
+  width: 3em;
+  height: 3em;
+  border-radius: 100px;
+  margin-right: 1em;
+  margin-bottom: 5px;
+}
+.more{
+  float: left;
+  width: 100%;
+  height: auto;
+  font-size: 18px;
+}
+.visit{
+  float: left;
+  margin-left: 1em;
+}
+.moreinfor{
+  float: right;
+  margin-right: 1em;
+}
+.share{
+  width: 100%;
+  min-height: 100px;
+  background: #fff;
+  padding: 1em;
+  font-size: 18px;
+  float: left;
+  border-bottom: 5px solid #ccc;
+}
+.share ul{
+  list-style-type: none;
+  padding: 0;
+  width: 100%;
+}
+.share li{
+  width: 100%;
+  float: left;
+  margin-top: 1em;
+}
+.share ul li img{
+  width: 2.5em;
+  height: 2.5em;
+  margin-right: 10px;
+  float: left;
+}
+.desc{
+  width: 80%;
+  float: left;
+}
+.spread{
+  margin-top: 0.5em;
+  float: left;
+}
+.message{
+  width: 100%;
+  min-height: 100px;
+  background: #fff;
+  padding: 1em;
+  font-size: 18px;
+  float: left;
+}
+.message ul{
+  list-style-type: none;
+  padding: 0;
+  width: 100%;
+}
+.message li{
+  width: 100%;
+  float: left;
+  margin-top: 1em;
+}
+.message li img{
+  width: 2.5em;
+  height: 2.5em;
+  margin-right: 5px;
+  border-radius: 100px;
+  float: left;
+}
+.r_con{
+  width: 80%;
+  height: auto;
+  float: left;
+}
+.publish{
+  width: 100%;
+  float: left;
+}
+.p_con{
+  width: 60%;
+}
+#public{
+  width: 18%;
+  border: 0;
+  background: #777;
+  color: white;
+}
+#privacy{
+  width: 18%;
+  color: white;
+  border: 0;
+  background: #777;
+}
+.page{
+  width: 100%;
+  float: left;
+}
+.last{
+  float: left;
+  margin-right: 1em;
+}
+.first{
+  float: left;
+}
+.next{
+  float: right;
+  margin-left: 1em;
+}
+.end{
+  float: right;
+}
