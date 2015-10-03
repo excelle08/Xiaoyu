@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from model import User
 from api import APIError
 from werkzeug.datastructures import FileStorage

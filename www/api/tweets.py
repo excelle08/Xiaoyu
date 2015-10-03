@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from model import User, Tweet, Reply, Friend
 from model import Visibility
 from model import db

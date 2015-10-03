@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from model import db, User, Friend, FriendGroup, BlackList
 from flask import session
 from api import APIError
@@ -127,7 +129,7 @@ def add_to_blacklist(target_id):
 
 def remove_from_blacklist(target_id):
     uid = session['uid']
-    blacklist = BlackList.query.filter(user==uid, to==target_id).first():
+    blacklist = BlackList.query.filter(user==uid, to==target_id).first()
     if not blacklist:
         raise APIError('指定的用户不在黑名单中')
 

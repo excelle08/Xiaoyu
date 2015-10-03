@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from model import db, Message, MessageReply, User, Visibility
 from flask import session
 from api import APIError

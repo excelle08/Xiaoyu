@@ -25,7 +25,7 @@ def handle_api_error(error):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return "Hello World"
+    return render_template('homepage.html')
 
 
 @app.route('/api/user/verify', methods=['POST'])
@@ -113,21 +113,21 @@ def api_get_user_ext():
     return json.dumps(api.user.get_user_extension(uid))
 
 
-@app.route('/api/user/meta/edit', methods['POST'])
+@app.route('/api/user/meta/edit', methods=['POST'])
 def api_edit_user_meta():
     uid = session['uid']
     args = request.form
     return json.dumps(api.user.set_user_meta(uid, args))
 
 
-@app.route('/api/user/ext/edit', methods['POST'])
+@app.route('/api/user/ext/edit', methods=['POST'])
 def api_edit_user_ext():
     uid = session['uid']
     args = request.form
     return json.dumps(api.user.set_user_ext(uid, args))
 
 
-@app.route('/api/user/password/edit', methods['POST'])
+@app.route('/api/user/password/edit', methods=['POST'])
 def api_edit_password():
     uid = session['uid']
     original = request.args['original']
@@ -309,7 +309,7 @@ def api_upload_photo():
         raise APIError(e.message)
 
 
-@app.route('/api/album/upload', methods['POST'])
+@app.route('/api/album/upload', methods=['POST'])
 def api_upload_to_album():
     try:
         photo = request.files['photo']
@@ -439,4 +439,4 @@ if __name__=='__main__':
     app.config['SQLALCHEMY_DATABASE_URI'] = get_mysql_conn_str()
     app.config.from_object('config.config')
     app.jinja_env.filters['datetime'] = datetime_filter
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
