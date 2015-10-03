@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>homepage</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/homepage.css" rel="stylesheet">
+    <script src="js/jq.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/homepage.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;z-index:9999;">
+      <div class="container row">
+        <div class="col-xs-2 col-md-2" style="padding:0;">
+          <span class="back" ><</span>
+        </div>
+        <div class="col-xs-8 col-md-8" style="text-align:center;">
+          <span class="index_kind">TA的主页</span>
+        </div>
+        <div class="col-xs-2 col-md-2" style="padding:0;">
+          <a class="choose" href="#">保存</a>
+        </div>
+      </div>
+    </nav>
+    <div style="equalnav" style="width:100%;"></div>
+    <div class="main" style="z-index:1000;">
+      <form id="userform" method="post" action="/api/user">
+        <div class="grid">
+          <div class="head"></div>
+          <input type="text" name="nickname" placeholder="  昵称：" class="nickname">
+        </div>
+        <!--<table border="1">
+          <tr>
+            <div class="head"></div>
+          </tr>
+          <tr>
+            <input type="text" name="nickname" placeholder="  昵称：" class="nickname">
+          </tr>
+          <tr>
+            <div class="sex">
+              <input type="radio" name="man">男
+              <input type="radio" name="woman">女
+            </div>
+          </tr>
+          <tr>
+            <div class="birth">
+              <div class="btn-group col-xs-4" style="padding:0;">
+                <select autofocus class="" style="width:100%;height:2em;background:#fff;">
+                  <option value="age1995">1995</option>
+                  <option value="age1996">1996</option>
+                  <option value="age1997">1997</option>
+                  <option value="age1998">1998</option>
+                  <option value="age1999">1999</option>
+                  <option value="age2000">2000</option>
+                  <option value="age2001">2001</option>
+                  <option value="age2002">2002</option>
+                </select>
+              </div>
+              <div class="btn-group col-xs-4" style="padding:0;">
+                <select autofocus class="" style="width:100%;height:2em;background:#fff;">
+                  <option value="day1">1</option>
+                  <option value="day2">2</option>
+                  <option value="day3">3</option>
+                  <option value="day4">4</option>
+                  <option value="day5">5</option>
+                  <option value="day6">6</option>
+                  <option value="day7">7</option>
+                  <option value="day8">8</option>
+                </select>
+              </div>
+              <div class="btn-group col-xs-4" style="padding:0;">
+                <select autofocus class="" style="width:100%;height:2em;background:#fff;">
+                  <option value="day1">1</option>
+                  <option value="day2">2</option>
+                  <option value="day3">3</option>
+                  <option value="day4">4</option>
+                  <option value="day5">5</option>
+                  <option value="day6">6</option>
+                  <option value="day7">7</option>
+                  <option value="day8">8</option>
+                </select>
+              </div>
+          </tr>
+          <tr>
+            <div class="btn-group form_" style="margin-top:1em">
+              <select style="width:99%;height:2.5em;background:#fff;margin:1px;">
+                <option value="tall">180</option>
+              </select>
+            </div>
+          </tr>
+          <tr>
+            <div class="btn-group form_">
+              <select style="width:99%;height:2.5em;background:#fff;margin:1px;">
+                <option value="home">home</option>
+              </select>
+            </div>
+          </tr>
+          <tr>
+            <div class="btn-group form_">
+              <select style="width:99%;height:2.5em;background:#fff;margin:1px;">
+                <option value="work">准备工作地</option>
+              </select>
+            </div>
+          </tr>
+          <tr>
+            <div class="real_name1">
+              <input class="real_name" type="text" name="real_name" placeholder="  真实姓名：">
+              <div style="float:right;font-size:1.1em;margin:0.7em 0.2em;"><input class="pub_" name="pub_real_name" type="radio"><span style="vertical-align:top;">公开</span></div>
+            </div>
+          </tr>
+          <tr>
+            <div class="tel1" style="margin-bottom:1em;">
+              <input class="tel" type="text" name="tel" placeholder="  联系方式：">
+              <div style="float:right;font-size:1.1em;margin:0.7em 0.2em;"><input class="pub_" name="pub_tel" type="radio"><span style="vertical-align:top;">公开</span></div>
+            </div>
+          </tr>
+          <tr>
+            <div class="school">
+              <span style="float:left;">学校信息</span><span id="auth" style="float:right;">还未认证</span>
+            </div>
+          </tr>
+          <tr>
+            <div class="btn-group form_" style="z-index:9999;">
+              <input type="text" id="schoolName" readonly placeholder="学校"/>
+              <div id="proSchool" class="provinceSchool">
+                <div class="title">
+                  <span>已选择:</span>
+                </div>
+                <div class="proSelect">
+		              <select></select>
+	                <span>如没找到选择项，请选择其他手动填写</span>
+		              <input type="text" >
+	               </div>
+                 <div class="schoolList">
+                   <ul>
+                   </ul>
+                 </div>
+              </div>
+            </div>
+          </tr>
+          <tr>
+            <div class="btn-group form_">
+              <select style="width:99%;height:2.5em;background:#fff;">
+                <option value="subjec">选择专业</option>
+              </select>
+            </div>
+          </tr>
+          <tr>
+            <div class="btn-group form_">
+              <select style="width:99%;height:2.5em;background:#fff;">
+                <option value="subjec">选择学历</option>
+              </select>
+            </div>
+          </tr>-->
+        </table>
+      </form>
+    </div>
+  </body>
+  <script>
+  var alert_h = $(".navbar").height();
+  var alert_t = (alert_h - $(".choose").height())/2;
+  $(".choose").css("margin-top",alert_t);
+  $(".publish").css("margin-top",alert_h);
+  $(".equalnav").css("height",alert_h);
+  $(".choose").click(function(){
+    $(".userform").submit(function(){
+      $.ajax({
+        url: "/api/user",
+        data: $(".userform").serialize(),
+        dataType: "application/json",
+        error: function(data){
+          alert(data.message);
+        },
+        success: function(data){
+
+        }
+      });
+    });
+  });
+  </script>
+</html>

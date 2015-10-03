@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>index</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/message.css" rel="stylesheet">
+    <script src="js/jq.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
+      <div class="container row">
+        <div class="col-xs-2 col-md-2" style="padding:0;">
+          <span class="back" ><</span>
+        </div>
+        <div class="col-xs-8 col-md-8" style="text-align:center;">
+          <span class="index_kind">消息中心</span>
+        </div>
+      </div>
+    </nav>
+    <ul>
+      <li>
+        <div class="mes_">
+          <img src="img/test.jpg" class="pic col-xs-3">
+          <div class="mes_nav col-xs-9">
+            <span class="mes_user"><b>消息中心</b>♀21</span>
+            <span class="time">1分钟前</span>
+          </div>
+          <div class="mes_con col-xs-8">
+            消息中心消息中心消息中心消息中心消息中心消息中心消息中心
+          </div>
+        </div>
+        <div class="mes_oper">
+          <div class="col-xs-6 ignore">忽略</div>
+          <div class="col-xs-6 agree">同意</div>
+        </div>
+      </li>
+    </ul>
+  </body>
+  <script>
+  var alert_h = $(".navbar").height();
+  var alert_t = (alert_h - $(".choose").height())/2;
+  $(".choose").css("margin-top",alert_t);
+  $("ul").css("margin-top",alert_h);
+  $(".mes_").click(function(){
+    $(this).parent().find(".mes_oper").slideToggle();
+  });
+  $(".ignore").click(function(){
+    $(".agree").removeClass("active");
+    $(this).addClass("active");
+  });
+  $(".agree").click(function(){
+    $(".ignore").removeClass("active");
+    $(this).addClass("active");
+  })
+  </script>
+</html>

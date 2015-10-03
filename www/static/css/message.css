@@ -1,0 +1,78 @@
+html,body{
+  background: #ddd;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+.col-xs-9{
+  padding: 0;
+}
+.col-xs-3{
+  padding: 0;
+}
+.col-xs-8{
+  padding: 0;
+}
+ul{
+  list-style-type: none;
+  padding: 0;
+}
+ul li{
+  float: left;
+  margin: 0;
+  width: 100%;
+  height: auto;
+  background: #fff;
+  font-size: 1.3em;
+}
+.back{
+  margin: auto;
+  float:left;
+  font-size: 30px;
+  margin-top:4px;
+  margin-left: 20%;
+}
+.index_kind{
+  font-size: 24px;
+  margin: auto;
+  line-height: 2;
+}
+.pic{
+  width: 2.3em;
+  height: 2.3em;
+  margin: 0.5em;
+  border-radius: 100px;
+  float: left;
+}
+.mes_nav{
+  float: left;
+  height: auto;
+  margin-top: 0.5em;
+}
+.mes_user{
+  float: left;
+}
+.time{
+  float: right;
+}
+.mes_con{
+  float: left;
+  margin-top: 0.4em;
+}
+.mes_oper{
+  width: 100%;
+  height: 2.5em;
+  background: #aaa;
+  text-align: center;
+  line-height: 2.5em;
+  font-size: 1em;
+  color: white;
+  display: none;
+  float: left;
+}
+.ignore{
+  border-right: 1px solid #555;
+}
+.active{
+  background: #555;
+}
