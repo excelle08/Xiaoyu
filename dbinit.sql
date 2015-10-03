@@ -71,6 +71,7 @@ create table tweets (
     `user` int(10) not null,
     `content` text,
     `visibility` tinyint(2),
+    `photos` text,
     `read` boolean,
     `created_at` real
 ) engine=innodb default charset=utf8;

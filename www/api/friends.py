@@ -30,7 +30,7 @@ def delete_friend_group(id):
     if id == 0:
         raise APIError('好友组不能删除')
 
-    friends = Friend.query.filter(user==uid, group==id).all()
+    friends = Friend.query.filter(Friend.user==uid, Friend.group==id).all()
     for i in friends:
         i.groups = 0
     db.session.commit()
@@ -47,7 +47,7 @@ def delete_friend_group(id):
 def rename_friend_group(id, title):
     uid = session['uid']
 
-    group = FriendGroup.query.filter(user==uid).first()
+    group = FriendGroup.query.filter(FriendGroup.user==uid).first()
     groups = json.load(group.content)
     groups[id] = title
     group.content = json.dumps(groups)
@@ -58,7 +58,7 @@ def rename_friend_group(id, title):
 
 def get_friends():
     uid = session['uid']
-    return Friend.query.filter(user==uid, agree==True).all()
+    return Friend.query.filter(Friend.user==uid, Friend.agree==True).all()
 
 
 def add_friends(target_id, group_id):
@@ -99,11 +99,11 @@ def agree_friend(id, group_id):
 
 def delete_friend(target_id):
     uid = session['uid']
-    friend = Friend.query.filter(user==uid, to==target_id).first()
+    friend = Friend.query.filter(Friend.user==uid, Friend.to==target_id).first()
     if not friend:
         raise APIError('指定的好友不存在')
 
-    f2 = Friend.query.filter(user==friend.to, to==friend.user).first()
+    f2 = Friend.query.filter(Friend.user==friend.to, Friend.to==friend.user).first()
     f_id = friend
     db.session.delete(friend)
     db.session.delete(f2)
@@ -116,7 +116,7 @@ def add_to_blacklist(target_id):
     if not User.query.filter_by(uid=target_id).first():
         raise APIError('指定的用户不存在')
 
-    if BlackList.query.filter(user==uid, to==target_id):
+    if BlackList.query.filter(BlackList.user==uid, BlackList.to==target_id):
         raise APIError('该用户已经在黑名单')
 
     blacklist = BlackList()
@@ -129,7 +129,7 @@ def add_to_blacklist(target_id):
 
 def remove_from_blacklist(target_id):
     uid = session['uid']
-    blacklist = BlackList.query.filter(user==uid, to==target_id).first()
+    blacklist = BlackList.query.filter(BlackList.user==uid, BlackList.to==target_id).first()
     if not blacklist:
         raise APIError('指定的用户不在黑名单中')
 
@@ -140,9 +140,9 @@ def remove_from_blacklist(target_id):
 
 
 def am_i_friend(whose):
-    return True if Friend.query.filter(user==whose, to==session['uid']).first() else False
+    return True if Friend.query.filter(Friend.user==whose, Friend.to==session['uid']).first() else False
 
 
 def am_i_blocked(whose):
-    return True if BlackList.query.filter(user==whose, to==session['uid']).first() else False
+    return True if BlackList.query.filter(BlackList.user==whose, BlackList.to==session['uid']).first() else False
 

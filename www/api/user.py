@@ -66,7 +66,7 @@ def user_register(phone, password, vcode):
     wall.uid = user.uid
 
     fgroup = FriendGroup()
-    fgroup.uid = user.uid
+    fgroup.user = user.uid
     fgroup.content = json.dumps(['好友', '密友'])
 
     db.session.add(school)
@@ -126,7 +126,7 @@ def get_online_users(offset=0, limit=10):
 
 
 def get_recent_logins(offset=0, limit=10):
-    return User.query.filter_by(online=UserStatus.Offline).order_by(User.last_login.desc()).offset(offset).limit(limit).all()
+    users = User.query.filter_by(online=UserStatus.Offline).order_by(User.last_login.desc()).offset(offset).limit(limit).all()
     return [ UserMeta.query.filter_by(uid=item.uid).first() for item in users ]
 
 
@@ -143,11 +143,11 @@ def get_user_meta(uid):
 
 
 def get_user_extension(uid):
-    return json.load(UserExt.query.filter_by(uid=uid).first().content)
+    return json.loads(UserExt.query.filter_by(uid=uid).first().content)
 
 
 def get_user_friend_groups(uid):
-    return json.load(FriendGroup.query.filter_by(uid=uid).first().content)
+    return json.loads(FriendGroup.query.filter_by(uid=uid).first().content)
 
 
 def get_friends(uid):
@@ -185,21 +185,21 @@ def pass_user_school(uid):
     return school
 
 
-def set_user_meta(uid, **args):
+def set_user_meta(uid, args):
     try:
         umeta = UserMeta.query.filter_by(uid=uid).first()
-        for key, value in args:
+        for key, value in args.iteritems():
             # Skip empty items
             if not value:
                 continue
-            umeta.__dict__[key] = value
+            umeta.__setattr__(key, value)
         db.session.commit()
         return umeta
     except KeyError, e:
         raise APIError(e.message)
 
 
-def set_user_ext(uid, **args):
+def set_user_ext(uid, args):
     uext = UserExt.query.filter_by(uid=uid).first()
     uext.content = json.dumps(args)
     db.session.commit()
@@ -222,3 +222,54 @@ def set_user_password(uid, prev, new, vcode):
         raise APIError(e.message)
 
 
+
+#### This function is intended for test.
+#### Will remove in production mode
+
+
+def __user_register(phone, password):
+
+    exist = User.query.filter_by(phone=phone.strip()).first()
+    if exist:
+        raise APIError('该手机号已经注册过')
+
+    user = User()
+    user.phone = phone.strip()
+    user.password = password.strip().lower()
+    user.permission = UserPermission.Unvalidated
+    user.created_at = time.time()
+    user.last_login = time.time()
+    user.online = UserStatus.Online
+    db.session.add(user)
+    db.session.commit()
+
+    school = UserSchool()
+    school.uid = user.uid
+
+    meta = UserMeta()
+    meta.uid = user.uid
+
+    ext = UserExt()
+    ext.uid = user.uid
+    ext.content = '{}'
+
+    wall = Wall()
+    wall.uid = user.uid
+
+    fgroup = FriendGroup()
+    fgroup.user = user.uid
+    fgroup.content = json.dumps(['好友', '密友'])
+
+    db.session.add(school)
+    db.session.add(meta)
+    db.session.add(ext)
+    db.session.add(wall)
+    db.session.add(fgroup)
+    db.session.commit()
+    del session['vcode']
+
+    # login
+    session['uid'] = user.uid
+    session['phone'] = phone.strip()
+    session['password'] = password.strip().lower()
+    return user

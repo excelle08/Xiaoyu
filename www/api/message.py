@@ -52,7 +52,8 @@ def get_messages(uid, offset=0, limit=10, later_than=0):
         if i.visibility == Visibility.Mutual and not (current_uid == i.user or current_uid == i.target):
             messages.remove(i)
 
-    return messages[offset : offset+limit].sort(key=lambda msg: msg.created_at)
+    messages.sort(key=lambda msg: msg.created_at)
+    return messages[offset: offset+limit]
 
 
 def get_replies(target_reply, offset=0, limit=10, later_than=0):
@@ -64,7 +65,9 @@ def get_replies(target_reply, offset=0, limit=10, later_than=0):
         if i.visibility == Visibility.Mutual and not (current_uid == message.user or current_uid == i.user):
             replies.remove(i)
 
-    return replies[offset: offset+limit].sort(key=lambda reply: reply.created_at)
+    replies.sort(key=lambda reply: reply.created_at)
+
+    return replies[offset: offset+limit]
 
 
 def remove_message(id):

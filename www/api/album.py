@@ -6,7 +6,7 @@ from api import APIError
 import api.photo, time, os
 
 
-def upload_photo(imagedata, desc, **args):
+def upload_photo(imagedata, desc, args):
     uid = session['uid']
     existing_photos = Photo.query.filter_by(user=uid).count()
     if existing_photos >= 50:

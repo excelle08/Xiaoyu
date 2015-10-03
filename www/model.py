@@ -2,6 +2,7 @@
 
 from flask.ext.sqlalchemy import SQLAlchemy
 from time import time
+from api import to_json
 
 db = SQLAlchemy()
 
@@ -13,7 +14,14 @@ UserPermission = enum(Blocked=-1, Unvalidated=0, InProgress=1, Validated=2, Admi
 UserStatus = enum(Offline=0, Online=1, HideToFriends=2, HideToStrangers=3, HideToAll=4)
 
 
-class User(db.Model):
+class Base():
+
+    @property
+    def json(self):
+        return to_json(self, self.__class__)
+
+
+class User(db.Model, Base):
     __tablename__ = 'user'
     uid = db.Column('uid', db.Integer, primary_key=True, autoincrement=True)
     phone = db.Column('phonenum', db.String(32), nullable=False)
@@ -23,10 +31,11 @@ class User(db.Model):
     created_at = db.Column('created_at', db.Float, nullable=False)
     last_login = db.Column('last_login', db.Float, nullable=False)
 
+
 Degree = enum(Unknown=0, Bachelor=1, Master=2, Phd=3)
 
 
-class UserSchool(db.Model):
+class UserSchool(db.Model, Base):
     __tablename__ = 'user_school'
     uid = db.Column('uid', db.Integer, primary_key=True, nullable=False)
     school_name = db.Column('school_name', db.Text)
@@ -38,7 +47,7 @@ class UserSchool(db.Model):
     auth_pass = db.Column('pass', db.Boolean)
 
 
-class UserMeta(db.Model):
+class UserMeta(db.Model, Base):
     __tablename__ = 'user_meta'
     uid = db.Column('uid', db.Integer, primary_key=True, nullable=False)
     nickname = db.Column('nickname', db.String(32))
@@ -60,13 +69,13 @@ class UserMeta(db.Model):
     show_name = db.Column('show_name', db.Boolean)
 
 
-class UserExt(db.Model):
+class UserExt(db.Model, Base):
     __tablename__ = 'user_ext'
     uid = db.Column('uid', db.Integer, primary_key=True, nullable=False)
     content = db.Column('content', db.Text)
 
 
-class Wall(db.Model):
+class Wall(db.Model, Base):
     __tablename__ = 'wall'
     uid = db.Column('uid', db.Integer, primary_key=True, nullable=False)
     photos = db.Column('photos', db.Text)
@@ -74,7 +83,7 @@ class Wall(db.Model):
     wall_filter = db.Column('filter', db.Text)
 
 
-class Photo(db.Model):
+class Photo(db.Model, Base):
     __tablename__ = 'photos'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     user = db.Column('user', db.Integer, nullable=False)
@@ -84,7 +93,7 @@ class Photo(db.Model):
 
 Visibility = enum(All=0, FriendsOnly=1, Mutual=2)
 
-class Tweet(db.Model):
+class Tweet(db.Model, Base):
     __tablename__ = 'tweets'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     user = db.Column('user', db.Integer, nullable=False)
@@ -95,7 +104,7 @@ class Tweet(db.Model):
     created_at = db.Column('created_at', db.Float)
 
 
-class Reply(db.Model):
+class Reply(db.Model, Base):
     __tablename__ = 'replies'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     user = db.Column('user', db.Integer, nullable=False)
@@ -106,7 +115,7 @@ class Reply(db.Model):
     created_at = db.Column('created_at', db.Float)
 
 
-class Message(db.Model):
+class Message(db.Model, Base):
     __tablename__ = 'messages'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     user = db.Column('user', db.Integer, nullable=False)
@@ -117,7 +126,7 @@ class Message(db.Model):
     created_at = db.Column('created_at', db.Float)
 
 
-class MessageReply(db.Model):
+class MessageReply(db.Model, Base):
     __tablename__ = 'msgreplies'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     user = db.Column('user', db.Integer, nullable=False)
@@ -128,7 +137,7 @@ class MessageReply(db.Model):
     created_at = db.Column('created_at', db.Float)
 
 
-class Friend(db.Model):
+class Friend(db.Model, Base):
     __tablename__ = 'friends'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     user = db.Column('user', db.Integer, nullable=False)
@@ -137,20 +146,20 @@ class Friend(db.Model):
     agree = db.Column('agree', db.Boolean)
 
 
-class FriendGroup(db.Model):
+class FriendGroup(db.Model, Base):
     __tablename__ = 'friend_group'
     user = db.Column('user', db.Integer, primary_key=True)
     content = db.Column('content', db.Text)
 
 
-class BlackList(db.Model):
+class BlackList(db.Model, Base):
     __tablename__ = 'black_list'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     user = db.Column('user', db.Integer, nullable=False)
     to = db.Column('to', db.Integer, nullable=False)
 
 
-class Notification(db.Model):
+class Notification(db.Model, Base):
     __tablename__ = 'notification'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     _from = db.Column('from', db.Integer, nullable=False)
@@ -160,7 +169,7 @@ class Notification(db.Model):
     created_at = db.Column('created_at', db.Float)
 
 
-class AbuseReport(db.Model):
+class AbuseReport(db.Model, Base):
     __tablename__ = 'abuse_report'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     _from = db.Column('from', db.Integer, nullable=False)
@@ -170,26 +179,26 @@ class AbuseReport(db.Model):
     created_at = db.Column('created_at', db.Float)
 
 
-class License(db.Model):
+class License(db.Model, Base):
     __tablename__ = 'license'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     content = db.Column('content', db.Text)
 
 
-class Horoscope(db.Model):
+class Horoscope(db.Model, Base):
     __tablename__ = 'horoscope'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name = db.Column('name', db.Text)
     desc = db.Column('desc', db.Text)
 
 
-class Province(db.Model):
+class Province(db.Model, Base):
     __tablename__ = 'province'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name = db.Column('name', db.Text)
 
 
-class City(db.Model):
+class City(db.Model, Base):
     __tablename__ = 'city'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     index = db.Column('index', db.Integer)
@@ -197,7 +206,7 @@ class City(db.Model):
     name = db.Column('name', db.Text)
 
 
-class School(db.Model):
+class School(db.Model, Base):
     __tablename__ = 'school'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name = db.Column('name', db.Text)

@@ -42,3 +42,27 @@ def datetime_filter(t):
         return u'%s days ago' % (delta // 86400)
     dt = datetime.fromtimestamp(t)
     return u'%s/%s/%s' % (dt.year, dt.month, dt.day)
+
+
+def to_json(inst, cls):
+    """
+    Jsonify the sql alchemy query result.
+    """
+    convert = dict()
+    # add your coversions for things like datetime's 
+    # and what-not that aren't serializable.
+    d = dict()
+    for c in cls.__dict__.keys():
+        if c.startswith('_'):
+            continue
+        v = getattr(inst, c)
+        if type(v) in convert.keys() and v is not None:
+            try:
+                d[c] = convert[c.type](v)
+            except:
+                d[c] = "Error:  Failed to covert using ", str(convert[type(v)])
+        elif v is None:
+            d[c] = str()
+        else:
+            d[c] = v
+    return json.dumps(d)

@@ -80,6 +80,7 @@ Step 2: Register
 
     * `phone` - Phone number
     * `password` - **MD5 hash** of password
+    * `remember` - Whether to remember login status. 0 for not remember.
 
 - On success:
 
