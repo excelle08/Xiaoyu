@@ -175,23 +175,26 @@ def set_user_school(uid, school_id, degree, auth_photo):
     school.auth_pass = False
     db.session.add(school)
     db.session.commit()
-    return {"status": "OK"}
+    return school
 
 
 def pass_user_school(uid):
     school = UserSchool.query.filter_by(uid=uid).first()
     school.auth_pass = True
     db.session.commit()
-    return {"status": "OK"}
+    return school
 
 
 def set_user_meta(uid, **args):
     try:
         umeta = UserMeta.query.filter_by(uid=uid).first()
         for key, value in args:
+            # Skip empty items
+            if not value:
+                continue
             umeta.__dict__[key] = value
         db.session.commit()
-        return {"status": "OK"}
+        return umeta
     except KeyError, e:
         raise APIError(e.message)
 
@@ -200,7 +203,7 @@ def set_user_ext(uid, **args):
     uext = UserExt.query.filter_by(uid=uid).first()
     uext.content = json.dumps(args)
     db.session.commit()
-    return {"status": "OK"}
+    return uext
 
 
 def set_user_password(uid, prev, new, vcode):

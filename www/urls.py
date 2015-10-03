@@ -3,6 +3,7 @@
 from flask import Flask
 from flask import jsonify, session, request
 from flask import render_template, make_response
+from flask import redirect, url_for
 from api import APIError, datetime_filter
 from captcha import generate_captcha
 from config.config import configs
@@ -62,6 +63,12 @@ def api_user_login():
         raise APIError(e.message)
 
 
+@app.route('/api/user/logout', methods=['GET', 'POST'])
+def api_user_logout():
+    api.user.user_logout()
+    return redirect(url_for('.index'))
+
+
 @app.route('/api/user/onlines', methods=['GET', 'POST'])
 def api_get_online_users():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
@@ -104,6 +111,30 @@ def api_get_user_meta():
 def api_get_user_ext():
     uid = request.args['uid'].strip() if "uid" in request.args else session['uid']
     return json.dumps(api.user.get_user_extension(uid))
+
+
+@app.route('/api/user/meta/edit', methods['POST'])
+def api_edit_user_meta():
+    uid = session['uid']
+    args = request.form
+    return json.dumps(api.user.set_user_meta(uid, args))
+
+
+@app.route('/api/user/ext/edit', methods['POST'])
+def api_edit_user_ext():
+    uid = session['uid']
+    args = request.form
+    return json.dumps(api.user.set_user_ext(uid, args))
+
+
+@app.route('/api/user/password/edit', methods['POST'])
+def api_edit_password():
+    uid = session['uid']
+    original = request.args['original']
+    new = request.args['new']
+    vcode = request.args['vcode']
+    api.user.set_user_password(uid, original, new, vcode)
+    return redirect(url_for('.index'))
 
 
 @app.route('/api/user/friends/add', methods=['GET', 'POST'])

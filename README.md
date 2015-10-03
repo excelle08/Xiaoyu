@@ -74,7 +74,7 @@ Step 2: Register
 
 ### Log in
 
-- POST: `/api/login`
+- POST: `/api/user/login`
 
 - Data:
 
@@ -88,6 +88,38 @@ Step 2: Register
 - On failure:
 
     * `data.message` - Error message
+
+### Log out
+
+- GET/POST: `/api/user/logout`
+
+- Will redirect to the homepage after this action
+
+### Edit my information
+
+- POST: `/api/user/meta/edit`
+
+- Data:
+
+    * Keys are property names of UserMeta object. Please refer to `model.py`.
+    * If you don't want to change a certain field, you may leave it empty.
+    * To change avatar please user `/api/photo/upload` to upload the avatar, after which you will get the returned URL.
+
+- Return value:
+    
+    * The UserMeta object
+
+### Change password
+
+- POST: `/api/user/password/edit`
+
+- Data:
+    
+    * `original` The old password
+    * `new` The new password
+    * `vcode` Verification code. You are required to do phone verification before requesting this API.
+
+- Will log out and redirect to homepage after success.
 
 ### Current user information
 
@@ -375,15 +407,73 @@ This section shows some user-related APIs that will return an array of data. For
 
 ### Leave a message
 
+- POST: `/api/message/add`
+
+- Data:
+
+    * `uid` The UID of the user you wanna leave message to
+    * `content` The content of message
+    * `visibility` Visibility of message
+
+- Return value: the Message object
+
 ### Reply to a message
+
+- POST: `/api/message/reply/add`
+
+- Data:
+
+    * `id` The ID of the message you want to reply to
+    * `content` Content. of reply
+    * `visibility` Visibility
+
+- Return value: the MessageReply object
 
 ### Get messages
 
+- GET/POST: `/api/message/get`
+
+- Data:
+    
+    * `uid` Optional. Specify the UID of user. Defaults to the current logged in user
+    * `offset` Offset / Start from. Optional, and defaults to 0.
+    * `limit` The number of tweets to return. Optional, and defaults to 0.
+    * `later_than` **Timestamp** of the earliest tweet to get. In other words, all returned tweets are created later than this time. Optional, and defaults to 0.
+
+- Return value: an array of Message objects
+
 ### Get replies of a message
+
+- GET/POST: `/api/message/reply/get`
+
+- Data:
+    
+    * `id` The ID of the message
+    * `offset` Offset / Start from. Optional, and defaults to 0.
+    * `limit` The number of tweets to return. Optional, and defaults to 0.
+    * `later_than` **Timestamp** of the earliest tweet to get. In other words, all returned tweets are created later than this time. Optional, and defaults to 0.
+
+- Return value: an array of MessageReply objects
 
 ### Delete a message
 
+- GET/POST: `/api/message/delete`
+
+- Data:
+    
+    * `id` The ID of the message
+
+- Return value: `data.id` the ID
+
 ### Delete a reply
+
+- GET/POST: `/api/message/reply/delete`
+
+- Data:
+
+    * `id` The ID of the reply
+
+- Return value: `data.id` the ID
 
 ## Common information
 
