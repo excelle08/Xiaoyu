@@ -140,6 +140,25 @@ def api_edit_user_ext():
     return api.user.set_user_ext(uid, args).json
 
 
+@app.route('/api/user/school/edit', methods=['POST'])
+def api_edit_user_school():
+    try:
+        uid = session['uid']
+        school_id = request.form['school']
+        degree = request.form['degree']
+        photo = request.form['photo']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return api.user.set_user_school(uid, school_id, degree, photo).json
+
+
+@app.route('/api/user/school/get', methods=['GET'])
+def api_get_user_school():
+    uid = request.args['uid'] if 'uid' in request.args else session['uid']
+    return api.user.get_user_school(uid).json
+
+
 @app.route('/api/user/password/edit', methods=['POST'])
 def api_edit_password():
     uid = session['uid']

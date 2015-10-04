@@ -154,6 +154,29 @@ Step 2: Register
 
     User Ext object of the current user.
 
+
+### Update user's school information
+
+- POST: `/api/user/school/edit`
+
+- Data:
+    
+    * `school` - School ID
+    * `degree` - Degree ID
+    * `photo` - URL of validation photo
+
+- Returned value: UserSchool object
+
+### Get user's school information
+
+- GET/POST: `/api/user/school/get`
+
+- Data:
+
+    * `uid` - Optional. User ID. Defaults to the current logged in user.
+
+- Returned value: UserSchool object
+
 ### User-array related operations
 
 This section shows some user-related APIs that will return an array of data. For these APIs you may specify these two paramaters via GET method in other to limit the offset and numbers of elements:
