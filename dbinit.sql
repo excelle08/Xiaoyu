@@ -29,6 +29,7 @@ create table user_meta (
     `uid` int(10) not null primary key,
     `nickname` varchar(32),
     `realname` varchar(32),
+    `avatar` text,
     `gender` tinyint(2),
     `age` tinyint(3),
     `height` real,

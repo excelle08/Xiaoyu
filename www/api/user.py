@@ -173,6 +173,9 @@ def set_user_school(uid, school_id, degree, auth_photo):
     school.school_id = school_id
     school.auth_photo = auth_photo
     school.auth_pass = False
+    user = User.query.filter_by(uid=uid)
+    user.permission = UserPermission.InProgress
+
     db.session.add(school)
     db.session.commit()
     return school
@@ -181,6 +184,9 @@ def set_user_school(uid, school_id, degree, auth_photo):
 def pass_user_school(uid):
     school = UserSchool.query.filter_by(uid=uid).first()
     school.auth_pass = True
+    user = User.query.filter_by(uid=uid).first()
+    user.permission = UserPermission.Validated
+
     db.session.commit()
     return school
 

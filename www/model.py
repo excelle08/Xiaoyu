@@ -52,6 +52,7 @@ class UserMeta(db.Model, Base):
     uid = db.Column('uid', db.Integer, primary_key=True, nullable=False)
     nickname = db.Column('nickname', db.String(32))
     realname = db.Column('realname', db.String(32))
+    avatar = db.Column('avatar', db.Text)
     gender = db.Column('gender', db.Integer)
     age = db.Column('age', db.Integer)
     height = db.Column('height', db.Float)
