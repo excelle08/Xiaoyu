@@ -9,7 +9,7 @@ from captcha import generate_captcha
 from config.config import configs
 from model import db
 import api.common, api.user, api.tweets, api.message, api.friends
-import api.photo, api.album 
+import api.photo, api.album, api.wall, api.chat
 import json
 
 app = Flask(__name__)
@@ -31,7 +31,7 @@ def index():
 ### This is for test.
 ### Will be removed in production mode
 
-@app.route('/test/api/register', methods['GET', 'POST'])
+@app.route('/test/api/register', methods=['GET', 'POST'])
 def test_user_register():
     phone = request.form['phone']
     password = request.form['password']
@@ -258,6 +258,57 @@ def api_delete_from_blacklist():
     return json.dumps(api.friends.remove_from_blacklist(uid))
 
 
+@app.route('/api/wall/go', methods=['POST'])
+def api_go_to_wall():
+    try:
+        uid = session['uid']
+        photos = request.form.getlist('photos[]')
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return api.wall.user_upwall(uid, photos).json
+
+
+@app.route('/api/wall/get', methods=['GET', 'POST'])
+def api_get_wall():
+    uid = request.args['uid'] if 'uid' in request.args else session['uid']
+    return api.wall.get_user_wall(uid).json
+
+
+@app.route('/api/wall/delete', methods=['GET', 'POST'])
+def api_delete_wall():
+    uid = request.args['uid']
+    return json.dumps(api.wall.remove_wall(uid))
+
+
+@app.route('/api/wall/edit_filter', methods=['POST'])
+def api_edit_filter():
+    uid = session['uid']
+    return api.wall.set_my_filter(uid, request.form).json
+
+
+@app.route('/api/wall/edit_photo', methods=['POST'])
+def api_edit_photo():
+    uid = session['uid']
+    new_photos = request.form.getlist('photos')
+    return api.wall.set_my_photos(uid, new_photos)
+
+
+@app.route('/api/wall/upvote', methods=['GET', 'POST'])
+def api_upvote_user():
+    try:
+        uid = session['uid']
+    except KeyError, e:
+        raise APIError(e.message)
+    return api.wall.upvote_user(uid)
+
+
+@app.route('/api/wall/guestwall', methods=['GET', 'POST'])
+    uid = session['uid']
+    guests = api.wall.get_guest_wall_items(uid)
+    return json.dumps[item.json for item in guests]
+
+
 @app.route('/api/tweet/add', methods=['POST'])
 def api_add_tweet():
     try:
@@ -426,6 +477,31 @@ def api_message_Reply_delete():
         return json.dumps(api.message.remove_reply(reply_id))
     except KeyError, e:
         raise APIError(e.message)
+
+
+@app.route('/api/chat/send', methods=['POST'])
+def api_chat_sendmsg():
+    pass
+
+
+@app.route('/api/chat/recv', methods=['GET', 'POST'])
+def api_chat_recvmsg():
+    pass
+
+
+@app.route('/api/notifications', methods=['GET', 'POST'])
+def api_get_notifications():
+    pass
+
+
+@app.route('/api/admin/notification/send', methods=['POST'])
+def api_send_notification():
+    pass
+
+
+@app.route('/api/admin/notification/delete', methods=['GET', 'POST'])
+def api_delete_notification():
+    pass
 
 
 @app.route('/api/common/license', methods=['GET', 'POST'])

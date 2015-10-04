@@ -202,6 +202,65 @@ This section shows some user-related APIs that will return an array of data. For
 
 - Returned data: An array of meta information of users who has logged in recently sorted descendly.
 
+## Wall
+
+### Go upon the wall
+
+- POST: `/api/wall/go`
+
+- Data: 
+
+    * `photos` - The array of photos URL. No more than 8 pictures.
+
+- Returned data: The Wall object
+
+### Edit my filter
+
+- POST: `/api/wall/edit_filter`
+
+- Data: Specify one or more of them to restrict your filter:
+    
+    * `school` School ID
+    * `degree` Degree ID
+    * `gender` Gender.
+    * `age_min` Minimum age
+    * `age_max` Maximum age
+    * `height_min` Minimum height
+    * `height_max` Maximum height
+    * `hometown_province` Province ID of hometown
+    * `hometown_city`  City ID of hometown
+    * `work_province` Province ID of work place
+    * `work_city` City ID of work place
+    * `horoscope` Horoscope ID
+
+- Returned data: the Wall object
+
+### Edit my photo
+
+- POST: `/api/wall/edit_photo`
+
+- Data:
+
+    * `photos` - The array of photos URL.
+
+- Returned Data: the Wall object
+
+### Upvote someone
+
+- GET/POST: `/api/wall/upvote`
+
+- Data:
+    
+    * `uid` The User ID
+
+- Returned value - the Wall object
+
+### Get guest wall
+
+- GET/POST: `/api/wall/guestwall`
+
+- Returned value: An array of users to be displayed on the guest wall.
+
 ## Tweets
 
 ### Post a tweet
@@ -499,6 +558,55 @@ This section shows some user-related APIs that will return an array of data. For
 
 - Return value: `data.id` the ID
 
+
+## Chat
+
+### Send message
+
+- POST: `/api/chat/send`
+
+- Data:
+    
+    * `to` The UID of the friend to whom you send message.
+    * `content` The content of message.
+
+- Return value: `data.id` the ID
+
+### Receive message
+
+- GET/POST: `/api/chat/recv`
+
+- Data:
+    
+    * `from` The UID of the friend from whom you receive messages.
+
+- Return value: An array of messages(ChatMessage object) that haven't been received.
+
+## Notifications
+
+### Get notificaitons
+
+- GET/POST: `/api/notificaitons`
+
+- Data:
+    
+    * `later_than` Optional. Get notificaitons sent later than this time.
+
+- Return value: An array of Notification objects
+
+## Abuse report
+
+### Send abuse report
+
+- POST: `/api/abuse_report`
+
+- Data:
+    
+    * `target` UID of the target user.
+    * `content` Complaint content
+
+- Return value: the AbuseReport object
+
 ## Common information
 
 ### Horoscopes
@@ -553,3 +661,24 @@ This section shows some user-related APIs that will return an array of data. For
     * `data.id` - The unique identifer
     * `data.name` - The name of the university
 
+## Admin operations
+
+### Send a notification
+
+- GET/POST: `/api/admin/notificaiton/send`
+
+- Data:
+    
+    * `content` - Content of notificaiton
+
+- Return value: the Notification object
+
+### Validate user's school
+
+### Process abuse reports
+
+### Set user permission
+
+### Statistics
+
+### Find an account by nickname

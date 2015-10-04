@@ -62,9 +62,6 @@ def user_register(phone, password, vcode):
     ext.uid = user.uid
     ext.content = '{}'
 
-    wall = Wall()
-    wall.uid = user.uid
-
     fgroup = FriendGroup()
     fgroup.user = user.uid
     fgroup.content = json.dumps(['好友', '密友'])
