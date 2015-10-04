@@ -138,6 +138,16 @@ class MessageReply(db.Model, Base):
     created_at = db.Column('created_at', db.Float)
 
 
+class ChatMessage(db.Model, Base):
+    __tablename__ = 'chatmsg'
+    id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    _from = db.Column('from', db.Integer, nullable=False)
+    to = db.Column('to', db.Integer, nullable=False)
+    message = db.Column('message', db.Text)
+    read = db.Column('read', db.Boolean)
+    created_at = db.Column('created_at', db.Float)
+
+
 class Friend(db.Model, Base):
     __tablename__ = 'friends'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
@@ -163,7 +173,6 @@ class BlackList(db.Model, Base):
 class Notification(db.Model, Base):
     __tablename__ = 'notification'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
-    _from = db.Column('from', db.Integer, nullable=False)
     content = db.Column('content', db.Text)
     read = db.Column('read', db.Boolean)
     created_at = db.Column('created_at', db.Float)

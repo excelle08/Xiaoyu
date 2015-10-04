@@ -4,13 +4,13 @@ from flask import Flask
 from flask import jsonify, session, request
 from flask import render_template, make_response
 from flask import redirect, url_for
-from api import APIError, datetime_filter
+from api import APIError, datetime_filter, check_admin
 from captcha import generate_captcha
 from config.config import configs
 from model import db
 import api.common, api.user, api.tweets, api.message, api.friends
-import api.photo, api.album, api.wall, api.chat
-import json
+import api.photo, api.album, api.wall, api.chat, api.notify, api.abuse_report
+import json, re
 
 app = Flask(__name__)
 db.init_app(app)
@@ -21,6 +21,42 @@ def handle_api_error(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
+
+
+@app.before_request
+def admin_interceptor():
+    if '/admin' in request.path:  
+        uid = session['uid'] if 'uid' in session else None
+        if not uid:
+            return redirect(url_for('.index'))
+
+        if not check_admin():
+            return redirect(url_for('.index'))
+
+
+@app.before_request
+def user_interceptor():
+    nopriv_allowed = [
+        '/',
+        '/static/.*',
+        '/login',
+        '/register',
+        '/api/common/.*',
+        '/api/user/verify',
+        '/api/user/login',
+        '/api/user/register'
+    ]
+
+    auth_flag = False
+    for item in nopriv_allowed:
+        regex = '^' + item + '$'
+        if re.match(regex, request.path):
+            auth_flag = True
+            break
+
+    if not auth_flag:
+        return redirect(url_for('.index'))
+    
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -481,27 +517,79 @@ def api_message_Reply_delete():
 
 @app.route('/api/chat/send', methods=['POST'])
 def api_chat_sendmsg():
-    pass
+    try:
+        uid = session['uid']
+        to = request.form['to']
+        content = request.form['content']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return api.chat.send(uid, to, content).json
 
 
 @app.route('/api/chat/recv', methods=['GET', 'POST'])
 def api_chat_recvmsg():
-    pass
+    uid = session['uid']
+
+    if 'from' in request.args:
+        _from = request.args['from']
+        return json.dumps([i.json for i in api.chat.receive(uid, _from)])
+    else:
+        return json.dumps([i.json for i in api.chat.receive_all(uid)])
 
 
 @app.route('/api/notifications', methods=['GET', 'POST'])
 def api_get_notifications():
-    pass
+    later_than = request.args['later_than'] if 'later_than' in request.args else 0    
+    return json.dumps([i.json for i in api.notify.get_notifications(later_than)])
+
+
+@app.route('/api/abuse_report', methods=['POST'])
+def api_abuse_report():
+    try:
+        uid = session['uid']
+        target = request.form['target']
+        content = request.form['content']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return api.abuse_report.report_abuse(uid, target, content).json
 
 
 @app.route('/api/admin/notification/send', methods=['POST'])
 def api_send_notification():
-    pass
+    try:
+        content = request.form['content']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return api.notify.send_notification(content).json
 
 
 @app.route('/api/admin/notification/delete', methods=['GET', 'POST'])
 def api_delete_notification():
-    pass
+    try:
+        n_id = request.args['id']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return json.dumps(api.notify.delete_notification(n_id))
+
+
+@app.route('/api/admin/abuse_report/get', methods=['GET', 'POST'])
+def api_process_abuse_report():
+    filter_read = request.args['filter_read'] if 'filter_read' in request.args else True
+    return json.dumps([i.json for i in api.abuse_report.get_reports(filter_read)])
+
+
+@app.route('/api/admin/abuse_report/read', methods=['GET', 'POST'])
+def api_mark_report_as_read():
+    try:
+        r_id = request.args['id']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return api.abuse_report.mark_as_read(r_id)
 
 
 @app.route('/api/common/license', methods=['GET', 'POST'])

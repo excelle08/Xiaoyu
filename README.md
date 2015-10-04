@@ -578,7 +578,7 @@ This section shows some user-related APIs that will return an array of data. For
 
 - Data:
     
-    * `from` The UID of the friend from whom you receive messages.
+    * `from` The UID of the friend from whom you receive messages. If not specified this will return ALL messages that send to you.
 
 - Return value: An array of messages(ChatMessage object) that haven't been received.
 
@@ -673,9 +673,35 @@ This section shows some user-related APIs that will return an array of data. For
 
 - Return value: the Notification object
 
-### Validate user's school
+### Pass a user school info validation
+
+- GET/POST: `/api/admin/school/verify`
+
+- Data:
+    
+    * `uid` User ID
+
+- Return value: the UserSchool object
 
 ### Process abuse reports
+
+- GET/POST: `/api/admin/abuse_report/get`
+
+- Data:
+    
+    * `filter_read` Filter out read items
+
+- Return value: an array of AbuseReport objects
+
+### Mark an abuse report as read
+
+- GET/POST: `/api/admin/abuse_report/read`
+
+- Data:
+    
+    * `id` ID of the item
+
+- Return value: the AbuseReport object
 
 ### Set user permission
 

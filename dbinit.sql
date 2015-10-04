@@ -107,6 +107,15 @@ create table msgreplies (
     `created_at` real
 ) engine=innodb default charset=utf8;
 
+create table chatmsg (
+    `id` int(10) not null primary key auto_increment,
+    `from` int(10) not null,
+    `to` int(10) not null,
+    `message` text,
+    `read` boolean,
+    `created_at` real
+) engine=innodb default charset=utf8;
+
 create table friends (
     `id` int(10) not null primary key auto_increment,
     `user` int(10) not null,

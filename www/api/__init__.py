@@ -4,6 +4,8 @@ import json
 import time
 import hashlib
 from datetime import datetime
+from model import User, UserPermission
+from flask import session
 
 
 class APIError(Exception):
@@ -66,3 +68,11 @@ def to_json(inst, cls):
         else:
             d[c] = v
     return json.dumps(d)
+
+
+
+def check_admin():
+    uid = session['uid']
+    u = User.query.filter_by(uid=uid).first()
+    return u.permission == UserPermission.Admin:
+
