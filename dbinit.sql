@@ -55,6 +55,7 @@ create table user_ext (
 create table wall (
     `uid` int(10) not null primary key,
     `photos` text, 
+    `title` text,
     `upvotes` int(10),
     `filter` text,
     `created_at` real,

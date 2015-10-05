@@ -332,10 +332,11 @@ def api_edit_filter():
 
 
 @app.route('/api/wall/edit_photo', methods=['POST'])
-def api_edit_photo():
+def api_edit_wall():
     uid = session['uid']
     new_photos = request.form.getlist('photos')
-    return api.wall.set_my_photos(uid, new_photos)
+    new_title = request.form['title']
+    return api.wall.set_my_photos(uid, new_photos, title)
 
 
 @app.route('/api/wall/upvote', methods=['GET', 'POST'])

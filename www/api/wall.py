@@ -26,11 +26,12 @@ def user_upwall(uid, title, photo_array):
     return set_my_filter(uid, {})
 
 
-def set_my_photos(uid, photo_array):
+def edit_wall(uid, photo_array, title):
     if photo_array.__len__() > 8:
         raise APIError('照片不能超过8张')
     wall = Wall.query.filter_by(uid=uid).first()
 
+    wall.title = title
     wall.photos = json.dumps(photo_array)
     wall.modified_at = time.time()
     db.session.commit()
