@@ -56,7 +56,9 @@ create table wall (
     `uid` int(10) not null primary key,
     `photos` text, 
     `upvotes` int(10),
-    `filter` text
+    `filter` text,
+    `created_at` real,
+    `modified_at` real
 );
 
 create table photos (
@@ -182,6 +184,14 @@ create table school (
     `location` text,
     `type` text,
     `properties` text
+) engine=innodb default charset=utf8;
+
+create table pageview (
+    `id` int(10) not null primary key auto_increment,
+    `user` int(10),
+    `path` text,
+    `ip_addr` text,
+    `time` real
 ) engine=innodb default charset=utf8;
 
 INSERT INTO `horoscope` VALUES (1, '白羊座', '');

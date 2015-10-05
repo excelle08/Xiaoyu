@@ -9,7 +9,7 @@ from captcha import generate_captcha
 from config.config import configs
 from model import db
 import api.common, api.user, api.tweets, api.message, api.friends
-import api.photo, api.album, api.wall, api.chat, api.notify, api.abuse_report
+import api.photo, api.album, api.wall, api.chat, api.notify, api.abuse_report, api.statistics
 import json, re
 
 app = Flask(__name__)
@@ -56,6 +56,14 @@ def user_interceptor():
 
     if not auth_flag:
         return redirect(url_for('.index'))
+
+
+@app.after_request
+def pageview_recorder():
+    uid = session['uid'] if 'uid' in session else 0
+    path = request.path
+    ip = request.remote_addr
+    api.statistics.pageview(uid, path, ip)
     
 
 

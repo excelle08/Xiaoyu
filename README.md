@@ -210,7 +210,8 @@ This section shows some user-related APIs that will return an array of data. For
 
 - Data: 
 
-    * `photos` - The array of photos URL. No more than 8 pictures.
+    * `photos` - The array of JSON object string which contain photos URL and description message. No more than 8 pictures.
+    * `title` - The name/title of the wall.
 
 - Returned data: The Wall object
 

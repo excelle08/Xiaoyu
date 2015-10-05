@@ -80,8 +80,11 @@ class Wall(db.Model, Base):
     __tablename__ = 'wall'
     uid = db.Column('uid', db.Integer, primary_key=True, nullable=False)
     photos = db.Column('photos', db.Text)
+    title = db.Column('text', db.Text)
     upvotes = db.Column('upvotes', db.Integer)
     wall_filter = db.Column('filter', db.Text)
+    created_at = db.Column('created_at', db.Float)
+    modified_at = db.Column('modified_at', db.Float)
 
 
 class Photo(db.Model, Base):
@@ -222,3 +225,12 @@ class School(db.Model, Base):
     location = db.Column('location', db.Text)
     s_type = db.Column('type', db.Text)
     s_property = db.Column('properties', db.Text)
+
+
+class PageView(db.Model, Base):
+    __tablename__ = 'pageview'
+    id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    user = db.Column('')
+    path = db.Column('path', db.Text)
+    ip_addr = db.Column('ip_addr', db.Text)
+    time = db.Column('time', db.Float)

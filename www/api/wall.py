@@ -1,10 +1,10 @@
 from model import db
 from model import Wall, User, UserMeta, UserSchool, UserPermission
 from api import APIError
-import json
+import json, time
 
 
-def user_upwall(uid, photo_array):
+def user_upwall(uid, title, photo_array):
     if photo_array.__len__() > 8:
         raise APIError('照片不能超过8张')
 
@@ -15,7 +15,10 @@ def user_upwall(uid, photo_array):
     wall = Wall()
     wall.uid = uid
     wall.photos = json.dumps(photo_array)
+    wall.title = title
     wall.upvotes = 0
+    wall.created_at = time.time()
+    wall.modified_at = time.time()
 
     db.session.add(wall)
     db.session.commit()
@@ -29,6 +32,7 @@ def set_my_photos(uid, photo_array):
     wall = Wall.query.filter_by(uid=uid).first()
 
     wall.photos = json.dumps(photo_array)
+    wall.modified_at = time.time()
     db.session.commit()
     return wall
 
@@ -50,6 +54,7 @@ def set_my_filter(uid, args):
     }
     wall = Wall.query.filter_by(uid=uid).first()
     wall.wall_filter = json.dumps(condition)
+    wall.modified_at = time.time()
 
     db.session.commit()
     return wall
