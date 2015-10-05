@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from model import db
 from model import Wall, User, UserMeta, UserSchool, UserPermission
 from api import APIError
@@ -48,9 +50,9 @@ def set_my_filter(uid, args):
         'height_min' : args['height_min'] if 'height_min' in args else 0,
         'height_min' : args['height_max'] if 'height_max' in args else 9999,
         'hometown_province' : args['hometown_province'] if 'hometown_province' in args else 0,
-        'hometown_city' : args['hometown_city'] if 'hometown_city' in args else 0
-        'work_province' : args['work_province'] if 'work_province' in args else 0
-        'work_city': args['work_city'] if 'work_city' in args else 0
+        'hometown_city' : args['hometown_city'] if 'hometown_city' in args else 0,
+        'work_province' : args['work_province'] if 'work_province' in args else 0,
+        'work_city': args['work_city'] if 'work_city' in args else 0,
         'horoscope': args['horoscope'] if 'horoscope' in args else 0
     }
     wall = Wall.query.filter_by(uid=uid).first()

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from model import db
 from model import AbuseReport
 from api import check_admin

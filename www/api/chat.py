@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from model import db
 from model import ChatMessage, Friend
 from api import APIError

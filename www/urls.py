@@ -4,9 +4,8 @@ from flask import Flask
 from flask import jsonify, session, request
 from flask import render_template, make_response
 from flask import redirect, url_for
-from api import APIError, datetime_filter, check_admin
+from api import APIError, check_admin
 from captcha import generate_captcha
-from config.config import configs
 from model import db
 import api.common, api.user, api.tweets, api.message, api.friends
 import api.photo, api.album, api.wall, api.chat, api.notify, api.abuse_report, api.statistics
@@ -59,12 +58,12 @@ def user_interceptor():
 
 
 @app.after_request
-def pageview_recorder():
+def pageview_recorder(req):
     uid = session['uid'] if 'uid' in session else 0
     path = request.path
     ip = request.remote_addr
     api.statistics.pageview(uid, path, ip)
-    
+    return req
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -349,9 +348,10 @@ def api_upvote_user():
 
 
 @app.route('/api/wall/guestwall', methods=['GET', 'POST'])
+def api_get_guest_wall():
     uid = session['uid']
     guests = api.wall.get_guest_wall_items(uid)
-    return json.dumps[item.json for item in guests]
+    return json.dumps([item.json for item in guests])
 
 
 @app.route('/api/tweet/add', methods=['POST'])
@@ -629,19 +629,3 @@ def get_city():
 def get_school():
     return json.dumps(api.common.get_schools())
 
-
-def get_mysql_conn_str():
-    db_user = configs.db.user
-    db_pass = configs.db.password
-    db_name = configs.db.database
-    db_host = configs.db.host
-    db_port = configs.db.port
-
-    return 'mysql+mysqlconnector://' + db_user + ':' + db_pass + '@' + db_host + ':' + str(db_port) + '/' + db_name
-
-
-if __name__=='__main__':
-    app.config['SQLALCHEMY_DATABASE_URI'] = get_mysql_conn_str()
-    app.config.from_object('config.config')
-    app.jinja_env.filters['datetime'] = datetime_filter
-    app.run(debug=True, host='0.0.0.0')

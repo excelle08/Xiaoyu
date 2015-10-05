@@ -2,9 +2,32 @@
 
 from flask.ext.sqlalchemy import SQLAlchemy
 from time import time
-from api import to_json
 
 db = SQLAlchemy()
+
+
+def to_json(inst, cls):
+    """
+    Jsonify the sql alchemy query result.
+    """
+    convert = dict()
+    # add your coversions for things like datetime's 
+    # and what-not that aren't serializable.
+    d = dict()
+    for c in cls.__dict__.keys():
+        if c.startswith('_'):
+            continue
+        v = getattr(inst, c)
+        if type(v) in convert.keys() and v is not None:
+            try:
+                d[c] = convert[c.type](v)
+            except:
+                d[c] = "Error:  Failed to covert using ", str(convert[type(v)])
+        elif v is None:
+            d[c] = str()
+        else:
+            d[c] = v
+    return json.dumps(d)
 
 
 def enum(**enums):
@@ -230,7 +253,7 @@ class School(db.Model, Base):
 class PageView(db.Model, Base):
     __tablename__ = 'pageview'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
-    user = db.Column('')
+    user = db.Column('user', db.Integer)
     path = db.Column('path', db.Text)
     ip_addr = db.Column('ip_addr', db.Text)
     time = db.Column('time', db.Float)

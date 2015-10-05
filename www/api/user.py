@@ -209,17 +209,18 @@ def set_user_ext(uid, args):
     return uext
 
 
-def set_user_password(uid, prev, new, vcode):
+def set_user_password(uid, new, new_2, vcode):
     try:
         user = User.query.filter_by(uid=uid).first()
         if not vcode == session['vcode']:
             raise APIError('短信验证码错误')
         if not _MD5.match(new):
             raise APIError('密码Hash值格式不正确')
-        if not prev.strip().lower() == user.password:
-            raise APIError('原密码错误')
+        if not new.strip().lower() == new_2.strip().lower():
+            raise APIError('两次密码不一样')
         user.password = new
         db.session.commit()
+        del session['vcode']
         user_logout()
     except KeyError, e:
         raise APIError(e.message)

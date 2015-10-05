@@ -116,8 +116,8 @@ Step 2: Register
 
 - Data:
     
-    * `original` The old password
-    * `new` The new password
+    * `original` Password
+    * `new` Retype password
     * `vcode` Verification code. You are required to do phone verification before requesting this API.
 
 - Will log out and redirect to homepage after success.
