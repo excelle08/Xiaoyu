@@ -110,6 +110,18 @@ Step 2: Register
     
     * The UserMeta object
 
+
+### Set user login status
+
+- GET/POST: `/api/user/online`
+
+- Data:
+    
+    * `status` - Login status.
+
+- Returned value: the User object.
+
+
 ### Change password
 
 - POST: `/api/user/password/edit`

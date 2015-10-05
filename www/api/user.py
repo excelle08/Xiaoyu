@@ -226,6 +226,14 @@ def set_user_password(uid, new, new_2, vcode):
         raise APIError(e.message)
 
 
+def set_user_login_state(uid, state):
+    u = User.query.filter_by(uid=uid).first()
+    u.online = state
+
+    db.session.commit()
+    u.password = ''
+    return u
+
 
 #### This function is intended for test.
 #### Will remove in production mode

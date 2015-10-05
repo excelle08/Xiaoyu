@@ -157,6 +157,17 @@ def api_get_user():
         raise APIError(e.message)
 
 
+@app.route('/api/user/online', methods=['GET', 'POST'])
+def api_set_user_online_state():
+    try:
+        uid = session['uid']
+        status = session['status']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return api.user.set_user_login_state(uid, status).json
+
+
 @app.route('/api/user/meta', methods=['GET', 'POST'])
 def api_get_user_meta():
     uid = request.args['uid'].strip() if "uid" in request.args else session['uid']
