@@ -8,6 +8,7 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/publish.css" rel="stylesheet">
     <script src="js/jq.js"></script>
+    <script src="js/dist/lrz.bundle.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
@@ -16,24 +17,65 @@
           <span class="back" ><</span>
         </div>
         <div class="col-xs-8 col-md-8" style="text-align:center;">
-          <span class="index_kind">TA的主页</span>
+          <span class="index_kind">说说</span>
         </div>
         <div class="col-xs-2 col-md-2" style="padding:0;">
           <a class="choose" href="#">发布</a>
         </div>
       </div>
     </nav>
-    <div style="padding:0;margin:0;">
-      <textarea class="publish" name="publish"></textarea>
-    </div>
-    <div class="pub_pic">
-      <img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg">
-    </div>
+    <form method="post" name="pub_">
+      <div style="padding:0;margin:0;">
+        <textarea class="publish" name="publish"></textarea>
+      </div>
+      <div class="pub_pic">
+        <div class="limits">
+          <select name="visibility" class="limit">
+            <option value="0" selected>对所有人可见</option>
+            <option value="1">只对好友可见</option>
+            <option value="2">Mutual</option>
+          </select>
+        </div>
+        <div id="addImg"></div>
+        <div class="ImgUploadContainer">
+          <input capture="camera" class="ImgUpload" id="ImgUpload" type="file" accept="image/*">
+        </div>
+      </div>
+    </form>
   </body>
   <script>
   var alert_h = $(".navbar").height();
   var alert_t = (alert_h - $(".choose").height())/2;
   $(".choose").css("margin-top",alert_t);
   $(".publish").css("margin-top",alert_h);
+  var width_i = $(".ImgUpload").width();
+  up_img = [];
+  $("#ImgUpload").on('change',function(){
+    //if (that.files.length === 0) return;
+    lrz(this.files[0],{width:width_i})
+      .then(function(rst){
+        var img = new Image();
+        img.src = rst.base64;
+        img.onload = function(){
+          $("#addImg").append(img);
+        };
+        up_img.push(rst.base64);
+      })
+      .catch(function(err){
+        alert(err);
+      });
+    console.log(up_img);
+    if($("#addImg>img").length > 1){
+      $(".ImgUploadContainer").hide();
+    }
+  });
+  $(".choose").click(function(){
+    $.post("/api/tweet/add",{content:$(".publish").val(),photos:up_img,visibility:$(".limit").val()},function(data){
+      if(data){
+        alert("发表成功");
+        setTimeout("window.location.href='http://www.baidu.com';", 2000);
+      }
+    });
+  });
   </script>
 </html>

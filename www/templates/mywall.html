@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN" ng-app="myApp">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>我的墙</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/mywall.css" rel="stylesheet">
+    <script src="js/jq.js"></script>
+    <script src="js/angular.min.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
+      <div class="container row" style="">
+        <div class="col-xs-3 col-md-3" style="padding:0;">
+          <span class="back" ><</span>
+        </div>
+        <div class="col-xs-6 col-md-6" style="text-align:center;">
+          <span class="index_kind">我的墙</span>
+        </div>
+        <div class="col-xs-3 col-md-3" style="padding:0;">
+          <div class="choose">编辑</div>
+        </div>
+      </div>
+    </nav>
+    <div class="equalnav"></div>
+    <ul ng-controller="thewall">
+      <div class="title">《{{wall.title}}》</div>
+      <li ng-repeat="photo in photos">
+        <img ng-src="{{photo.url}}" class="cover">
+        <div class="describe">
+          {{photo.description}}
+        </div>
+      </li>
+    </ul>
+  </body>
+  <script>
+  var alert_h = $(".navbar").height();
+  var alert_t = (alert_h - $(".choose").height())/2;
+  $(".choose").css("margin-top",alert_t);
+  $(".equalnav").css("height",alert_h);
+  var myApp = angular.module('myApp',[]);
+  myApp.controller('thewall',function($scope,$http){
+    $http.get("/api/wall/guestwall").success(function(data){
+      $scope.photos = data.photos;
+      $scope.wall = data;
+    });
+  });
+  </script>
+</html>

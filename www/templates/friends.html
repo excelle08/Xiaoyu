@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" ng-app="myApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>index</title>
+    <title>我的好友</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/friends.css" rel="stylesheet">
     <script src="js/jq.js"></script>
+    <script src="js/angular.min.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
@@ -24,18 +25,22 @@
       <div class="col-xs-6 chat_list" style="border-right:1px solid #666;">聊天</div>
       <div class="col-xs-6 fn_active f_list">好友</div>
     </div>
-    <ul class="friends_list">
-      <li>
-        <div class="group">a</div>
-        <div class="user">
+    <ul class="friends_list" ng-controller="myfriends">
+      <li ng-repeat="group in groups">
+        <div class="group" id="{{group.id}}">{{group.name}}</div>
+        <div class="group_">
+          <div class="col-xs-6 group_change" style="border-right:1px solid #fff;">更改分组名称</div>
+          <div class="col-xs-6 group_del">删除分组</div>
+        </div>
+        <div class="user" id="{{friend.uid}}" ng-repeat="friend in group.friends">
           <div class="user_infor">
-            <img src="img/test.jpg" class="userhead">
-            <span class="username"><b>奥莉薇拉</b>♀21</span>
+            <img ng-src="{{friend.avatar}}" class="userhead">
+            <span class="username"><b>{{friend.nickname}}</b>{{friend.gender}}{{friend.age}}</span>
           </div>
           <div class="user_oper">
-            <div class="col-xs-4" style="border-right:1px solid #666;padding:0;">转分组</div>
-            <div class="col-xs-4" style="border-right:1px solid #666;padding:0;">Ta的主页</div>
-            <div class="col-xs-4" style="border-right:1px solid #666;padding:0;">删除</div>
+            <div class="col-xs-4 f_trans">转分组</div>
+            <div class="col-xs-4 f_index">Ta的主页</div>
+            <div class="col-xs-4 f_delete">删除</div>
           </div>
         </div>
         <div class="user">
@@ -107,5 +112,85 @@
   $(".chat_main").click(function(){
     $(this).next().slideToggle();
   })
+  $(".group").click(function(){
+    $(this).parent().find(".group_").slideToggle();
+  });
+  $(".group_change").click(function(){
+    var name = window.prompt("分组的新名称","");
+    var id = $(this).parent().prev().attr("id");
+    if(name != "" && name != undefined){
+      $.post("/api/user/friends/groups/modify",{"title":name,"id":id},function(data){
+        if(data != ""){
+          $(this).parent().prev().text(name);
+        }
+      });
+    }
+  });
+  $(".group_del").click(function(){
+    if($(this).parent().has(".user")){
+      var mes = confirm('分组内的好友会移动到默认分组，您确定这么做吗？');
+      if(mes){
+        $.post("/api/user/friends/groups/delete",{"id":id},function(result){
+          window.location.reload();
+        });
+      }
+      else{
+        return;
+      }
+    }
+    else{
+      $.post("/api/user/friends/groups/delete",{"id":id},function(result){
+        window.location.reload();
+      });
+    }
+  });
+
+  var myApp = angular.module('myApp',[]);
+  myApp.controller('myfriends',function($scope,$http){
+    var groups = [];
+    $.post("/api/user/friends/groups",function(data){
+      for(var i=o;i<data.length;i++){
+        var group = {"id":data[i].index(),"name":data[i]};
+        groups.push(group);
+      }
+    });
+    $http.post("/api/user/friends").success(function(data){
+      for(var i=0;i<data.length;i++){
+        var uid = data[i].to;
+        var index = data[i].group;
+        $http.get("/api/user/meta",{"uid":uid}).success(function(data){
+          if(data.gender == 0){
+            data.gender ="♂";
+          }else{
+            data.gender = "♀";
+          }
+          var friends = [], friend = {};
+          $.extend({},friend,{"uid":uid});
+          $.extend({},friend,{"avatar":data.avatar});
+          $.extend({},friend,{"nickname":data.nickname});
+          $.extend({},friend,{"gender":data.gender});
+          $.extend({},friend,{"age":data.age});
+          friends.push(friend);
+        });
+        $.extend({},groups[index],{"friends":friends});
+      }
+    });
+    $scope.groups = groups;
+  });
+  $(".f_delete").click(function(){
+    var uid = $(this).parent().parent().attr("id");
+    var check = window.confirm("你确定要删除此好友吗?");
+    if(check){
+      $.post("/api/user/friends/delete",{"uid":uid},function(data){
+        if(data.id == uid){
+          var success = window.confirm("删除成功!");
+          if(success){
+            window.location.reload();
+          }
+          window.setTimeout("window.location.reload()",1000);
+        }
+      });
+    }
+  });
   </script>
 </html>

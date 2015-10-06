@@ -45,6 +45,16 @@ ul li{
   padding: 3px;
   font-size: 1em;
 }
+.group_{
+  height: 1.5em;
+  width: 100%;
+  background: #555;
+  font-size: 1.5em;
+  line-height: 1.5em;
+  color: white;
+  text-align: center;
+  display: none;
+}
 .user{
   width: 100%;
   height: auto;

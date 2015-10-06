@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" ng-app="myApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,6 +8,8 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/others.css" rel="stylesheet">
     <script src="js/jq.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/Jquery.Query.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
@@ -29,25 +31,25 @@
       <div class="blacklist">黑名单</div>
       <div class="report">举报</div>
     </div>
-    <div class="main">
+    <div class="main" ng-controller="userinfor">
       <div class="other_head">
-        <img src="img/test.jpg" class="head">
+        <img ng-src="{{user.avatar}}" class="head">
         <div class="dz">
           <img src="img/dz.jpg"><br>
-          <span class="num_dz">123</span>
+          <span class="num_dz">{{user.upvotes}}</span>
         </div>
       </div>
       <div class="other_intro">
         <div class="user">
-          <div class="user_name"><b>aoliweila</b> ♀21</div>
+          <div class="user_name"><b>{{user.nickname}}</b> {{user.gender}}{{user.age}}</div>
           <div class="user_check">认证中</div>
           <div class="tags">
             <ul>
-              <li>hhh</li><li>hhh</li><li>hhh</li><li>hhh</li><li>hhh</li><li>hhh</li><li>hhh</li><li>hhh</li>
+              <li>{{user.schoolname}}</li><li>{{user.degree}}</li>
             </ul>
           </div>
           <div class="motto">
-            一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好
+            {{user.motto}}
           </div>
         </div>
       </div>
@@ -55,7 +57,7 @@
         <img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg">
       </div>
       <div class="more">
-        <div class="visit"><span class="visit_num">222</span>访客</div><a class="moreinfor">详细资料</a>
+        <div class="visit"><span class="visit_num">{{user.contact}}</span>访客</div><a class="moreinfor">详细资料</a>
       </div>
     </div>
     <div class="share">
@@ -293,6 +295,35 @@
       $(this).removeClass("c_active");
       $(".control").slideUp();
     }
+  });
+
+  //
+  var uid = $.query.get('uid');
+  var myApp = angular.module('myApp',[]);
+  myApp.controller('userinfor',function($scope,$http){
+    var user;
+    $http.post("/api/user/meta",{"uid":uid}).success(function(data){
+      if(data.gender == 0){
+        data.gender = "♂";
+      }else{
+        data.gender = "♀";
+      }
+      user = data;
+    });
+    $http.post("/api/wall/get",{"uid":uid}).success(function(data){
+      var user0 = {"upvotes":data.upvotes};
+      $.extend({},user,user0);
+    });
+    $http.post("/api/user/school/get",{"uid":uid}).success(function(data){
+      var user1 = {"schoolname":data.school_name,"degree":data.degree};
+      $.extend({},user,user1);
+    });
+    $scope.user = user;
+  });
+  myApp.controller('usershares',function($scope,$http){
+    $http.post("/api/tweet/user",{"uid":uid}).success(function(data){
+      
+    });
   });
   </script>
 </html>

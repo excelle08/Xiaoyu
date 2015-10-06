@@ -1,0 +1,58 @@
+html,body{
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+}
+a{
+  text-decoration: none;
+}
+.login-logo{
+  width:100%;
+  height:35%;
+  background: #000;
+  display: block;
+  margin-bottom: 20px;
+}
+.b_flame{
+  padding: 0 0.8em;
+}
+.flame_disp{
+  width: 90%;
+  height: 40px;
+  border-radius: 0;
+  margin-left: 0.1em;
+  margin-bottom: 20px;
+}
+.login_password{
+  width: 100%;
+  border:1px solid #aaa;
+}
+.forget{
+  margin: 0 auto;
+}
+.check{
+  width: 40%;
+  height: 40px;
+  margin-left:3%;
+  float: left;
+}
+.reg_f1{
+  width: 90%;
+  height:40px;
+  float: left;
+  margin-left: 5%;
+  margin-bottom: 15px;
+}
+.reg-form{
+  width: 90%;
+  height: auto;
+  float: left;
+}
+.reg_f2{
+  width: 47%;
+  height: 40px;
+  margin-left: 5%;
+  margin-bottom: 15px;
+  float: left;
+}

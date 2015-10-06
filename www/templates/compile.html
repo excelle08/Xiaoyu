@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>我的墙</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/compile.css" rel="stylesheet">
+    <script src="js/jq.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/dist/lrz.bundle.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
+      <div class="container row" style="">
+        <div class="col-xs-3 col-md-3" style="padding:0;">
+          <span class="back" ><</span>
+        </div>
+        <div class="col-xs-6 col-md-6" style="text-align:center;">
+          <span class="index_kind">我的墙</span>
+        </div>
+        <div class="col-xs-3 col-md-3" style="padding:0;">
+          <div class="choose">保存</div>
+        </div>
+      </div>
+    </nav>
+    <div class="equalnav"></div>
+    <ul class="bodyul">
+      <div class="title">
+        <input type="text" value="《{{wall.title}}》" class="title_">
+      </div>
+      <li>
+        <div class="com_cover">
+          <img ng-src="{{photo.url}}" id="cover" class="cover">
+          <div class="ImgUploadContainer">
+            <input capture="camera" class="ImgUpload" id="ImgUpload" type="file" accept="image/*">
+          </div>
+        </div>
+        <textarea disabled class="describe">{{photo.description}}{{photo.description}}{{photo.description}}{{photo.description}}{{photo.description}}{{photo.descriptio</textarea>
+        <div class="com_scr">
+          <div class="col-xs-2 com_con">编辑</div>
+          <div class="col-xs-2 com_del">删除</div>
+          <div class="col-xs-2 com_script">
+            <span class="scr_">字体</span>
+            <ul class="choose_scr">
+              <li>宋体</li>
+              <li>黑体</li>
+              <li>微软雅黑</li>
+              <li>微软正黑体</li>
+              <li>新宋体</li>
+              <li>新细明体</li>
+              <li>细明体</li>
+              <li>标楷体</li>
+              <li>仿宋</li>
+              <li>楷体</li>
+            </ul>
+          </div>
+          <div class="col-xs-3 com_add_img">
+            <input capture="camera" class="add_img" type="file" accept="image/*">
+          </div>
+          <div class="col-xs-3 com_add_scr">在下加文</div>
+        </div>
+      </li>
+      <li>
+        <div class="com_photo">
+          <img class="photo">
+          <div class="com_pic">
+            <div class="col-xs-3 com_pic_change">
+              <input capture="camera" class="change_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_pic_del">删除</div>
+            <div class="col-xs-3 com_add_img">
+              <input capture="camera" class="add_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_add_scr">在下加文</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="com_photo">
+          <img class="photo">
+          <div class="com_pic">
+            <div class="col-xs-3 com_pic_change">
+              <input capture="camera" class="change_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_pic_del">删除</div>
+            <div class="col-xs-3 com_add_img">
+              <input capture="camera" class="add_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_add_scr">在下加文</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="com_photo">
+          <img class="photo">
+          <div class="com_pic">
+            <div class="col-xs-3 com_pic_change">
+              <input capture="camera" class="change_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_pic_del">删除</div>
+            <div class="col-xs-3 com_add_img">
+              <input capture="camera" class="add_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_add_scr">在下加文</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="com_photo">
+          <img class="photo">
+          <div class="com_pic">
+            <div class="col-xs-3 com_pic_change">
+              <input capture="camera" class="change_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_pic_del">删除</div>
+            <div class="col-xs-3 com_add_img">
+              <input capture="camera" class="add_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_add_scr">在下加文</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="com_photo">
+          <img class="photo">
+          <div class="com_pic">
+            <div class="col-xs-3 com_pic_change">
+              <input capture="camera" class="change_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_pic_del">删除</div>
+            <div class="col-xs-3 com_add_img">
+              <input capture="camera" class="add_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_add_scr">在下加文</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="com_photo">
+          <img class="photo">
+          <div class="com_pic">
+            <div class="col-xs-3 com_pic_change">
+              <input capture="camera" class="change_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_pic_del">删除</div>
+            <div class="col-xs-3 com_add_img">
+              <input capture="camera" class="add_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_add_scr">在下加文</div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="com_photo">
+          <img class="photo">
+          <div class="com_pic">
+            <div class="col-xs-3 com_pic_change">
+              <input capture="camera" class="change_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_pic_del">删除</div>
+            <div class="col-xs-3 com_add_img">
+              <input capture="camera" class="add_img" type="file" accept="image/*">
+            </div>
+            <div class="col-xs-3 com_add_scr">在下加文</div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </body>
+  <script>
+  var cover;
+  var photos = [];
+  var alert_h = $(".navbar").height();
+  var alert_t = (alert_h - $(".choose").height())/2;
+  $(".choose").css("margin-top",alert_t);
+  $(".equalnav").css("height",alert_h);
+  $(".com_con").click(function(){
+    $(this).parent().prev().removeAttr("disabled");
+  });
+  $(".com_del").click(function(){
+    $(this).parent().prev().remove();
+    $(this).parent().remove();
+  });
+  $(".scr_").click(function(){
+    $(".choose_scr").slideDown();
+    $(".choose_scr").show().find("li").bind("click" ,function(){
+      $(this).parent().prev().text($(this).text());
+      $(this).parent().parent().parent().prev().css("font-family",$(this).text());
+      $(".choose_scr").slideUp();
+    });
+  });
+  $(".change_img").on('change',function(){
+    if(this.files.length === 0) return;
+    var that = $(this);
+    lrz(this.files[0])
+      .then(function(rst){
+        that.parent().parent().prev().attr("src",rst.base64);
+        console.log(that.parent().parent().parent().parent().index());
+      })
+      .catch(function(err){
+        alert(err);
+      });
+  });
+  $(".add_img").on('change',function(){
+    lrz(this.files[0])
+      .then(function(rst){
+        var parentdiv = $('<div></div>');
+        parentdiv.addClass("com_photo");
+        var img = new Image();
+        img.className = "photo";
+        img.src = rst.base64;
+        parentdiv.append(img);
+        photos.push(img.src);
+        var childdiv2 = $('<div></div>');
+        childdiv2.addClass("com_pic");
+        var change = $('<div></div>');
+        change.addClass("col-xs-3");
+        change.addClass("com_pic_change");
+        childdiv2.append(change);
+        var del = $('<div></div>');
+        del.addClass("col-xs-3 com_pic_del");
+        childdiv2.append(del);
+        var add_img = $('<div></div>');
+        add_img.addClass("col-xs-3 add_img");
+        childdiv2.append(add_img);
+        var add_scr = $('<div></div>');
+        add_scr.addClass("col-xs-3 com_add_scr");
+        childdiv2.append(add_scr);
+        parentdiv.append(childdiv2);
+        var li = $('<li></li>');
+        li.append(parentdiv);
+        $(".bodyul").append(li);
+      })
+      .catch(function(err){
+        alert(err);
+      });
+  });
+  $("#ImgUpload").on('change',function(){
+    if (this.files.length === 0) return;
+    lrz(this.files[0])
+      .then(function(rst){
+        $("#cover").attr("src",rst.base64);
+        cover = rst.base64;
+      })
+      .catch(function(err){
+        alert(err);
+      });
+  });
+
+
+  </script>
+</html>

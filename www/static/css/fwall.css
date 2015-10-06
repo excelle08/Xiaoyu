@@ -19,6 +19,7 @@ ul li{
   padding-top: 0.5em;
   padding-left: 1em;
   padding-bottom: 0.5em;
+  font-size: 1.2em;
 }
 .back{
   margin: auto;
@@ -72,8 +73,12 @@ ul li{
   margin-top: 0.7em;
 }
 .user{
+  color: #777;
   float: left;
 }
 .update{
   float: right;
+}
+.sex{
+  color: #000;
 }
