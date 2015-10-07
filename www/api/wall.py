@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from model import db
-from model import Wall, User, UserMeta, UserSchool, UserPermission
+from model import Wall, User, UserMeta, UserSchool, UserPermission, WallUpvote
 from api import APIError
 import json, time
 
@@ -65,7 +65,7 @@ def set_my_filter(uid, args):
 
 def remove_wall(uid):
     wall = Wall.query.filter_by(uid=uid)
-    wid = wall.id
+    wid = wall.uid
     db.session.delete(wall)
     db.session.commit()
     return {"id": wid}
@@ -79,8 +79,28 @@ def upvote_user(uid):
     wall = Wall.query.filter_by(uid=uid).first()
     wall.upvotes += 1
 
+    upvote = WallUpvote()
+    upvote.uid = uid
+    upvote.target = wall.uid
+    upvote.new = True
+    upvote.time = time.time()
+
+    db.session.add(upvote)
     db.session.commit()
-    return wall
+    return upvote
+
+
+def get_new_upvotes(uid):
+    upvotes = WallUpvote.query.filter_by(new=True).ordered_by(WallUpvote.time.desc()).all()
+    for i in upvotes:
+        i.new = False
+
+    db.session.commit()
+    return upvotes
+
+
+def get_all_my_upvotes(uid):
+    return WallUpvote.query.ordered_by(WallUpvote.time.desc()).all()
 
 
 def filter_users(uid):

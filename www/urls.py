@@ -22,6 +22,7 @@ def handle_api_error(error):
     return response
 
 
+#  ------------Permission control, Interceptor---------------
 @app.before_request
 def admin_interceptor():
     if '/admin' in request.path:  
@@ -65,7 +66,7 @@ def pageview_recorder(req):
     api.statistics.pageview(uid, path, ip)
     return req
 
-
+#  ---------------Front-end view rendering route--------------
 @app.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('homepage.html')
@@ -84,6 +85,7 @@ def test_user_register():
 ### end
 
 
+# ---------------User-related backend API---------------------
 @app.route('/api/user/verify', methods=['POST'])
 def api_send_verification_sms():
     try:
@@ -223,6 +225,7 @@ def api_edit_password():
     return redirect(url_for('.index'))
 
 
+#    ------------------FRIENDS----------------
 @app.route('/api/user/friends/add', methods=['GET', 'POST'])
 def api_add_friend():
     try:
@@ -282,6 +285,17 @@ def api_agree_friends_request():
     return api.friends.agree_friend(req_id, group).json
 
 
+@app.route('/api/user/friends/transgroup', methods=['GET', 'POST'])
+def api_trans_friend_group():
+    try:
+        friend_id = request.args['friend_id'].strip()
+        to_group = request.args['to_group'].strip()
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return api.friends.trans_friend(friend_id, to_group)
+
+
 @app.route('/api/user/friends/delete', methods=['GET', 'POST'])
 def api_delete_friend():
     try:
@@ -312,6 +326,7 @@ def api_delete_from_blacklist():
     return json.dumps(api.friends.remove_from_blacklist(uid))
 
 
+#    -------------W A L L---------------
 @app.route('/api/wall/go', methods=['POST'])
 def api_go_to_wall():
     try:
@@ -331,7 +346,7 @@ def api_get_wall():
 
 @app.route('/api/wall/delete', methods=['GET', 'POST'])
 def api_delete_wall():
-    uid = request.args['uid']
+    uid = session['uid']
     return json.dumps(api.wall.remove_wall(uid))
 
 
@@ -341,7 +356,7 @@ def api_edit_filter():
     return api.wall.set_my_filter(uid, request.form).json
 
 
-@app.route('/api/wall/edit_photo', methods=['POST'])
+@app.route('/api/wall/edit_wall', methods=['POST'])
 def api_edit_wall():
     uid = session['uid']
     new_photos = request.form.getlist('photos')
@@ -358,6 +373,18 @@ def api_upvote_user():
     return api.wall.upvote_user(uid)
 
 
+@app.route('/api/wall/upvote/new', methods=['GET', 'POST'])
+def api_get_my_new_upvotes():
+    uid = request.args['uid'] if 'uid' in request.args else session['uid']
+    return json.dumps([ i.json for i in api.wall.get_new_upvotes(uid) ])
+
+
+@app.route('/api/wall/upvote/all', methods=['GET', 'POST'])
+def api_get_all_upvotes():
+    uid = request.args['uid'] if 'uid' in request.args else session['uid']
+    return json.dumps([ i.json for i in api.wall.get_all_my_upvotes(uid) ])
+
+
 @app.route('/api/wall/guestwall', methods=['GET', 'POST'])
 def api_get_guest_wall():
     uid = session['uid']
@@ -365,6 +392,7 @@ def api_get_guest_wall():
     return json.dumps([item.json for item in guests])
 
 
+#  -------- Tweet system -----------
 @app.route('/api/tweet/add', methods=['POST'])
 def api_add_tweet():
     try:
@@ -438,6 +466,7 @@ def api_reply_delete():
         raise APIError(e.message)
 
 
+# ------------Photo system------------------
 @app.route('/api/photo/upload', methods=['POST'])
 def api_upload_photo():
     try:
@@ -473,6 +502,7 @@ def api_remove_photo():
         raise APIError(e.message)
 
 
+# ---------------Message-------------------
 @app.route('/api/message/add', methods=['POST'])
 def api_message_add():
     try:
@@ -535,6 +565,7 @@ def api_message_Reply_delete():
         raise APIError(e.message)
 
 
+# ------------------Chat-----------------------
 @app.route('/api/chat/send', methods=['POST'])
 def api_chat_sendmsg():
     try:
@@ -558,6 +589,7 @@ def api_chat_recvmsg():
         return json.dumps([i.json for i in api.chat.receive_all(uid)])
 
 
+# ----------------Utilities--------------------
 @app.route('/api/notifications', methods=['GET', 'POST'])
 def api_get_notifications():
     later_than = request.args['later_than'] if 'later_than' in request.args else 0    
@@ -576,6 +608,7 @@ def api_abuse_report():
     return api.abuse_report.report_abuse(uid, target, content).json
 
 
+# -------------------Admin back-side operations----------------
 @app.route('/api/admin/notification/send', methods=['POST'])
 def api_send_notification():
     try:

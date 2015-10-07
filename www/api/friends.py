@@ -54,7 +54,18 @@ def rename_friend_group(id, title):
 
     db.session.commit()
     return group
-    
+
+
+def trans_friend(friend_id, to_group):
+    uid = session['uid']
+    friend = Friend.query.filter(Friend.user==uid, Friend.to==friend_id).first()
+    if not friend:
+        raise APIError('好友不存在。。')
+    friend.group = to_group
+
+    db.session.commit()
+    return friend
+
 
 def get_friends():
     uid = session['uid']

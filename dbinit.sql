@@ -46,20 +46,29 @@ create table user_meta (
 	`show_name` boolean,
 	`show_contact` boolean
 ) engine=innodb default charset=utf8;
+
 # JSON key-value data
 create table user_ext (
     `uid` int(10) not null primary key,
     `content` text  
 ) engine=innodb default charset=utf8;
-# JSON array
+
 create table wall (
     `uid` int(10) not null primary key,
     `photos` text, 
     `title` text,
-    `upvotes` int(10),
     `filter` text,
+    `upvotes` int(10),
     `created_at` real,
     `modified_at` real
+);
+
+create table wallupvotes (
+    `id` int(10) not null primary key auto_increment,
+    `uid` int(10),
+    `target` int(10),
+    `new` boolean
+    `time` real
 );
 
 create table photos (

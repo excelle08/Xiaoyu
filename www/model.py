@@ -110,6 +110,15 @@ class Wall(db.Model, Base):
     modified_at = db.Column('modified_at', db.Float)
 
 
+class WallUpvote(db.Model, Base):
+    __tablename__ = 'wallupvotes'
+    id = db.Column('id', db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    uid = db.Column('uid', db.Integer)
+    target = db.Column('target', db.Integer)
+    new = db.Column('new', db.Boolean)
+    time = db.Column('time', db.Float)
+
+
 class Photo(db.Model, Base):
     __tablename__ = 'photos'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)

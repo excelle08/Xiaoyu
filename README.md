@@ -227,6 +227,23 @@ This section shows some user-related APIs that will return an array of data. For
 
 - Returned data: The Wall object
 
+
+### Get one's wall
+
+- GET/POST: `/api/wall/get`
+
+- Data:
+    
+    * `uid` - UID. Defaults to the current login user.
+
+- Returned value: the Wall object
+
+### Remove my wall 
+
+- GET/POST: `/api/wall/delete`
+
+- Returned value: `data.id` the UID.
+
 ### Edit my filter
 
 - POST: `/api/wall/edit_filter`
@@ -248,13 +265,14 @@ This section shows some user-related APIs that will return an array of data. For
 
 - Returned data: the Wall object
 
-### Edit my photo
+### Edit my wall
 
 - POST: `/api/wall/edit_photo`
 
 - Data:
 
     * `photos` - The array of photos URL.
+    * `title` - The name/title of the wall
 
 - Returned Data: the Wall object
 
@@ -266,7 +284,27 @@ This section shows some user-related APIs that will return an array of data. For
     
     * `uid` The User ID
 
-- Returned value - the Wall object
+- Returned value - the WallUpvote object
+
+### Get one's new upvotes
+
+- GET/POST: `/api/wall/upvote/new`
+
+- Data: 
+    
+    * `uid` the user ID. Defaults to the current login user.
+
+- Return value: an array of WallUpvote objects
+
+### Get one's all upvotes
+
+- GET/POST: `/api/wall/upvote/all`
+
+- Data: 
+    
+    * `uid` the user ID. Defaults to the current login user.
+
+- Return value: an array of WallUpvote objects
 
 ### Get guest wall
 
@@ -391,6 +429,17 @@ This section shows some user-related APIs that will return an array of data. For
     * `group` The ID of group to which you want add the friend if you agree. Defaults to 0.
 
 - Return value: The Friend object.
+
+### Trans friend to another group
+
+- GET/POST: `/api/user/friends/transgroup`
+
+- Data:
+    
+    * `friend_id` UID of the friend
+    * `to_group` ID of the group to be transferred to
+
+- Returned value: the Friend object.
 
 ### Delete a friend
 
