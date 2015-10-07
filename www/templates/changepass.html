@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN" ng-app="login">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>更改密码</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/changepass.css" rel="stylesheet">
+    <script src="js/jq.js"></script>
+    <script src="js/angular.min.js"></script>
+  </head>
+  <body ng-controller="myController">
+    <div class="login-logo"></div>
+    <form class="b_flame" method="post" ng-submit="submitForm(myForm.$valid)" name="myForm" novalidate>
+      <input type="number" class="reg_f1" name="phone" placeholder="  手机号:" required ng-model="phone" ng-minlength='11' ng-maxlength='11'/>
+      <span ng-show="myForm.phone.$dirty && myForm.phone.$valid"></span>
+      <input type="text" class="reg_f2" name="vcode" placeholder="  填写验证码:" required ng-model="check">
+      <input type="button" class="check" id="check" value="获取验证码">
+      <span ng-show="myForm.check.$dirty && myForm.check.$valid"></span>
+        <input type="password" class="flame_disp" name="new" id="pass" placeholder="  原密码:" required ng-minlength='8' ng-model="pass"/>
+        <br><span ng-show="myForm.password.$dirty && myForm.password.$valid"></span>
+        <input type="password" class="reg_f1" name="r_new" id="r_pass" placeholder="  新密码:最小长度为8" required ng-minlength='8' ng-model="r_pass"/>
+        <span ng-show="myForm.r_pass.$dirty && myForm.r_pass.$valid"></span>
+      <input type="submit" class="btn btn-default form-control flame_disp" id="submit" ng-disabled="myForm.phone.$invalid || myForm.check.$invalid || myForm.new.$invalid || myForm.r_new.$invalid" style="background:#777;" value="登录">
+    </form>
+  </body>
+  <script type="text/javascript">
+    $(".reg").click(function(){
+      window.location = "reg.html";
+    });
+    var myApp = angular.module('login', [])
+    myApp.controller('myController', function($scope) {
+      $scope.submitForm = function(isValid) {
+            if (!isValid) {
+                alert('请注意格式');
+            }
+        };
+      }
+    );
+    $(".check").click(function(){
+      var numbers = /^1\d{10}$/;
+      var val = $(".reg_f1").val().replace(/\s+/g,"");
+      if(!numbers.test(val) || val.length ==0){
+        alert("手机格式错误");
+      }
+      else{
+        $.post("/api/user/verify",{phone:$(".reg_f1").val()},function(data){
+          if(data.code == 0 && data.msg == "OK"){
+            alert("短信已发送");
+          }
+          else{
+            alert("发生错误:"+data.msg);
+          }
+          var count = 60;
+          var countdown = setInterval(CountDown, 1000);
+          function CountDown() {
+            $(".check").attr("disabled", true);
+            $(".check").val(count + "秒后重发");
+            if (count == 0) {
+              $(".check").val("获取验证码").removeAttr("disabled");
+              clearInterval(countdown);
+            }
+            count--;
+          }
+        });
+      }
+    });
+    $("#submit").click(function(){
+      if($("#pass").val() != $("#r_pass").val()){
+        alert("输入密码不一致");
+      }else{
+        $(".b_flame").submit(function(){
+          $.ajax({
+            url: "/api/user/password/edit",
+            data: $(".reg_form").serialize(),
+            dataType: "application/json",
+            error: function(data){
+              alert(data.message);
+            },
+            success: function(data){
+              alert("修改成功");
+              window.location = history.back();
+            }
+          });
+        });
+      }
+    });
+  </script>
+</html>

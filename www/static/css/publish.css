@@ -38,13 +38,48 @@ html,body{
 .pub_pic{
   margin-top: 0;
   width: 100%;
+  height: auto;
   min-height: 8em;
   background: #fff;
   padding: 1em;
+  overflow: hidden;
 }
 .pub_pic img{
   width: 4.5em;
   height: 4.5em;
   margin-right: 0.5em;
   margin-bottom: 1em;
+}
+.limits{
+  margin-bottom: 2em;
+  height: 2em;
+}
+.limit{
+  height: 2.5em;
+  font-size: 1.2em;
+  width: 50%;
+}
+.ImgUploadContainer{
+  height: 5em;
+  width: 5em;
+  background: url(../img/add.jpg) no-repeat;
+  background-size: cover;
+  position: relative;
+}
+.ImgUpload{
+  height: 5em;
+  width: 5em;
+  position: absolute;
+  right: 0;
+  top: 0;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  cursor: pointer;
+  float: left;
+}
+.pub_pic img{
+  margin-top: 2em;
+  margin-right: 2em;
+  width: 8em;
+  height: 8em;
 }

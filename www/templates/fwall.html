@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" ng-app="myApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,7 +17,7 @@
           <span class="back" ><</span>
         </div>
         <div class="col-xs-6 col-md-6" style="text-align:center;">
-          <span class="index_kind">首页</span>
+          <span class="index_kind">嘉宾墙</span>
         </div>
         <div class="col-xs-3 col-md-3" style="padding:0;">
           <div class="choose">我的墙</div>
@@ -25,15 +25,15 @@
       </div>
     </nav>
     <div class="equalnav"></div>
-    <ul>
-      <li>
-        <div class="title">《关于一个乐观的我》</div>
-        <img src="img/test.jpg" class="cover">
+    <ul ng-controller="guestwalls">
+      <li ng-repeat="wall in walls">
+        <div class="title">{{wall.title}}</div>
+        <img ng-src="{{wall.photo.url}}" class="cover">
         <div class="describe">
-          关于一个乐观的我关于一个乐观的我关于一个乐观的我关于一个乐观的我关于一个乐观的我关于一个乐观的我关于一个乐观的我关于一个乐观的我关于一个乐观的我
+          {{wall.photo.description}}
         </div>
         <div class="infor">
-          <span class="user">关于一个♂21</span>
+          <span class="user">{{wall.nickname}}<span class="sex">{{wall.gender}}</span>{{wall.age}}</span>
           <span class="update">1分钟前更新</span>
         </div>
       </li>
@@ -44,5 +44,31 @@
   var alert_t = (alert_h - $(".choose").height())/2;
   $(".choose").css("margin-top",alert_t);
   $(".equalnav").css("height",alert_h);
+  var myApp = angular.module('myApp',[]);
+  myApp.controller('guestwalls',function($scope,$http){
+    var wall_init,user;
+    var walls = [];
+    $http.get("/api/wall/guestwall").success(function(data){
+      wall_init = data;
+    });
+    for(var i = 0; i < wall_init.length; i++){
+      var wall0 = {uid:wall_init[i].uid,photo:wall_init[i].photos[0],title:wall_init[i].title};
+      $.post("/api/user/meta",{uid:wall_init[i].uid},function(data){
+        user = data;
+        for(var i = 0;i < user.length; i++){
+          var user0 = {nickname:user[i].nickname,gender:user[i].gender,age:user[i].age};
+          var wall_m = $.extend({},wall0,user0);
+          g_walls.push(wall_m);
+          if(wall_m[i].gender == "man"){
+            wall_m[i].gender = "♂";
+          }
+          else{
+            wall_m[i].gender = "♀";
+          }
+        }
+      });
+    }
+    $scope.walls = g_walls;
+  });
   </script>
 </html>
