@@ -28,11 +28,7 @@
     <div style="equalnav" style="width:100%;"></div>
     <div class="main" style="z-index:1000;">
       <form id="userform" method="post" action="/api/user">
-        <div class="grid">
-          <div class="head"></div>
-          <input type="text" name="nickname" placeholder="  昵称：" class="nickname">
-        </div>
-        <!--<table border="1">
+        <table border="1">
           <tr>
             <div class="head"></div>
           </tr>
@@ -41,68 +37,37 @@
           </tr>
           <tr>
             <div class="sex">
-              <input type="radio" name="man">男
-              <input type="radio" name="woman">女
+              <input type="radio" name="man" class="sex_man">男
+              <input type="radio" name="woman" class="sex_woman">女
             </div>
           </tr>
           <tr>
             <div class="birth">
               <div class="btn-group col-xs-4" style="padding:0;">
-                <select autofocus class="" style="width:100%;height:2em;background:#fff;">
-                  <option value="age1995">1995</option>
-                  <option value="age1996">1996</option>
-                  <option value="age1997">1997</option>
-                  <option value="age1998">1998</option>
-                  <option value="age1999">1999</option>
-                  <option value="age2000">2000</option>
-                  <option value="age2001">2001</option>
-                  <option value="age2002">2002</option>
-                </select>
+                <input class="input__" type="text" placeholder="出生年"/>
               </div>
               <div class="btn-group col-xs-4" style="padding:0;">
-                <select autofocus class="" style="width:100%;height:2em;background:#fff;">
-                  <option value="day1">1</option>
-                  <option value="day2">2</option>
-                  <option value="day3">3</option>
-                  <option value="day4">4</option>
-                  <option value="day5">5</option>
-                  <option value="day6">6</option>
-                  <option value="day7">7</option>
-                  <option value="day8">8</option>
-                </select>
+                <input class="input__" type="text" placeholder="出生月"/>
               </div>
               <div class="btn-group col-xs-4" style="padding:0;">
-                <select autofocus class="" style="width:100%;height:2em;background:#fff;">
-                  <option value="day1">1</option>
-                  <option value="day2">2</option>
-                  <option value="day3">3</option>
-                  <option value="day4">4</option>
-                  <option value="day5">5</option>
-                  <option value="day6">6</option>
-                  <option value="day7">7</option>
-                  <option value="day8">8</option>
-                </select>
+                <input class="input__" type="text" placeholder="出生日"/>
               </div>
           </tr>
           <tr>
             <div class="btn-group form_" style="margin-top:1em">
-              <select style="width:99%;height:2.5em;background:#fff;margin:1px;">
-                <option value="tall">180</option>
-              </select>
+              <div class="btn-group form_">
+                <input class="input_" type="text" placeholder="选择身高"/>
+              </div>
             </div>
           </tr>
           <tr>
             <div class="btn-group form_">
-              <select style="width:99%;height:2.5em;background:#fff;margin:1px;">
-                <option value="home">home</option>
-              </select>
+              <input class="input_" type="text" placeholder="选择家乡"/>
             </div>
           </tr>
           <tr>
             <div class="btn-group form_">
-              <select style="width:99%;height:2.5em;background:#fff;margin:1px;">
-                <option value="work">准备工作地</option>
-              </select>
+              <input class="input_" type="text" placeholder="准备工作地"/>
             </div>
           </tr>
           <tr>
@@ -123,38 +88,20 @@
             </div>
           </tr>
           <tr>
-            <div class="btn-group form_" style="z-index:9999;">
-              <input type="text" id="schoolName" readonly placeholder="学校"/>
-              <div id="proSchool" class="provinceSchool">
-                <div class="title">
-                  <span>已选择:</span>
-                </div>
-                <div class="proSelect">
-		              <select></select>
-	                <span>如没找到选择项，请选择其他手动填写</span>
-		              <input type="text" >
-	               </div>
-                 <div class="schoolList">
-                   <ul>
-                   </ul>
-                 </div>
-              </div>
+            <div class="btn-group form_">
+              <input class="input_" type="text" placeholder="选择学校"/>
             </div>
           </tr>
           <tr>
             <div class="btn-group form_">
-              <select style="width:99%;height:2.5em;background:#fff;">
-                <option value="subjec">选择专业</option>
-              </select>
+              <input class="input_" type="text" placeholder="选择专业"/>
             </div>
           </tr>
           <tr>
             <div class="btn-group form_">
-              <select style="width:99%;height:2.5em;background:#fff;">
-                <option value="subjec">选择学历</option>
-              </select>
+              <input class="input_" type="text" placeholder="选择学历"/>
             </div>
-          </tr>-->
+          </tr>
         </table>
       </form>
     </div>
@@ -165,6 +112,12 @@
   $(".choose").css("margin-top",alert_t);
   $(".publish").css("margin-top",alert_h);
   $(".equalnav").css("height",alert_h);
+  $(".sex_man").click(function(){
+    $(".sex_woman").removeAttr("checked");
+  });
+  $(".sex_woman").click(function(){
+    $(".sex_man").removeAttr("checked");
+  });
   $(".choose").click(function(){
     $(".userform").submit(function(){
       $.ajax({

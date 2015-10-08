@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" ng-app="myApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -26,22 +26,44 @@
       </div>
     </nav>
     <div class="equalnav"></div>
-    <ul class="bodyul">
+    <ul class="bodyul" ng-controller="wall">
+      <div id="script">
+      <textarea disabled class="describe"></textarea>
+      <div class="com_scr">
+        <div class="col-xs-4 com_con">编辑</div>
+        <div class="col-xs-4 com_del">删除</div>
+        <div class="col-xs-4 com_script">
+          <span class="scr_">字体</span>
+          <ul class="choose_scr">
+            <li>宋体</li>
+            <li>黑体</li>
+            <li>微软雅黑</li>
+            <li>微软正黑体</li>
+            <li>新宋体</li>
+            <li>新细明体</li>
+            <li>细明体</li>
+            <li>标楷体</li>
+            <li>仿宋</li>
+            <li>楷体</li>
+          </ul>
+        </div>
+      </div>
+      </div>
       <div class="title">
-        <input type="text" value="《{{wall.title}}》" class="title_">
+        <input type="text" value="{{title}}" class="title_">
       </div>
       <li>
         <div class="com_cover">
-          <img ng-src="{{photo.url}}" id="cover" class="cover">
+          <img ng-src="{{cover.cover_url}}" id="cover" class="cover">
           <div class="ImgUploadContainer">
             <input capture="camera" class="ImgUpload" id="ImgUpload" type="file" accept="image/*">
           </div>
         </div>
-        <textarea disabled class="describe">{{photo.description}}{{photo.description}}{{photo.description}}{{photo.description}}{{photo.description}}{{photo.descriptio</textarea>
+        <textarea disabled class="describe">{{cover.cover_des}}</textarea>
         <div class="com_scr">
-          <div class="col-xs-2 com_con">编辑</div>
-          <div class="col-xs-2 com_del">删除</div>
-          <div class="col-xs-2 com_script">
+          <div class="col-xs-4 com_con">编辑</div>
+          <div class="col-xs-4 com_del">删除</div>
+          <div class="col-xs-4 com_script">
             <span class="scr_">字体</span>
             <ul class="choose_scr">
               <li>宋体</li>
@@ -56,114 +78,38 @@
               <li>楷体</li>
             </ul>
           </div>
-          <div class="col-xs-3 com_add_img">
-            <input capture="camera" class="add_img" type="file" accept="image/*">
-          </div>
-          <div class="col-xs-3 com_add_scr">在下加文</div>
         </div>
       </li>
       <li>
         <div class="com_photo">
-          <img class="photo">
+          <img class="photo" ng-src="{{photo1.photo1_url}}">
           <div class="com_pic">
-            <div class="col-xs-3 com_pic_change">
+            <div class="col-xs-6 com_pic_change">
               <input capture="camera" class="change_img" type="file" accept="image/*">
             </div>
-            <div class="col-xs-3 com_pic_del">删除</div>
-            <div class="col-xs-3 com_add_img">
-              <input capture="camera" class="add_img" type="file" accept="image/*">
-            </div>
-            <div class="col-xs-3 com_add_scr">在下加文</div>
+            <div class="col-xs-6 com_add_scr">在下加文</div>
           </div>
         </div>
       </li>
       <li>
         <div class="com_photo">
-          <img class="photo">
+          <img class="photo" ng-src="{{photo2.photo2_url}}">
           <div class="com_pic">
-            <div class="col-xs-3 com_pic_change">
+            <div class="col-xs-6 com_pic_change">
               <input capture="camera" class="change_img" type="file" accept="image/*">
             </div>
-            <div class="col-xs-3 com_pic_del">删除</div>
-            <div class="col-xs-3 com_add_img">
-              <input capture="camera" class="add_img" type="file" accept="image/*">
-            </div>
-            <div class="col-xs-3 com_add_scr">在下加文</div>
+            <div class="col-xs-6 com_add_scr">在下加文</div>
           </div>
         </div>
       </li>
       <li>
         <div class="com_photo">
-          <img class="photo">
+          <img class="photo" ng-src="{{photo3.photo3_url}}">
           <div class="com_pic">
-            <div class="col-xs-3 com_pic_change">
+            <div class="col-xs-6 com_pic_change">
               <input capture="camera" class="change_img" type="file" accept="image/*">
             </div>
-            <div class="col-xs-3 com_pic_del">删除</div>
-            <div class="col-xs-3 com_add_img">
-              <input capture="camera" class="add_img" type="file" accept="image/*">
-            </div>
-            <div class="col-xs-3 com_add_scr">在下加文</div>
-          </div>
-        </div>
-      </li>
-      <li>
-        <div class="com_photo">
-          <img class="photo">
-          <div class="com_pic">
-            <div class="col-xs-3 com_pic_change">
-              <input capture="camera" class="change_img" type="file" accept="image/*">
-            </div>
-            <div class="col-xs-3 com_pic_del">删除</div>
-            <div class="col-xs-3 com_add_img">
-              <input capture="camera" class="add_img" type="file" accept="image/*">
-            </div>
-            <div class="col-xs-3 com_add_scr">在下加文</div>
-          </div>
-        </div>
-      </li>
-      <li>
-        <div class="com_photo">
-          <img class="photo">
-          <div class="com_pic">
-            <div class="col-xs-3 com_pic_change">
-              <input capture="camera" class="change_img" type="file" accept="image/*">
-            </div>
-            <div class="col-xs-3 com_pic_del">删除</div>
-            <div class="col-xs-3 com_add_img">
-              <input capture="camera" class="add_img" type="file" accept="image/*">
-            </div>
-            <div class="col-xs-3 com_add_scr">在下加文</div>
-          </div>
-        </div>
-      </li>
-      <li>
-        <div class="com_photo">
-          <img class="photo">
-          <div class="com_pic">
-            <div class="col-xs-3 com_pic_change">
-              <input capture="camera" class="change_img" type="file" accept="image/*">
-            </div>
-            <div class="col-xs-3 com_pic_del">删除</div>
-            <div class="col-xs-3 com_add_img">
-              <input capture="camera" class="add_img" type="file" accept="image/*">
-            </div>
-            <div class="col-xs-3 com_add_scr">在下加文</div>
-          </div>
-        </div>
-      </li>
-      <li>
-        <div class="com_photo">
-          <img class="photo">
-          <div class="com_pic">
-            <div class="col-xs-3 com_pic_change">
-              <input capture="camera" class="change_img" type="file" accept="image/*">
-            </div>
-            <div class="col-xs-3 com_pic_del">删除</div>
-            <div class="col-xs-3 com_add_img">
-              <input capture="camera" class="add_img" type="file" accept="image/*">
-            </div>
-            <div class="col-xs-3 com_add_scr">在下加文</div>
+            <div class="col-xs-6 com_add_scr">在下加文</div>
           </div>
         </div>
       </li>
@@ -184,11 +130,12 @@
     $(this).parent().remove();
   });
   $(".scr_").click(function(){
-    $(".choose_scr").slideDown();
-    $(".choose_scr").show().find("li").bind("click" ,function(){
+    $c_scr = $(this).parent().find(".choose_scr");
+    $c_scr.slideToggle();
+    $c_scr.show().find("li").bind("click" ,function(){
       $(this).parent().prev().text($(this).text());
       $(this).parent().parent().parent().prev().css("font-family",$(this).text());
-      $(".choose_scr").slideUp();
+      $c_scr.slideUp();
     });
   });
   $(".change_img").on('change',function(){
@@ -203,39 +150,13 @@
         alert(err);
       });
   });
-  $(".add_img").on('change',function(){
-    lrz(this.files[0])
-      .then(function(rst){
-        var parentdiv = $('<div></div>');
-        parentdiv.addClass("com_photo");
-        var img = new Image();
-        img.className = "photo";
-        img.src = rst.base64;
-        parentdiv.append(img);
-        photos.push(img.src);
-        var childdiv2 = $('<div></div>');
-        childdiv2.addClass("com_pic");
-        var change = $('<div></div>');
-        change.addClass("col-xs-3");
-        change.addClass("com_pic_change");
-        childdiv2.append(change);
-        var del = $('<div></div>');
-        del.addClass("col-xs-3 com_pic_del");
-        childdiv2.append(del);
-        var add_img = $('<div></div>');
-        add_img.addClass("col-xs-3 add_img");
-        childdiv2.append(add_img);
-        var add_scr = $('<div></div>');
-        add_scr.addClass("col-xs-3 com_add_scr");
-        childdiv2.append(add_scr);
-        parentdiv.append(childdiv2);
-        var li = $('<li></li>');
-        li.append(parentdiv);
-        $(".bodyul").append(li);
-      })
-      .catch(function(err){
-        alert(err);
-      });
+  $(".com_add_scr").click(function(){
+    if($(this).parent().parent().find("textarea").length == 0){
+      var b = $("#script").clone(true,true);
+      b.css("display","block");
+      $(this).parent().parent().append(b);
+      console.log(b);
+    }
   });
   $("#ImgUpload").on('change',function(){
     if (this.files.length === 0) return;
@@ -248,7 +169,63 @@
         alert(err);
       });
   });
-
-
+  console.log($(".photo").eq(0).attr("src"));
+  $(".choose").click(function(){
+    var photos = [];
+    var cover_url = $("#cover").attr("src"),photo1_url = $(".photo").eq(0).attr("src"),photo2_url = $(".photo").eq(1).attr("src"),photo3_url = $(".photo").eq(2).attr("src");
+    var title = $(".title_").val();
+    var cover_des = $(".bodyul>li").eq(0).find(".describe").val();
+    var a = {"cover_des":cover_des,"cover_url":cover_url};
+    if(a == undefined){
+      a = "";
+    }
+    photos.push(a);
+    var photo1_des = $(".bodyul>li").eq(1).find(".describe").val();
+    if(photo1_des == undefined){
+      photo1_des = "";
+    }
+    photos.push({"photo1_url":photo1_url,"photo1_des":photo1_des});
+    var photo2_des = $(".bodyul>li").eq(1).find(".describe").val();
+    if(photo2_des == undefined){
+      photo2_des = "";
+    }
+    photos.push({"photo2_url":photo2_url,"photo2_des":photo2_des});
+    var photo3_des = $(".bodyul>li").eq(1).find(".describe").val();
+    if(photo3_des == undefined){
+      photo3_des = "";
+    }
+    photos.push({"photo3_url":photo1_url,"photo3_des":photo1_des});
+    $.post("/api/wall/edit_photo",{"photos":photos,"title":title},function(data){
+      if(data != ""){
+        alert("操作成功！");
+        setTimeout("window.location.reload()",1000);
+      }
+    });
+  });
+  var myApp = angular.module('myApp',[]);
+  myApp.controller('wall',function($scope,$http){
+    $http.get("/api/wall/get").success(function(data){
+      $scope.title = data.title;
+      $scope.cover = data.photos[0];
+      $scope.photo1 = data.photos[1];
+      if(data.photos[1].photo1_des != ""){
+        var a = $("#script").clone(true,true);
+        a.find(".describe").val(data.photos[1].photo1_des);
+        $(".bodyul>li").eq(1).append(a);
+      }
+      $scope.photo2 = data.photos[2];
+      if(data.photos[2].photo1_des != ""){
+        var a = $("#script").clone(true,true);
+        a.find(".describe").val(data.photos[2].photo1_des);
+        $(".bodyul>li").eq(2).append(a);
+      }
+      $scope.photo3 = data.photos[3];
+      if(data.photos[3].photo1_des != ""){
+        var a = $("#script").clone(true,true);
+        a.find(".describe").val(data.photos[3].photo1_des);
+        $(".bodyul>li").eq(3).append(a);
+      }
+    });
+  });
   </script>
 </html>

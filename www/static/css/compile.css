@@ -69,7 +69,6 @@ html,body{
   padding: 0;
 }
 .com_pic_change{
-  border-right: 1px solid #fff;
   height: 2em;
   background: url(../img/change.png) no-repeat;
   background-size: 100% 100%;
@@ -87,9 +86,6 @@ html,body{
 }
 .com_pic_del{
   border-right: 1px solid #fff;
-}
-.com_add_scr{
-  border-left: 1px solid #fff;
 }
 #rec_fri{
   display: none;
@@ -135,7 +131,7 @@ html,body{
 }
 .com_photo{
   width: 100%;
-  height: 8.5em;
+  height: auto;
 }
 .com_scr{
   background: #333;
@@ -172,11 +168,29 @@ html,body{
   filter: alpha(opacity=0);
   cursor: pointer;
 }
+#script{
+  display: none;
+}
+.com_con{
+  border-right: 1px solid #fff;
+}
+.com_del{
+  border-right: 1px solid #fff;
+}
+.com_script{
+  border-right: 1px solid #fff;
+}
 .col-xs-2{
   padding: 0;
   border-right: 1px solid #fff;
 }
 .col-xs-3{
+  padding: 0;
+}
+.col-xs-4{
+  padding: 0;
+}
+.col-xs-6{
   padding: 0;
 }
 .choose_scr{

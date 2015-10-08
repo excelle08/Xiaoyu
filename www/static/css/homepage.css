@@ -1,7 +1,6 @@
 html,body{
   background: #ddd;
   width: 100%;
-  height: 100%;
   margin: 0;
   color: #777;
   font-size: 18px;
@@ -53,12 +52,6 @@ table{
   z-index: 1000;
   margin-bottom: 1em;
 }
-.form_ input{
-  border: 0;
-  width: 90%;
-  margin-right: 5%;
-  font-size: 1.5em;
-}
 .dropdown-toggle input{
   border: 0;
 }
@@ -69,24 +62,13 @@ ul li{
 .col-xs-4{
 
 }
-.grid{
-  display: grid;
-  background-color: orange;
-  grid-definition-columns: auto;
-  grid-definition-rows: auto;
-}
 .head{
-  grid-column: 1;
-  grid-row: 1 ;
   height: 5em;
   width: 99%;
   margin-left: 0.5%;
   background: #fff;
-  border: 1px solid #000;
 }
 .nickname{
-  grid-column: 1;
-  grid-row: 2;
   width: 100%;
   height: 2em;
   border: 1px solid #999;
@@ -158,15 +140,14 @@ ul li{
   border:1px solid #72B9D7;
   z-index: 9999;
 }
-	  .provinceSchool .title { width:100%;height:1em;background:#079;}
-	  .provinceSchool .title span { margin-left:10px;font-weight:600;color:#FFF;line-height:1em;}
-	  .provinceSchool .proSelect { width:100%;height:2em;margin:5px;}
-	  .provinceSchool .proSelect select { width:30%;}
-	  .provinceSchool .proSelect input { display:none;}
-	  .provinceSchool .schoolList { width:100%;height:8em;margin-left:2px;overflow-y:auto; border:1px solid #72B9D7;}
-	  .provinceSchool .schoolList ul { width: 100%;}
-	  .provinceSchool .schoolList ul li { float:left;width:90%;height:auto;margin-left:2px;padding-left:2px;line-height:1.5em;cursor:pointer;}
-		.provinceSchool .schoolList ul li.DoubleWidthLi { width:60%;height: auto;}
-	  .provinceSchool .schoolList ul li:hover { background:#72B9D7;}
-	  .provinceSchool .button { width:100%;height:3em;margin-top:4px;}
-	  .provinceSchool .button button { float:right;height:2em;margin-right:1em;padding:2px 4px; background:#999;border:none;color:#FFF;font-weight:600;cursor:pointer;}</style>
+.input_{
+  width:99%;
+  height:2.5em;
+  background:#fff;
+  margin:1px;
+}
+.input__{
+  width:99%;
+  height:2.5em;
+  background:#fff;
+}

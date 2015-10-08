@@ -1,13 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" ng-app="myApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>index</title>
+    <title>首页</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-switch.css" rel="stylesheet">
     <link href="css/index.css" rel="stylesheet">
     <script src="js/jq.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/bootstrap-switch.min.js"></script>
     <script src="js/index.js"></script>
   </head>
   <body>
@@ -24,27 +27,131 @@
         </div>
       </div>
     </nav>
+    <div class="UserInfor_">
+      <div class="U_head">
+        <img src="img/test.jpg" class="U_headicon col-xs-5" style="padding:0;">
+        <div class="col-xs-7" style="float:left;margin-top:0.5em;margin-left:0.5em;padding:0;"><span class="UserName">UserName</span><br><span class="U_check">未认证</span></div>
+        <div class="U_circle"></div>
+      </div>
+      <div class="U_">
+        <img src="img/test.jpg" class="U_img">
+        <div class="U_circle2"><span class="fri_update">3</span></div>
+        <span style="font-size:1.5em;line-height:2em;">好友</span>
+        <span id="rec_fri" style="float:right;font-size:1em;line-height:3em;">有新的消息</span>
+      </div>
+      <div class="U_">
+        <img src="img/test.jpg" class="U_img">
+        <div class="U_circle3"><span class="mes_update">3</span></div>
+        <span style="font-size:1.5em;line-height:2em;">消息</span>
+        <span id="rec_mes" style="float:right;font-size:1em;line-height:3em;">收到<span class="mes_update">3</span>个赞</span>
+      </div>
+      <div class="U_">
+        <img src="img/test.jpg" class="U_img">
+        <div class="U_circle4"><span class="note_update">3</span></div>
+        <span style="font-size:1.5em;line-height:2em;">公告</span>
+        <span id="rec_note" style="float:right;font-size:1em;line-height:3em;">最近<span class="note_update">3</span>条更新</span>
+      </div>
+        <button class="U_off">关闭</button>
+        <button class="U_logout">注销登录</button>
+        <button class="U_change_pass" onclick="window.location = '/changepass'">修改密码</button>
+      <div class="hiding">
+        <div class="to_friends">
+          <span>对好友隐身</span>
+            <input type="checkbox" name="my-checkbox" id="hidetof" style="float:right;"/>
+        </div>
+        <div class="to_strangers">
+          <span>对陌生人隐身</span>
+          <input type="checkbox" name="my-checkbox" id="hidetos" style="float:right;"/>
+        </div>
+      </div>
+    </div>
     <div class="alert" style="height:20px;">最近被<span id="z"></span>人赞过</div>
     <div class="menu">
       <div class="b_switch">
         <div class="switchon">开启</div>
-        <div class="switchoff">关闭</div>
+        <div class="switchoff s_active" >关闭</div>
       </div>
-      <table class="c_">
+      <table class="c_" ng-controller="filters">
         <tr>
-          <td class="td_left">选择学校▼</td><td class="td_right">选择专业▼</td>
+          <td class="td_left" ng-controller="SchoolName">
+            <input class="s_check" name="school" id="c_school" type="text" ng-model="schoolmodel" placeholder="{{filter.school}}" style="text-align:left;"/>
+            <ul class="SchoolName Fliter_Name">
+              <li ng-repeat="school in schools | orderBy:'id' | filter: schoolmodel" id="{{school.id}}">{{school.name}}</li>
+            </ul>
+          </td>
+          <td class="td_right">
+            <input class="s_check" name="subject" id="c_subject" type="text" placeholder="{{filter.subject}}" style="text-align:left;"/>
+            <ul class="SubjectName Fliter_Name">
+              <li>中国国国国国国国国国国国国国国国国国国国国国国国国国国国国国</li>
+              <li>美国</li>
+              <li>英国</li>
+              <li>加拿大</li>
+            </ul>
+          </td>
         </tr>
         <tr>
-          <td class="td_left">选择学历▼</td><td class="td_right">选择身高▼</td>
+          <td class="td_left">
+            <input class="s_check" name="degree" id="c_degree" type="text" placeholder="{{filter.degree}}" style="text-align:left;"/>
+            <ul class="GradeName Fliter_Name">
+              <li>中国国国国国国国国国国国国国国国国国国国国国国国国国国国国国</li>
+              <li>美国</li>
+              <li>英国</li>
+              <li>加拿大</li>
+            </ul>
+          </td>
+          <td class="td_right">
+            <input class="s_check" name="permission" id="c_permission" type="text" placeholder="{{filter.permission}}" style="text-align:left;"/>
+            <ul class="PermissionName Fliter_Name">
+              <li>中国国国国国国国国国国国国国国国国国国国国国国国国国国国国国</li>
+              <li>美国</li>
+              <li>英国</li>
+              <li>加拿大</li>
+            </ul>
+          </td>
+          <td class="td_left">
+            <input class="s_check" name="tall_min" id="c_tall_min" type="number" placeholder="{{filter.height_min}}" style="text-align:left;"/>
+          </td>
+          <td class="td_right">
+            <input class="s_check" name="tall_max" id="c_tall_max" type="number" placeholder="{{filter.height_max}}" style="text-align:left;"/>
+          </td>
         </tr>
         <tr>
-          <td class="td_left">选择家乡▼</td><td class="td_right">准备工作地▼</td>
+          <td class="td_left">
+            <input class="s_check" name="hometown_city" id="c_hometown" type="text" placeholder="{{filter.hometown_city}}" style="text-align:left;"/>
+            <ul class="HometownName Fliter_Name">
+              <li>中国国国国国国国国国国国国国国国国国国国国国国国国国国国国国</li>
+              <li>美国</li>
+              <li>英国</li>
+              <li>加拿大</li>
+            </ul>
+          </td>
+          <td class="td_right">
+            <input class="s_check" name="work_city" id="c_work_city" type="text" placeholder="{{filter.work_city}}" style="text-align:left;"/>
+            <ul class="WorkplaceName Fliter_Name">
+              <li>中国国国国国国国国国国国国国国国国国国国国国国国国国国国国国</li>
+              <li>美国</li>
+              <li>英国</li>
+              <li>加拿大</li>
+            </ul>
+          </td>
         </tr>
         <tr>
-          <td class="td_left">选择年龄▼</td><td class="td_right">认证状态▼</td>
+          <td class="td_left">
+            <input class="s_check" name="age_min" id="c_age_min" type="text" placeholder="{{filter.age_min}}" style="text-align:left;"/>
+          </td>
+          <td class="td_right">
+            <input class="s_check" name="age_max" id="c_age_max" type="text" placeholder="{{filter.age_max}}" style="text-align:left;"/>
+          </td>
         </tr>
         <tr>
-          <td class="td_left">星座▼</td><td class="td_right">最近活跃▼</td>
+          <td class="td_left">
+            <input class="s_check" name="horoscope" id="c_horoscope" type="text" placeholder="{{filter.horoscope}}" style="text-align:left;"/>
+            <ul class="HoroscopeName Fliter_Name">
+              <li>中国国国国国国国国国国国国国国国国国国国国国国国国国国国国国</li>
+              <li>美国</li>
+              <li>英国</li>
+              <li>加拿大</li>
+            </ul>
         </tr>
       </table>
       <div class="b_switch2" style="margin-top:15px;">
@@ -59,82 +166,443 @@
           <span class="wall_more">></span>
         </div>
         <div class="wall_pic">
-          <img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg">
+          <img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg">
         </div>
       </div>
     </div>
-    <div class="main">
+    <div class="main" ng-controller="user">
       <div class="main_nav row" style="margin-right:0;padding-right:0;">
-        <div class="col-xs-4 col-md-4 col1">在线用户♂♀</div>
+        <div class="col-xs-4 col-md-4 col1">在线用户<span id="c_sex_">♀</span></div>
+        <ul class="choose_sex" style="width:6em;">
+          <li id="c_sex_woman">女♂</li>
+          <li id="c_sex_man">男♀</li>
+        </ul>
         <div class="col-xs-4 col-md-4 col2">最近登录</div>
         <div class="col-xs-4 col-md-4 col3">周热门</div>
       </div>
       <div class="now male">
-
+        <ul>
+          <li ng-repeat="online in onlines | filter:{'gender':1} | filter1">
+            <div class="col-xs-3">
+              <img ng-src="{{online.avatar}}" class="avatar">
+            </div>
+            <div class="col-xs-9">
+              <div class="avatar_nav">
+                <b>{{online.nickname}}</b>♀<span class="age">{{online.age}}</span>
+                <span class="like_num">{{online.like}}</span><img src="img/dz.png" class="like_">
+              </div>
+              <div class="tags"><span class="tag">{{online.schoolname}}</span><span class="tag">{{online.degree}}</span></div>
+              <div class="motto">{{online.motto}}</div>
+            </div>
+          </li>
+        </ul>
       </div>
       <div class="now female">
-
+        <ul>
+          <li ng-repeat="online in onlines | filter:{'gender':0} | filter1">
+            <div class="col-xs-3">
+              <img ng-src="{{online.avatar}}" class="avatar">
+            </div>
+            <div class="col-xs-9">
+              <div class="avatar_nav">
+                <b>{{online.nickname}}</b>♂<span class="age">{{online.age}}</span>
+                <span class="like_num">{{online.upvotes}}</span><img src="img/dz.png" class="like_">
+              </div>
+              <div class="tags"><span class="tag">{{online.schoolname}}</span><span class="tag">{{online.degree}}</span></div>
+              <div class="motto">{{online.motto}}</div>
+            </div>
+          </li>
+        </ul>
       </div>
       <div class="near">
-
+        <ul>
+          <li ng-repeat="recent in recents | filter1">
+            <div class="user_">
+              <div class="col-xs-3">
+                <img ng-src="{{recent.avatar}}" class="avatar">
+              </div>
+              <div class="col-xs-9">
+                <div class="avatar_nav">
+                  <b>{{recent.nickname}}</b><span class="sex">{{recent.gender}}</span><span class="age">{{recent.age}}</span>
+                  <span class="like_num">{{recent.upvotes}}</span><img src="img/dz.png" class="like_">
+                </div>
+                <div class="tags"><span class="tag">{{recent.schoolname}}</span><span class="tag">{{recent.degree}}</span></div>
+                <div class="motto">{{recent.motto}}</div>
+              </div>
+            </div>
+            <div class="user_oper">
+              <div class="col-xs-4 add_fri" style="border-right:1px solid #777;padding:0;">加为好友</div>
+              <div class="col-xs-4 send_mes" style="border-right:1px solid #777;padding:0;">发私信</div>
+              <div class="col-xs-4 add_black">黑名单</div>
+            </div>
+          </li>
+        </ul>
       </div>
       <div class="weak-hot">
-
+        <ul>
+          <li ng-repeat="hot in hots | filter1">
+            <div class="col-xs-3">
+              <img ng-src="{{hot.avatar}}" class="avatar">
+            </div>
+            <div class="col-xs-9">
+              <div class="avatar_nav">
+                <b>{{hot.nickname}}</b><span class="sex">{{hot.gender}}</span><span class="age">{{hot.age}}</span>
+                <span class="like_num">{{hot.upvotes}}</span><img src="img/dz.png" class="like_">
+              </div>
+              <div class="tags"><span class="tag">{{hot.schoolname}}</span><span class="tag">{{hot.degree}}</span></div>
+              <div class="motto">{{hot.motto}}</div>
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
   </body>
   <script>
-  $(".choose").click(function(){
-      if(!$(this).hasClass("c_active")){
-          $(this).addClass("c_active");
-          $(".menu").slideDown();
-        }
-      else{
-        $(this).removeClass("c_active");
-        $(".menu").slideUp();
+  window.localStorage.setItem("later_time",0);
+  var myApp = angular.module('myApp',[]);
+  myApp.controller('SchoolName',function($scope,$http){
+    $http.get("/api/common/school").success(function(data){
+      $scope.schools = data;
+    });
+  });
+  $(".b_switch").click(function(){
+    if(window.localStorage){
+      if($(".switchon").hasClass("s_active")){
+        window.localStorage.setItem("switch","on");
+      }else{
+        window.localStorage.setItem("switch","off");
       }
+    }else{
+      return;
+    }
   });
-  $(".switchon").click(function(){
-    $(this).addClass("s_active");
-    $(".switchoff").removeClass("s_active");
+  $.post("/api/user",function(data){
+    if(data.online == 0){
+      window.location = "login.html";
+      if(data.permission == -1){
+
+      }
+      else if (data.permission == 0) {
+        $(".U_check").text("未认证");
+      }
+      else if(data.permission == 1){
+        $(".U_check").text("认证中");
+      }
+      else if(data.permission == 2){
+        $(".U_check").text("已认证");
+      }
+      else{
+        $(".U_check").text("管理员");
+      }
+    }
+    else if(data.online == 1){
+      $("#hidetof").attr("checked",true);
+      $("#hidetos").attr("checked",true);
+      if(data.permission == -1){
+
+      }
+      else if (data.permission == 0) {
+        $(".U_check").text("未认证");
+      }
+      else if(data.permission == 1){
+        $(".U_check").text("认证中");
+      }
+      else if(data.permission == 2){
+        $(".U_check").text("已认证");
+      }
+      else{
+        $(".U_check").text("管理员");
+      }
+    }
+    else if(data.online == 2){
+      $("#hidetof").attr("checked",false);
+      $("#hidetos").attr("checked",true);
+      if(data.permission == -1){
+
+      }
+      else if (data.permission == 0) {
+        $(".U_check").text("未认证");
+      }
+      else if(data.permission == 1){
+        $(".U_check").text("认证中");
+      }
+      else if(data.permission == 2){
+        $(".U_check").text("已认证");
+      }
+      else{
+        $(".U_check").text("管理员");
+      }
+    }
+    else if(data.online == 3){
+      $("#hidetof").attr("checked",true);
+      $("#hidetos").attr("checked",false);
+      if(data.permission == -1){
+
+      }
+      else if (data.permission == 0) {
+        $(".U_check").text("未认证");
+      }
+      else if(data.permission == 1){
+        $(".U_check").text("认证中");
+      }
+      else if(data.permission == 2){
+        $(".U_check").text("已认证");
+      }
+      else{
+        $(".U_check").text("管理员");
+      }
+    }
+    else{
+      $("#hidetof").attr("checked",false);
+      $("#hidetos").attr("checked",false);
+      if(data.permission == -1){
+        $(".U_check").text("被封号");
+      }
+      else if (data.permission == 0) {
+        $(".U_check").text("未认证");
+      }
+      else if(data.permission == 1){
+        $(".U_check").text("认证中");
+      }
+      else if(data.permission == 2){
+        $(".U_check").text("已认证");
+      }
+      else{
+        $(".U_check").text("管理员");
+      }
+    }
   });
-  $(".switchoff").click(function(){
-    $(this).addClass("s_active");
-    $(".switchon").removeClass("s_active");
+  $.post("/api/message/get",function(result){
+    if(result.limit == 0 || result.limit == undefined ){
+      return;
+    }else{
+      $(".U_circle2").show();
+      $("#rec_fri").show();
+      $(".fri_update").text(result.limit);
+    }
   });
-  $(".cancel").click(function(){
-    $(".menu").slideUp();
+  $.post("/api/wall/get",function(data){
+    $(".U_circle3").show();
+    $("#rec_mes").show();
+    $(".mes_update").text(data.upvotes);
   });
-  $(".verify").click(function(){
-    $(".menu").slideUp();
+
+  $.post("/api/notifications",{});
+  function loadonlines(){myApp.controller('user',function($scope,$http){
+    $http.post("/api/user/onlines").success(function(data){
+      for(var i = 0;i < data.length;i++){
+        var uid = data[i].uid;
+        $.post("/api/wall/school/get",{"uid":uid},function(result){
+          var schoolname = result.school_name;
+          var degree = result.degree;
+          if(degree == 0){
+            degree = "未知";
+          }else if(degree == 1){
+            degree = "本科生";
+          }else if(degree == 2){
+            degree = "研究生";
+          }else{
+            degree = "博士";
+          }
+          var a = {"schoolname":schoolname,"degree":degree};
+          $.extend({},data[i],a);
+        });
+        $.post("/api/wall/guestwall",{"uid":uid},function(result){
+          var upvote = {"upvotes":result.upvotes};
+          $.extend({},data[i],upvote);
+        });
+      }
+      $scope.onlines = data;
+    });
+    $http.post("/api/user/hot").success(function(data){
+      for(var i = 0;i < data.length;i++){
+        var uid = data[i].uid;
+        $.post("/api/wall/guestwall",{"uid":uid},function(result){
+          var upvote = {"upvotes":result.upvotes};
+          $.extend({},data[i],upvote);
+        });
+        $.post("/api/user/school/get",{"uid":uid},function(result){
+          var schoolname = result.school_name;
+          var degree = result.degree;
+          var a = {"schoolname":schoolname,"degree":degree};
+          $.extend({},data[i],a);
+        });
+        if(data[i].gender == 0){
+          data[i].gender == "♂";
+        }
+        else{
+          data[i].gender == "♀";
+        }
+      }
+      $scope.hots = data;
+    });
+    $http.post("/api/user/recent_login").success(function(data){
+      for(var i = 0;i < data.length;i++){
+        var uid = data[i].uid;
+        $.post("/api/wall/guestwall",{"uid":uid},function(result){
+          var upvote = {"upvotes":result.upvotes};
+          $.extend({},data[i],upvote);
+        });
+        $.post("/api/user/school/get",{"uid":uid},function(result){
+          var schoolname = result.school_name;
+          var degree = result.degree;
+          var a = {"schoolname":schoolname,"degree":degree};
+          $.extend({},data[i],a);
+        });
+        if(data[i].gender == 0){
+          data[i].gender == "♂";
+        }
+        else{
+          data[i].gender == "♀";
+        }
+      }
+      $scope.recents = data;
+    });
   });
-  var alert_h = $(".navbar").height();
-  var alert_t = (alert_h - $(".choose").height())/2;
-  $(".choose").css("margin-top",alert_t);
-  $(".alert").css("top",alert_h);
-  $(".menu").css("top",alert_h);
-  var line_h = $(".wall_pic").height();
-  $(".wall_pic img").css("margin-top",(line_h-40)/2);
-  var main_nav_w = $(".main_nav").width();
-  $(".main_nav").css("width",main_nav_w+20);
-  $(".col1").click(function(){
-    $(".col2,.col3").css("background","#ccc");
-    $(this).css("background","#fff");
+}
+function load_filter_onlines(){
+  myApp.controller('user',function($scope,$http){
+  $http.post("/api/user/onlines").success(function(data){
+    for(var i = 0;i < data.length;i++){
+      var uid = data[i].uid;
+      $.post("/api/wall/school/get",{"uid":uid},function(result){
+        var schoolname = result.school_name;
+        var degree = result.degree;
+        if(degree == 0){
+          degree = "未知";
+        }else if(degree == 1){
+          degree = "本科生";
+        }else if(degree == 2){
+          degree = "研究生";
+        }else{
+          degree = "博士";
+        }
+        var a = {"schoolname":schoolname,"degree":degree};
+        $.extend({},data[i],a);
+      });
+      $.post("/api/wall/guestwall",{"uid":uid},function(result){
+        var upvote = {"upvotes":result.upvotes};
+        $.extend({},data[i],upvote);
+      });
+    }
+    $scope.onlines = data;
   });
-  $(".col2").click(function(){
-    $(".col1,.col3").css("background","#ccc");
-    $(this).css("background","#fff");
-    $(".now,.weak-hot").hide();
-    $(".near").show();
+  $http.post("/api/user/hot").success(function(data){
+    for(var i = 0;i < data.length;i++){
+      var uid = data[i].uid;
+      $.post("/api/wall/guestwall",{"uid":uid},function(result){
+        var upvote = {"upvotes":result.upvotes};
+        $.extend({},data[i],upvote);
+      });
+      $.post("/api/user/school/get",{"uid":uid},function(result){
+        var schoolname = result.school_name;
+        var degree = result.degree;
+        var a = {"schoolname":schoolname,"degree":degree};
+        $.extend({},data[i],a);
+      });
+      if(data[i].gender == 0){
+        data[i].gender == "♂";
+      }
+      else{
+        data[i].gender == "♀";
+      }
+    }
+    $scope.hots = data;
   });
-  $(".col3").click(function(){
-    $(".col2,.col1").css("background","#ccc");
-    $(this).css("background","#fff");
-    $(".now,.near").hide();
-    $(".weak-hot").show();
+  $http.post("/api/user/recent_login").success(function(data){
+    for(var i = 0;i < data.length;i++){
+      var uid = data[i].uid;
+      $.post("/api/wall/guestwall",{"uid":uid},function(result){
+        var upvote = {"upvotes":result.upvotes};
+        $.extend({},data[i],upvote);
+      });
+      $.post("/api/user/school/get",{"uid":uid},function(result){
+        var schoolname = result.school_name;
+        var degree = result.degree;
+        var a = {"schoolname":schoolname,"degree":degree};
+        $.extend({},data[i],a);
+      });
+      if(data[i].gender == 0){
+        data[i].gender == "♂";
+      }
+      else{
+        data[i].gender == "♀";
+      }
+    }
+    $scope.recents = data;
   });
-  var c_left = parseInt($(".headicon").css("margin-left")) + 33;
-  alert(c_left);
-  $(".circle").css("left",c_left);
+})
+  .filter('filter1',function(){
+    return function(items){
+      angular.forEach(items,function(item,i){
+        var check = 0;
+        for(var j=0;j<uid.length;j++){
+          if (item.uid == uid0[i].uid) {
+            check = 1;
+            continue;
+          }
+        }
+        if(check == 0){
+          for(var h=i;h<items.length;h++){
+            items[h] = items[h+1];
+          }
+          items.pop();
+        }
+      });
+      return items;
+    }
+  });
+}
+  if(window.localStorage){
+    $.post("/api/common/school",function(data){
+      var schools = JSON.stringify(data);
+      window.localStorage.setItem("schools",schools);
+    });
+    $.post("/api/common/horoscope",function(data){
+      var horoscopes = JSON.stringify(data);
+      window.localStorage.setItem("horoscopes",horoscopes);
+    });
+    $.post("/api/common/province",function(province){
+      var provinces = [];
+      for(var i=1;i<=province.length;i++){
+        $.post("/api/common/city?province=",{"province":i},function(city){
+          var id = i;
+          provinces.push({"id":id,"cities":city});
+        });
+      }
+      window.localStorage.setItem("provinces",JSON.stringify(provinces));
+    });
+    if(window.localStorage.getItem("switch") == "on"){
+      myApp.controller('filters',function($scope,$http){
+        var filter,onlines = [];
+        $http.post("/api/wall/get").success(function(data){
+          filter = data;
+        });
+        $http.post("/api/wall/edit_filter",filter,function(data){
+          for(var i=0;i<data.length;i++){
+            $http.post("/api/wall/get",{"uid":data[i].uid}).success(function(data){
+              onlines.push(data);
+            });
+          }
+        });
+        $scope.onlines = onlines;
+      });
+    }else{
+      $("#c_school").attr({placeholder:"选择学校",disabled:true});
+      $("#c_subject").attr({"placeholder":"选择专业",disabled:true});
+      $("#c_degree").attr({"placeholder":"选择学历","disabled":true});
+      $("#c_age_min").attr({"placeholder":"最小年龄",disabled:true});
+      $("#c_age_max").attr({"placeholder":"最大年龄",disabled:true});
+      $("#c_horoscope").attr({"placeholder":"选择星座",disabled:true});
+      $("#c_work_city").attr({"placeholder":"（准备）工作地",disabled:true});
+      $("#c_tall_min").attr({"placeholder":"最低身高(cm)",disabled:true});
+      $("#c_tall_max").attr({"placeholder":"最高身高(cm)",disabled:true});
+      $("#c_permission").attr({"placeholder":"选择认证",disabled:true});
+      $("#c_hometown").attr({"placeholder":"选择家乡",disabled:true});
+      loadonlines();
+    }
+  }else{
+    loadonlines();
+  }
   </script>
 </html>

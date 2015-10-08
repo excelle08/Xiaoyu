@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" ng-app="myApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>index</title>
+    <title>消息中心</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/message.css" rel="stylesheet">
     <script src="js/jq.js"></script>
+    <script src="js/angular.min.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
@@ -20,21 +21,83 @@
         </div>
       </div>
     </nav>
-    <ul>
-      <li>
-        <div class="mes_">
-          <img src="img/test.jpg" class="pic col-xs-3">
-          <div class="mes_nav col-xs-9">
-            <span class="mes_user"><b>消息中心</b>♀21</span>
-            <span class="time">1分钟前</span>
-          </div>
-          <div class="mes_con col-xs-8">
-            消息中心消息中心消息中心消息中心消息中心消息中心消息中心
+    <div class="nav_nav"></div>
+    <div class="nav_ban" id="upvote">点赞</div>
+    <ul id="upvote_ul" ng-controller="userupvote">
+      <li ng-repeat="upvote in upvotes">
+        <div class="up_mes_">
+          <img ng-src="{{upvote.avatar}}" class="up_pic col-xs-3">
+          <div class="up_mes_nav col-xs-9">
+            <span class="up_mes_user"><b>{{upvote.nickname}}</b>{{upvote.gender}}{{upvote.age}}</span>
+            <span class="up_time">{{upvote.time}}</span>
           </div>
         </div>
-        <div class="mes_oper">
-          <div class="col-xs-6 ignore">忽略</div>
-          <div class="col-xs-6 agree">同意</div>
+      </li>
+    </ul>
+    <div class="nav_ban" id="f_apply">好友请求</div>
+    <ul id="apply_ul" ng-controller="userapply">
+      <li ng-repeat="apply in applys">
+        <div class="apply_mes_" id="{{apply.re_id}}">
+          <img ng-src="{{apply.avatar}}" class="apply_pic col-xs-3">
+          <div class="apply_mes_nav col-xs-9">
+            <span class="apply_mes_user"><b>{{apply.nickname}}</b>{{apply.gender}}{{apply.age}}</span>
+          </div>
+          <div class="mes_con col-xs-8">
+            请求添加我为好友
+          </div>
+        </div>
+        <div class="apply_mes_oper">
+          <div class="col-xs-6 apply_reject">拒绝</div>
+          <div class="col-xs-6 apply_agree">同意</div>
+        </div>
+      </li>
+    </ul>
+    <div class="nav_ban" id="system">系统公告</div>
+    <ul id="system_ul" ng-controller="usersystem">
+      <li ng-repeat="system in systems">
+        <div class="system_mes_">
+          <div class="col-xs-9">
+            系统公告：{{system.content}}
+          </div>
+          <div class="col-xs-3">{{system.create_at}}</div>
+        </div>
+      </li>
+    </ul>
+    <div class="nav_ban" id="tweet_re">说说回复</div>
+    <ul id="tweet_ul" ng-controller="usertweets">
+      <li ng-repeat="reply in replys">
+        <div class="tweet_mes_" id="{{reply.re_id}}">
+          <img ng-src="{{reply.avatar}}" class="tweet_pic col-xs-3">
+          <div class="tweet_mes_nav col-xs-9">
+            <span class="tweet_mes_user"><b>{{reply.nickname}}</b>{{reply.gender}}{{reply.age}}</span>
+            <span class="tweet_time">{{reply.create_at}}</span>
+          </div>
+          <div class="tweet_mes_con col-xs-8">
+            {{reply.content}}
+          </div>
+        </div>
+        <div class="tweet_mes_oper">
+          <div class="col-xs-6 tweet_delete">删除</div>
+          <div class="col-xs-6 tweet_reply" id="reply.uid">回复</div>
+        </div>
+      </li>
+    </ul>
+    <div class="nav_ban" id="privacy">私聊</div>
+    <ul id="privacy_ul" ng-controller="userprivacy">
+      <li ng-repeat="privacy in privacys">
+        <div class="privacy_mes_" id="{{privacy.id}}">
+          <img ng-src="{{privacy.avatar}}" class="privacy_pic col-xs-3">
+          <div class="privacy_mes_nav col-xs-9">
+            <span class="privacy_mes_user"><b>{{privacy.nickname}}</b>{{privacy.gender}}{{privacy.age}}</span>
+            <span class="privacy_time">{{privacy.create_at}}</span>
+          </div>
+          <div class="privacy_mes_con col-xs-8">
+            给我私密留言：{{privacy.content}}
+          </div>
+        </div>
+        <div class="privacy_mes_oper">
+          <div class="col-xs-6 privacy_delete">删除</div>
+          <div class="col-xs-6 privacy_reply" id="{{privacy.user}}">回复</div>
         </div>
       </li>
     </ul>
@@ -43,9 +106,15 @@
   var alert_h = $(".navbar").height();
   var alert_t = (alert_h - $(".choose").height())/2;
   $(".choose").css("margin-top",alert_t);
-  $("ul").css("margin-top",alert_h);
-  $(".mes_").click(function(){
-    $(this).parent().find(".mes_oper").slideToggle();
+  $(".nav_nav").css("margin-top",alert_h);
+  $(".apply_mes_").click(function(){
+    $(this).parent().find(".apply_mes_oper").slideToggle();
+  });
+  $(".tweet_mes_").click(function(){
+    $(this).parent().find(".tweet_mes_oper").slideToggle();
+  });
+  $(".privacy_mes_").click(function(){
+    $(this).parent().find(".privacy_mes_oper").slideToggle();
   });
   $(".ignore").click(function(){
     $(".agree").removeClass("active");
@@ -55,5 +124,366 @@
     $(".ignore").removeClass("active");
     $(this).addClass("active");
   })
+  $("#f_apply").click(function(){
+    $("#apply_ul").slideToggle();
+  });
+  $("#upvote").click(function(){
+    $("#upvote_ul").slideToggle();
+  });
+  $("#system").click(function(){
+    $("#system_ul").slideToggle();
+  });
+  $("#tweet_re").click(function(){
+    $("#tweet_ul").slideToggle();
+  });
+  $("#privacy").click(function(){
+    $("#privacy_ul").slideToggle();
+  });
+
+  //get
+  var uid = window.location.pathname.substr(9);
+  var myApp = angular.module('myApp',[]);
+  myApp.controller('userupvote',function($scope,$http){
+    var user = [];
+    $http.post("/api/wall/upvote/new").success(function(data){
+      for(var i=0;i<data.length;i++){
+        var user0 = {};
+        $http.get("/api/user/meta",{"uid":data[i].uid}).success(function(data){
+          if(data.gender == 0){
+            data.gender = "♂";
+          }else{
+            data.gender = "♀";
+          }
+          $.extend({},user0,{"uid":data.uid,"age":data.age,"nickname":data.nickname,"gender":data.gender,"avatar":data.avatar});
+        });
+        var second = 1000;
+        var minite = second * 60;
+        var hour = minite * 60;
+        var day = hour * 24;
+        var month = day * 30;
+        var now = new Date().getTime();
+        var time = now - parseInt(data[i].time * 1000);
+        if(time < 0){
+          alert("error");
+        }else{
+          var monthC = time/month;
+          var weekC = time/(7*day);
+          var dayC = time/day;
+          var hourC = time/hour;
+          var miniteC = time/minite;
+          var secondC = time/second;
+          if(monthC > 1){
+            data.time = parseInt(monthC) + "个月前";
+          }else if(weekC > 1){
+            data.time = parseInt(weekC) + "个星期前";
+          }else if(dayC > 1){
+            data.time = parseInt(dayC) + "天前";
+          }else if(hourC > 1){
+            data.time = parseInt(hourC) + "小时前";
+          }else if(miniteC > 1){
+            data.time = parseInt(miniteC) + "分钟前";
+          }else if(secondC > 1){
+            data.time = parseInt(secondC) + "秒前";
+          }else{
+            data.time = "刚刚";
+          }
+        }
+        var user1 = $.extend({},user0,{"time":data.time});
+        user.push(user1);
+      }
+    });
+    $scope.upvotes = user;
+  });
+  myAPpp.controller('userapply',function($scope,$http){
+    var user = [];
+    $http.post("/api/user/friends/get_requests").success(function(data){
+      for(var i=0;i<data.length;i++){
+        var user0 = {"re_id":data[i].id};
+        $http.get("/api/user/meta",{"uid":data[i].user}).success(function(data){
+          if(data.gender == 0){
+            data.gender = "♂";
+          }else{
+            data.gender = "♀";
+          }
+          var user1 = {};
+          var user0 = $.extend({},user1,{"uid":data.uid,"nickname":data.nickname,"age":data.age,"avatar":data.avatar,"gender":data.gender});
+          user.push(user0);
+        });
+      }
+    });
+    $scope.applys = user;
+  });
+  myApp.controller('usertweets',function($scope,$http){
+    var time =  window.localStorage.getItem("later_time");
+    var later_than = (time*1000 - 1000*60*60*24*15)/1000;
+    $http.post("/api/tweet/user",{"uid":uid,"later_than":later_than}).success(function(data){
+      var user = [];
+      for(var i=0;i<data.length;i++){
+        $http.post("/api/tweet/reply/get",{"id":data[i].id}).success(function(data){
+          if(data.target == uid){
+            for(var i=0;i<data.length;i++){
+              var second = 1000;
+              var minite = second * 60;
+              var hour = minite * 60;
+              var day = hour * 24;
+              var month = day * 30;
+              var now = new Date().getTime();
+              var time = now - parseInt(data[i].create_at * 1000);
+              if(time < 0){
+                alert("error");
+              }else{
+                var monthC = time/month;
+                var weekC = time/(7*day);
+                var dayC = time/day;
+                var hourC = time/hour;
+                var miniteC = time/minite;
+                var secondC = time/second;
+                if(monthC > 1){
+                  data.create_at = parseInt(monthC) + "个月前";
+                }else if(weekC > 1){
+                  data.create_at = parseInt(weekC) + "个星期前";
+                }else if(dayC > 1){
+                  data.create_at = parseInt(dayC) + "天前";
+                }else if(hourC > 1){
+                  data.create_at = parseInt(hourC) + "小时前";
+                }else if(miniteC > 1){
+                  data.create_at = parseInt(miniteC) + "分钟前";
+                }else if(secondC > 1){
+                  data.create_at = parseInt(secondC) + "秒前";
+                }else{
+                  data.create_at = "刚刚";
+                }
+              }
+              var reply = {"re_id":data.id};
+              $.extend({},reply,data);
+              $http.get("/api/user/meta",{"uid":data[i].user}).success(function(data){
+                if(data.gender == 0){
+                  data.gender = "♂";
+                }else{
+                  data.gender = "♀";
+                }
+                var user0 = {"uid":data.uid,"nickname":data.nickname,"gender":data.gender,"avatar":data.avatar,"age":data.age};
+                $.extend({},reply,user0);
+                user.push(reply);
+              });
+            }
+          }
+        });
+      }
+      $scope.replys = user;
+    });
+  });
+  myApp.controller('userapply',function($scope,$http){
+
+  });
+  myApp.controller('usersystem',function($scope,$http){
+    var systems_ = [];
+    $http.post("/api/notifications").success(function(data){
+      for(var i=0;i<data.length;i++){
+        var second = 1000;
+        var minite = second * 60;
+        var hour = minite * 60;
+        var day = hour * 24;
+        var month = day * 30;
+        var now = new Date().getTime();
+        var time = now - parseInt(data[i].create_at * 1000);
+        if(time < 0){
+          alert("error");
+        }else{
+          var monthC = time/month;
+          var weekC = time/(7*day);
+          var dayC = time/day;
+          var hourC = time/hour;
+          var miniteC = time/minite;
+          var secondC = time/second;
+          if(monthC > 1){
+            data[i].create_at = parseInt(monthC) + "个月前";
+          }else if(weekC > 1){
+            data[i].create_at = parseInt(weekC) + "个星期前";
+          }else if(dayC > 1){
+            data[i].create_at = parseInt(dayC) + "天前";
+          }else if(hourC > 1){
+            data[i].create_at = parseInt(hourC) + "小时前";
+          }else if(miniteC > 1){
+            data[i].create_at = parseInt(miniteC) + "分钟前";
+          }else if(secondC > 1){
+            data[i].create_at = parseInt(secondC) + "秒前";
+          }else{
+            data[i].create_at = "刚刚";
+          }
+        }
+        systems_.push(data[i]);
+      }
+    });
+    $scope.systems = systems_;
+  });
+  myApp.controller('userupvote',function($scope,$http){
+
+  });
+  myApp.controller('userprivacy',function($scope,$http){
+    var messages = [];
+    $http.post("/api/message/get").success(function(data){
+      for(var i=0;i<data.length;i++){
+        if(data[i].visibility == 2){
+          var second = 1000;
+          var minite = second * 60;
+          var hour = minite * 60;
+          var day = hour * 24;
+          var month = day * 30;
+          var now = new Date().getTime();
+          var time = now - parseInt(data[i].create_at * 1000);
+          if(time < 0){
+            alert("error");
+          }else{
+            var monthC = time/month;
+            var weekC = time/(7*day);
+            var dayC = time/day;
+            var hourC = time/hour;
+            var miniteC = time/minite;
+            var secondC = time/second;
+            if(monthC > 1){
+              data[i].create_at = parseInt(monthC) + "个月前";
+            }else if(weekC > 1){
+              data[i].create_at = parseInt(weekC) + "个星期前";
+            }else if(dayC > 1){
+              data[i].create_at = parseInt(dayC) + "天前";
+            }else if(hourC > 1){
+              data[i].create_at = parseInt(hourC) + "小时前";
+            }else if(miniteC > 1){
+              data[i].create_at = parseInt(miniteC) + "分钟前";
+            }else if(secondC > 1){
+              data[i].create_at = parseInt(secondC) + "秒前";
+            }else{
+              data[i].create_at = "刚刚";
+            }
+          }
+          var user0 = data[i];
+          $http.get("/api/user/meta",{"uid":data[i].user}).success(function(data){
+            if(data.gender == 0){
+              data.gender = "♂";
+            }else{
+              data.gender = "♀";
+            }
+            var user1 = {"uid":data.uid,"nickname":data.nickname,"age":data.age,"avatar":data.avatar,"gender":data.gender};
+            var user = $.extend({},user0,user1);
+            messages.push(user);
+          });
+        }
+        $http.post("/api/message/reply/get",{"id":data[i].id}).success(function(data){
+          for(var i=0;i<data.length;i++){
+            if(data[i].visibility == 2 && data[i].target == uid){
+              var second = 1000;
+              var minite = second * 60;
+              var hour = minite * 60;
+              var day = hour * 24;
+              var month = day * 30;
+              var now = new Date().getTime();
+              var time = now - parseInt(data[i].create_at * 1000);
+              if(time < 0){
+                alert("error");
+              }else{
+                var monthC = time/month;
+                var weekC = time/(7*day);
+                var dayC = time/day;
+                var hourC = time/hour;
+                var miniteC = time/minite;
+                var secondC = time/second;
+                if(monthC > 1){
+                  data[i].create_at = parseInt(monthC) + "个月前";
+                }else if(weekC > 1){
+                  data[i].create_at = parseInt(weekC) + "个星期前";
+                }else if(dayC > 1){
+                  data[i].create_at = parseInt(dayC) + "天前";
+                }else if(hourC > 1){
+                  data[i].create_at = parseInt(hourC) + "小时前";
+                }else if(miniteC > 1){
+                  data[i].create_at = parseInt(miniteC) + "分钟前";
+                }else if(secondC > 1){
+                  data[i].create_at = parseInt(secondC) + "秒前";
+                }else{
+                  data[i].create_at = "刚刚";
+                }
+              }
+              var user2 = data[i];
+              $http.get("/api/user/meta",{"uid":data[i].user}).success(function(data){
+                if(data.gender == 0){
+                  data.gender = "♂";
+                }else{
+                  data.gender = "♀";
+                }
+                var user3 = $.extend({},user2,{"nickname":data.nickname,"age":data.age,"avatar":data.avatar,"gender":data.gender});
+                messages.push(user3);
+              });
+            }
+          }
+        });
+      }
+    });
+    $scope.privacys = messages;
+  });
+
+  //message controll
+  $(".apply_reject").click(function(){
+    var check = window.confirm("您确定拒绝吗？");
+    if(check){
+      var requestid = $(this).parent().prev().attr("id");
+      $.post("/api/user/friends/reject",{"id":requestid},function(data){
+        if(data != ""){
+          alert("操作成功");
+          setTimeout("window.location.reload()",1000);
+        }
+      });
+    }
+  });
+  $(".apply_agree").click(function(){
+    var check = window.confirm("您确定同意吗？");
+    var requestid = $(this).parent().prev().attr("id");
+    if(check){
+      $.post("/api/user/friends/agree",{"req_id":requestid},function(data){
+        if(data != ""){
+          alert("操作成功");
+          setTimeout("window.location.reload()",1000);
+        }
+      });
+    }
+  });
+  $(".tweet_delete").click(function(){
+    var check = window.confirm("您确定删除吗？");
+    var replyid = $(this).parent().prev().attr("id");
+    if(check){
+      $.post("/api/tweet/reply/delete",{"id":replyid},function(data){
+        if(data.id != ""){
+          alert("操作成功");
+          setTimeout("window.location.reload()",1000);
+        }
+      });
+    }
+  });
+  $(".tweet_delete").click(function(){
+    var check = window.confirm("您确定回复吗？");
+    var replyid = $(this).attr("id");
+    if(check){
+      window.location = "/reply/" + uid + "?/to=" + replyid;
+    }
+  });
+  $(".privacy_delete").click(function(){
+    var check = window.confirm("您确定删除吗？");
+    var privacyid = $(this).parent().prev().attr("id");
+    if(check){
+      $.post("/api/message/reply/delete",{"id":privacyid},function(data){
+        if(data.id != ""){
+          alert("操作成功");
+          setTimeout("window.location.reload()",1000);
+        }
+      });
+    }
+  });
+  $(".privacy_delete").click(function(){
+    var check = window.confirm("您确定回复吗？");
+    var privacyid = $(this).attr("id");
+    if(check){
+      window.location = "/privacy/" + uid + "?/to=" + privacyid;
+    }
+  });
   </script>
 </html>

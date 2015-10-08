@@ -16,6 +16,7 @@ html,body{
 ul{
   list-style-type: none;
   padding: 0;
+  height: auto;
 }
 ul li{
   float: left;
@@ -24,6 +25,7 @@ ul li{
   height: auto;
   background: #fff;
   font-size: 1.3em;
+  overflow: hidden;
 }
 .back{
   margin: auto;
@@ -37,7 +39,11 @@ ul li{
   margin: auto;
   line-height: 2;
 }
-.pic{
+.up_mas_{
+  width: 100%;
+  height: 3em;
+}
+.up_pic{
   width: 2.3em;
   height: 2.3em;
   margin: 0.5em;
@@ -45,21 +51,133 @@ ul li{
   float: left;
 }
 .mes_nav{
+  height: 3em;
+  line-height: 3em;
   float: left;
   height: auto;
   margin-top: 0.5em;
 }
-.mes_user{
+.up_mes_user{
   float: left;
+  line-height: 3em;
 }
-.time{
+.up_time{
   float: right;
+  line-height: 3em;
 }
 .mes_con{
   float: left;
   margin-top: 0.4em;
 }
+.apply_mas_{
+  width: 100%;
+}
+.apply_pic{
+  width: 2.3em;
+  height: 2.3em;
+  margin: 0.5em;
+  border-radius: 100px;
+  float: left;
+}
+.apply_mes_nav{
+  float: left;
+  height: auto;
+  margin-top: 0.5em;
+}
+.apply_mes_user{
+  float: left;
+}
+.apply_time{
+  float: right;
+}
+.apply_mes_con{
+  float: left;
+  margin-top: 0.4em;
+}
+.tweet_mas_{
+  width: 100%;
+}
+.tweet_pic{
+  width: 2.3em;
+  height: 2.3em;
+  margin: 0.5em;
+  border-radius: 100px;
+  float: left;
+}
+.tweet_mes_nav{
+  float: left;
+  height: auto;
+  margin-top: 0.5em;
+}
+.tweet_mes_user{
+  float: left;
+}
+.tweet_time{
+  float: right;
+}
+.tweet_mes_con{
+  float: left;
+  margin-top: 0.4em;
+}
+.privacy_mas_{
+  width: 100%;
+}
+.privacy_pic{
+  width: 2.3em;
+  height: 2.3em;
+  margin: 0.5em;
+  border-radius: 100px;
+  float: left;
+}
+.privacy_mes_nav{
+  float: left;
+  height: auto;
+  margin-top: 0.5em;
+}
+.privacy_mes_user{
+  float: left;
+}
+.privacy_time{
+  float: right;
+}
+.privacy_mes_con{
+  float: left;
+  margin-top: 0.4em;
+}
 .mes_oper{
+  width: 100%;
+  height: 2.5em;
+  background: #aaa;
+  text-align: center;
+  line-height: 2.5em;
+  font-size: 1em;
+  color: white;
+  display: none;
+  float: left;
+}
+.apply_mes_oper{
+  width: 100%;
+  height: 2.5em;
+  background: #aaa;
+  text-align: center;
+  line-height: 2.5em;
+  font-size: 1em;
+  color: white;
+  display: none;
+  float: left;
+}
+.tweet_mes_oper{
+  width: 100%;
+  height: 2.5em;
+  background: #aaa;
+  text-align: center;
+  line-height: 2.5em;
+  font-size: 1em;
+  color: white;
+  display: none;
+  float: left;
+}
+.privacy_mes_oper{
   width: 100%;
   height: 2.5em;
   background: #aaa;
@@ -75,4 +193,33 @@ ul li{
 }
 .active{
   background: #555;
+}
+.nav_ban{
+  width: 100%;
+  height: 2em;
+  background: #555;
+  color: white;
+  font-size: 1.5em;
+  text-align: center;
+  line-height: 2em;
+  float: left;
+  border-bottom: 1px solid #fff;
+}
+.nav_nav{
+  width: 100%;
+}
+#upvote_ul{
+  display: none;
+}
+#apply_ul{
+  display: none;
+}
+#tweet_ul{
+  display: none;
+}
+#system_ul{
+  display: none;
+}
+#privacy_ul{
+  display: none;
 }
