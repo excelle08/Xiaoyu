@@ -91,10 +91,21 @@ def add_friends(target_id, group_id):
     return friend
 
 
+def get_friend_requests():
+    uid = session['uid']
+
+    return Friend.query.filter_by(agree=False).all()
+
+
 def agree_friend(id, group_id):
     uid = session['uid']
 
     friend = Friend.query.filter_by(id=id).first()
+    if not friend:
+        raise APIError('指定的请求不存在')
+    if friend.agree:
+        raise APIError('该好友请求已经被同意')
+
     friend.agree = True
 
     f2 = Friend()
@@ -106,6 +117,18 @@ def agree_friend(id, group_id):
     db.session.add(f2)
     db.session.commit()
     return f2
+
+
+def reject_friend(id):
+    uid = session['uid']
+
+    friend = Friend.query.filter_by(id=id, to=uid).first()
+    if not friend:
+        raise APIError('指定的请求不存在')
+
+    db.session.delete(friend)
+    db.session.commit()
+    return {"id": id}
 
 
 def delete_friend(target_id):

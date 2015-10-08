@@ -419,6 +419,12 @@ This section shows some user-related APIs that will return an array of data. For
 
 - Return value: An array of all my accepted friends.
 
+### Get all friends-adding requests
+
+- GEt/POST: `/api/user/friends/get_requests`
+
+- Return value: An array of Friend objects whose `agree` field is `False`
+
 ### Agree a friend-adding request
 
 - GET/POST: `/api/user/friends/agree`
@@ -429,6 +435,16 @@ This section shows some user-related APIs that will return an array of data. For
     * `group` The ID of group to which you want add the friend if you agree. Defaults to 0.
 
 - Return value: The Friend object.
+
+### Reject a request
+
+- GET/POST: `/api/user/friends/reject`
+
+- Data:
+    
+    * `id` The ID of friend object / request ID.
+
+- Return value: The ID.
 
 ### Trans friend to another group
 

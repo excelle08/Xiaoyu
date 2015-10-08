@@ -285,6 +285,21 @@ def api_agree_friends_request():
     return api.friends.agree_friend(req_id, group).json
 
 
+@app.route('/api/user/friends/reject', methods=['GET', 'POST'])
+def api_reject_friend_request():
+    try:
+        id = request.args['id'].strip()
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return json.dumps(api.friends.reject_friend(id))
+
+
+@app.route('/api/user/friends/get_requests', methods=['GET', 'POST'])
+def api_retrieve_friend_request():
+    return json.dumps([i.json for i in api.friends.get_friend_requests()])
+
+
 @app.route('/api/user/friends/transgroup', methods=['GET', 'POST'])
 def api_trans_friend_group():
     try:
