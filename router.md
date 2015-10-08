@@ -1,29 +1,50 @@
-###登录页面
+﻿###登录页面
 	/login
+	login.html
 ###注册页面
 	/reg
+	reg.html
 ###忘记密码、修改密码
 	/changepass
+	changepass.html
 ###首页
 	/index/id
 	id为本用户uid
+	index.html
 ###我的主页
 	/home/id
 	id为本用户uid
+	me.html
 ###好友和聊天页面
 	/friends/id
 	id为本用户id
+	friends.html
 ###好友的主页
 	/friends/id?uid=
 	其中uid为好友的id
+	others.html
 ###回复chat/tweet
 	/reply/id？to=uid
 	其中id为本用户id，uid为回复对象的id
 	若为私聊则：/privacy/id?to=uid
+	reply.html
 ###发布说说
 	/publish/id
 	其中id为本用户id
+	publish.html
 ###消息中心
 	/message/id
 	其中id为本用户id
-
+	message.html
+###编辑个人信息
+	/edit/id
+	homepage.html
+###嘉宾墙
+	/friendwall/id
+	fwall.html
+###我的墙
+	/mywall/id
+	mywall.html
+###编辑我的墙
+	/compile/id
+	compile.html
