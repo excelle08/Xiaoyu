@@ -1,0 +1,29 @@
+###登录页面
+	/login
+###注册页面
+	/reg
+###忘记密码、修改密码
+	/changepass
+###首页
+	/index/id
+	id为本用户uid
+###我的主页
+	/home/id
+	id为本用户uid
+###好友和聊天页面
+	/friends/id
+	id为本用户id
+###好友的主页
+	/friends/id?uid=
+	其中uid为好友的id
+###回复chat/tweet
+	/reply/id？to=uid
+	其中id为本用户id，uid为回复对象的id
+	若为私聊则：/privacy/id?to=uid
+###发布说说
+	/publish/id
+	其中id为本用户id
+###消息中心
+	/message/id
+	其中id为本用户id
+
