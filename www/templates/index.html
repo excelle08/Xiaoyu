@@ -373,18 +373,34 @@
     }
   });
   $.post("/api/message/get",function(result){
-    if(result.limit == 0 || result.limit == undefined ){
-      return;
-    }else{
+    var fri_update = 0;
+    for(var i=0;i<result.length;i++){
+      if(result[i].read == true){
+        return;
+      }else{
+        fri_update++;
+      }
+    }
+    if(fri_update != 0){
       $(".U_circle2").show();
       $("#rec_fri").show();
-      $(".fri_update").text(result.limit);
+      $(".fri_update").text(fri_update);
     }
   });
-  $.post("/api/wall/get",function(data){
-    $(".U_circle3").show();
-    $("#rec_mes").show();
-    $(".mes_update").text(data.upvotes);
+  $.post("/api/wall/upvote/new",function(data){
+    var mes_update = 0;
+    for(var i=0;i<data.length;i++){
+      if(data[i].new == true){
+        return;
+      }else{
+        mes_update++;
+      }
+    }
+    if(mes_update != 0){
+      $(".U_circle3").show();
+      $("#rec_mes").show();
+      $(".mes_update").text(mes_update);
+    }
   });
 
   $.post("/api/notifications",{});
