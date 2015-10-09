@@ -262,7 +262,8 @@
     $scope.schools = schools;
   });
   myApp.controller('subjectlist',function($scope){
-
+    var subjects = JSON.parse(window.localStorage.getItem("majors"));
+    $scope.subjects = subjects;
   });
   myApp.controller('horoscopelist',function($scope){
     var horoscopes = JSON.parse(window.localStorage.getItem("horoscopes"));
@@ -361,10 +362,10 @@
       }
     }
     var subject = $(".c_subject").val();
-    var subjects = window.localStorage.getItem("subjects");
-    for(var i=0;i<subjects.length;i++){
-      if(subjects[i].name == school){
-        subject = subjects[i].id;
+    var subjects = window.localStorage.getItem("majors");
+    for(var i=0;i<majors.length;i++){
+      if(majors[i].name == school){
+        subject = majors[i].id;
       }
     }
     var degree = $(".c_degree").val();

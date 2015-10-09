@@ -562,6 +562,10 @@ function load_filter_onlines(){
       var horoscopes = JSON.stringify(data);
       window.localStorage.setItem("horoscopes",horoscopes);
     });
+    $.post("/api/common/major",function(data){
+      var majors = JSON.stringify(data);
+      window.localStorage.setItem("majors",majors);
+    });
     $.post("/api/common/province",function(province){
       var provinces = [];
       for(var i=1;i<=province.length;i++){
