@@ -259,6 +259,12 @@ class School(db.Model, Base):
     s_property = db.Column('properties', db.Text)
 
 
+class Major(db.Model, Base):
+    __tablename__ = 'major'
+    id = db.Column('id', db.Integer, primary_key=True)
+    name = db.Column('name', db.Text)
+
+
 class PageView(db.Model, Base):
     __tablename__ = 'pageview'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
