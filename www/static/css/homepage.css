@@ -15,6 +15,13 @@ table{
   width: 100%;
   height: auto;
 }
+ul{
+  padding: 0;
+}
+ul li{
+  padding: 0 1em;
+  margin:0;
+}
 .back{
   margin: auto;
   float:left;
@@ -67,6 +74,11 @@ ul li{
   width: 99%;
   margin-left: 0.5%;
   background: #fff;
+}
+.photo{
+  width: 100%;
+  height: auto;
+  margin-bottom: 1em;
 }
 .nickname{
   width: 100%;
@@ -145,9 +157,88 @@ ul li{
   height:2.5em;
   background:#fff;
   margin:1px;
+  z-index: 1000;
 }
 .input__{
   width:99%;
   height:2.5em;
   background:#fff;
+  z-index: 1000;
+}
+.chomeul,.phomeul{
+  display: none;
+  background: #ddd;
+  z-index: 2000;
+  position: absolute;
+}
+.cworkul,.pworkul{
+  display: none;
+  background: #ddd;
+  z-index: 9999;
+  position: absolute;
+}
+.horoscopeul{
+  display: none;
+  background: #ddd;
+  z-index: 9999;
+  position: absolute;
+}
+.schoolul,.subjectul{
+  display: none;
+  background: #ddd;
+  z-index: 9999;
+  position: absolute;
+}
+.degreeul{
+  display: none;
+  background: #ddd;
+  z-index: 9999;
+  position: absolute;
+}
+.ImgUploadContainer{
+  height: 3em;
+  width: 3em;
+  background: url(../img/add.jpg) no-repeat;
+  background-size: cover;
+  position: relative;
+}
+.ImgUpload{
+  height: 3em;
+  width: 3em;
+  position: absolute;
+  right: 0;
+  top: 0;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  cursor: pointer;
+  float: left;
+}
+.change_ava_Container{
+  height: 1.5em;
+  width: 6em;
+  background: url(../img/avatar.png) no-repeat;
+  background-size: cover;
+  position: relative;
+  float: right;
+}
+.change_ava_Upload{
+  height: 1.5em;
+  width: 4em;
+  position: absolute;
+  right: 0;
+  top: 0;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  cursor: pointer;
+  float: left;
+}
+.avatar{
+  width: 4em;
+  height: 4em;
+}
+#add_photo img{
+  width: 2.5em;
+  height: 2.5em;
+  margin-right: 0.5em;
+  margin-bottom: 0.5em;
 }

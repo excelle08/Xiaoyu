@@ -25,12 +25,23 @@
         </div>
       </div>
     </nav>
-    <div style="equalnav" style="width:100%;"></div>
+    <div class="equalnav" style="width:100%;"></div>
     <div class="main" style="z-index:1000;">
       <form id="userform" method="post" action="/api/user">
         <table border="1">
           <tr>
-            <div class="head"></div>
+            <div class="head">
+              <img class="avatar" src="/static/images/test.jpg">
+              <div class="change_ava_Container">
+                <input capture="camera" class="change_ava_Upload" id="change_ava_Upload" type="file" accept="image/*">
+              </div>
+            </div>
+            <div class="photo">
+              <div id="add_photo"></div>
+              <div class="ImgUploadContainer">
+                <input capture="camera" class="ImgUpload" id="ImgUpload" type="file" accept="image/*">
+              </div>
+            </div>
           </tr>
           <tr>
             <input type="text" name="nickname" placeholder="  昵称：" class="nickname">
@@ -44,35 +55,71 @@
           <tr>
             <div class="birth">
               <div class="btn-group col-xs-4" style="padding:0;">
-                <input class="input__" type="text" placeholder="出生年"/>
+                <input class="input__ c_year" type="text" placeholder="出生年"/>
               </div>
               <div class="btn-group col-xs-4" style="padding:0;">
-                <input class="input__" type="text" placeholder="出生月"/>
+                <input class="input__ c_month" type="text" placeholder="出生月"/>
               </div>
               <div class="btn-group col-xs-4" style="padding:0;">
-                <input class="input__" type="text" placeholder="出生日"/>
+                <input class="input__ c_day" type="text" placeholder="出生日"/>
               </div>
           </tr>
           <tr>
             <div class="btn-group form_" style="margin-top:1em">
               <div class="btn-group form_">
-                <input class="input_" type="text" placeholder="选择身高"/>
+                <input class="input_ c_height" type="text" placeholder="身高"/>
               </div>
             </div>
           </tr>
           <tr>
-            <div class="btn-group form_">
-              <input class="input_" type="text" placeholder="选择家乡"/>
+              <div class="btn-group form_">
+                <input class="input_ c_horoscope" type="text" placeholder="星座"/>
+                <ul class="horoscopeul" ng-controller="horoscopelist">
+                  <li ng-repeat="horoscope in horoscopes" id="{{horoscope.id}}">{{horoscope.name}}</li>
+                </ul>
+              </div>
+          </tr>
+          <tr>
+            <div class="form_">
+              <input class="input_ c_home_p" type="text" placeholder="选择家乡（省）"/>
+              <ul class="phomeul" ng-controller="provincelist">
+                <li ng-repeat="province in provinces" id="{{province.id}}">{{privince.name}}</li>
+                <li>ssss</li>
+                <li>ssss</li>
+              </ul>
             </div>
           </tr>
           <tr>
-            <div class="btn-group form_">
-              <input class="input_" type="text" placeholder="准备工作地"/>
+            <div class="form_">
+              <input class="input_ c_home_c" type="text" placeholder="选择家乡（市）"/>
+              <ul class="chomeul" ng-controller="citylist">
+                <li ng-repeat="city in citys" id="{{city.id}}">{{city.name}}</li>
+                <li>ssss</li>
+                <li>ssss</li>
+              </ul>
+            </div>
+          </tr>
+          <tr>
+            <div class="form_">
+              <input class="input_ c_work_p" type="text" placeholder="准备工作地（省）"/>
+              <ul class="pworkul" ng-controller="provincelist">
+                <li ng-repeat="province in provinces" id="{{province.id}}">{{province.name}}</li>
+                <li>ssss</li>
+              </ul>
+            </div>
+          </tr>
+          <tr>
+            <div class="form_">
+              <input class="input_ c_work_c" type="text" placeholder="准备工作地（市）"/>
+              <ul class="cworkul" ng-controller="citylist">
+                <li ng-repeat="city in citys" id="{{city.id}}">{{city.name}}</li>
+                <li>ssss</li>
+              </ul>
             </div>
           </tr>
           <tr>
             <div class="real_name1">
-              <input class="real_name" type="text" name="real_name" placeholder="  真实姓名：">
+              <input class="real_name" type="text" name="real_name" placeholder="  真实姓名：" value="">
               <div style="float:right;font-size:1.1em;margin:0.7em 0.2em;"><input class="pub_" name="pub_real_name" type="radio"><span style="vertical-align:top;">公开</span></div>
             </div>
           </tr>
@@ -89,17 +136,29 @@
           </tr>
           <tr>
             <div class="btn-group form_">
-              <input class="input_" type="text" placeholder="选择学校"/>
+              <input class="input_ c_school" type="text" placeholder="选择学校"/>
+              <ul ng-controller="schoollist" class="schoolul">
+                <li ng-repeat="school in schools" id="{{school.id}}">{{school.name}}</li>
+              </ul>
             </div>
           </tr>
           <tr>
             <div class="btn-group form_">
-              <input class="input_" type="text" placeholder="选择专业"/>
+              <input class="input_ c_subject" type="text" placeholder="选择专业"/>
+              <ul ng-controller="subjectlist" class="subjectul">
+                <li ng-repeat="subject in subjects" id="{{subject.id}}">{{subject.name}}</li>
+              </ul>
             </div>
           </tr>
           <tr>
             <div class="btn-group form_">
-              <input class="input_" type="text" placeholder="选择学历"/>
+              <input class="input_ c_degree" type="text" placeholder="选择学历"/>
+              <ul class="degreeul">
+                <li id="0">未知</li>
+                <li id="1">本科生</li>
+                <li id="2">研究生</li>
+                <li id="3">博士</li>
+              </ul>
             </div>
           </tr>
         </table>
@@ -111,10 +170,10 @@
   var alert_t = (alert_h - $(".choose").height())/2;
   $(".choose").css("margin-top",alert_t);
   $(".publish").css("margin-top",alert_h);
+  $(".equalnav").css("height",alert_h);
   $(".back").click(function(){
     window.history.back(-1);
   });
-  $(".equalnav").css("height",alert_h);
   $(".sex_man").click(function(){
     $(".sex_woman").removeAttr("checked");
   });
@@ -135,6 +194,191 @@
         }
       });
     });
+  });
+  $(".c_home_p").click(function(){
+    $(".phomeul").toggle();
+  });
+  $(".c_home_c").click(function(){
+    $(".chomeul").toggle();
+  });
+  $(".c_work_c").click(function(){
+    $(".cworkul").toggle();
+  });
+  $(".c_work_p").click(function(){
+    $(".pworkul").toggle();
+  });
+  $(".c_school").click(function(){
+    $(".schoolul").toggle();
+  });
+  $(".c_horoscope").click(function(){
+    $(".horoscopeul").toggle();
+  });
+  $(".c_degree").click(function(){
+    $(".degreeul").toggle();
+  });
+  $(".c_subject").click(function(){
+    $(".subjectul").toggle();
+  });
+  $("li").click(function(){
+    var a = $(this).text();
+    $(this).parent().prev().val(a);
+    $(this).parent().hide();
+  });
+  var photos = [];
+  $("#ImgUpload").on('change',function(){
+    //if (that.files.length === 0) return;
+    lrz(this.files[0])
+      .then(function(rst){
+        var img = new Image();
+        img.src = rst.base64;
+        img.onload = function(){
+          $("#add_photo").append(img);
+        };
+        var str = rst.base64;;
+        photos.push(str);
+      })
+      .catch(function(err){
+        alert(err);
+      });
+    if($("#add_photo>img").length > 3){
+      $(".ImgUploadContainer").hide();
+    }
+  });
+  var avatar;
+  $("#change_ava_Upload").on('change',function(){
+    //if (that.files.length === 0) return;
+    lrz(this.files[0])
+      .then(function(rst){
+        $(".avatar").attr("src",rst.base64);
+        avatar = rst.base64;
+      })
+      .catch(function(err){
+        alert(err);
+      });
+  });
+  var myApp = angular.module('myApp',[]);
+  myApp.controller('schoollist',function($scope){
+    var schools = JSON.parse(window.localStorage.getItem("schools"));
+    $scope.schools = schools;
+  });
+  myApp.controller('subjectlist',function($scope){
+
+  });
+  myApp.controller('horoscopelist',function($scope){
+    var horoscopes = JSON.parse(window.localStorage.getItem("horoscopes"));
+    $scope.horoscopes = horoscopes;
+  });
+  myApp.controller('provincelist',function($scope){
+    var provinces = JSON.parse(window.localStorage.getItem("provinces"));
+    $scope.provinces = provinces;
+  });
+  $(".c_home_c").click(function(){
+    myApp.controller('citylist',function($scope){
+      var provinces = JSON.parse(window.localStorage.getItem("provinces"));
+      var province = $(".c_home_p").val(),citys = [];
+      for(var i=0;i<provinces.length;i++){
+        if(provinces[i].name == province){
+          citys = provinces[i].cities;
+        }
+      }
+      $scope.citys = citys;
+    });
+  });
+  $(".c_work_c").click(function(){
+    myApp.controller('citylist',function($scope){
+      var provinces = JSON.parse(window.localStorage.getItem("provinces"));
+      var province = $(".c_work_p").val(),citys = [];
+      for(var i=0;i<provinces.length;i++){
+        if(provinces[i].name == province){
+          citys = provinces[i].cities;
+        }
+      }
+      $scope.citys = citys;
+    });
+  });
+  $(".choose").click(function(){
+    var check = 0;
+    $.post("/api/photo/upload",{"avatar":avatar,"avatar_photos":photos},function(data){
+      if(data != ""{
+        check++;
+      })
+    });
+    var nickname = $(".nickname").val();
+    var gender;
+    if($(".sex_man").is(":checked")){
+      gender = 1;
+    }else if($(".sex_woman").is(":checked")){
+      gender = 0;
+    }
+    var year = $(".c_year").val(),month = $(".c_month").val(),day = $(".c_day").val();
+    var date = year + "-" + month + "-" + day;
+    var birthday = new Date(date).getTime();
+    var height = $(".c_height").val();
+    var horoscope = $(".c_horoscope").val();
+    var horoscopes = window.localStorage.getItem("horoscopes");
+    for(var i=0;i<horoscopes.length;i++){
+      if(horoscopes[i].name == horoscope){
+        horoscope = horoscopes[i].id;
+      }
+    }
+    var home_p = $(".c_home_p").val();
+    var provinces = window.localStorage.getItem("provinces");
+    for(var i=0;i<provinces.length;i++){
+      if(provinces[i].name == home_p){
+        home_p = provinces[i].id;
+      }
+    }
+    var home_c = $(".c_home_c").val();
+    for(var i=0;i<provinces[home_p-1].cities.length;i++){
+      if(provinces[home_p - 1].cities[i].name == home_c){
+        home_c = provinces[home_p - 1].cities[i].id;
+      }
+    }
+    var work_p = $(".c_work_p").val();
+    for(var i=0;i<provinces.length;i++){
+      if(provinces[i].name == work_p){
+        work_p = provinces[i].id;
+      }
+    }
+    var work_c = $(".c_work_c").val();
+    for(var i=0;i<provinces[work_p-1].cities.length;i++){
+      if(provinces[work_p - 1].cities[i].name == work_c){
+        work_c = provinces[work_p - 1].cities[i].id;
+      }
+    }
+    var realname = $(".real_name").val();
+    var contact = $(".tel").val();
+    $.post("/api/user/meta/edit",{"nickname":nickname,"realname":realname,"gender":gender,"birthday":birthday,"horoscope":horoscope,"hometown_province":home_p,"hometown_city":home_c,"workplace_province":work_p,"workplace_city":work_c,"contact":contact},function(data){
+      if(data != ""){
+        check++;
+      }
+    });
+    var school = $(".c_school").val();
+    var schools = window.localStorage.getItem("schools");
+    for(var i=0;i<schools.length;i++){
+      if(schools[i].name == school){
+        school = schools[i].id;
+      }
+    }
+    var subject = $(".c_subject").val();
+    var subjects = window.localStorage.getItem("subjects");
+    for(var i=0;i<subjects.length;i++){
+      if(subjects[i].name == school){
+        subject = subjects[i].id;
+      }
+    }
+    var degree = $(".c_degree").val();
+    for(var i=0;i<$(".degreeul>li").length;i++){
+      if($(".degreeul>li").eq(i).val() == degree){
+        degree = $(".degreeul>li").eq(i).attr("id");
+      }
+    }
+    $.post("/api/user/school/edit",{"school":school,"subject":subject,"degree":degree},function(data){
+      if (data != "" && check == 2) {
+        alert("上传成功");
+        setTimeout("window.location.reload()",1000);
+      }
+    })
   });
   </script>
 </html>
