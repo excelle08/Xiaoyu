@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from model import db
-from model import License, Horoscope, Province, City, School
+from model import License, Horoscope, Province, City, School, Major
 import json
 
 
@@ -34,3 +34,6 @@ def get_schools():
     schools = School.query.all()
     return [{item.id : item.name} for item in schools]
 
+def get_majors():
+    majors = Major.query.all()
+    return [{item.id : item.name} for item in majors]

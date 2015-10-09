@@ -37,14 +37,15 @@ def admin_interceptor():
 @app.before_request
 def user_interceptor():
     nopriv_allowed = [
-        '/',
         '/static/.*',
         '/login',
-        '/register',
+        '/reg',
         '/api/common/.*',
         '/api/user/verify',
         '/api/user/login',
-        '/api/user/register'
+        '/api/register',
+        '/api/test/.*',
+        '/test.*'
     ]
 
     auth_flag = False
@@ -55,7 +56,7 @@ def user_interceptor():
             break
 
     if not auth_flag:
-        return redirect(url_for('.index'))
+        return redirect('/login')
 
 
 @app.after_request
@@ -72,6 +73,41 @@ def index():
     return render_template('homepage.html')
 
 
+@app.route('/reg', methods=['GET', 'POST'])
+def register():
+    return render_template('reg.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    return render_template('login.html')
+
+
+@app.route('/changepass', methods=['GET', 'POST'])
+def changepass():
+    return render_template('changepass.html')
+
+
+@app.route('/home', methods=['GET', 'POST'])
+def home():
+    return render_template('homepage.html')
+
+
+@app.route('/friends', methods=['GET', 'POST'])
+def friends():
+    return render_template('friends.html')
+
+
+@app.route('/publish', methods=['GET', 'POST'])
+def publish_tweet():
+    return render_template('publish.html')
+
+
+@app.route('/message', methods=['GET', 'POST'])
+def message_center():
+    return render_template('message.html')
+
+
 ### This is for test.
 ### Will be removed in production mode
 
@@ -81,6 +117,11 @@ def test_user_register():
     password = request.form['password']
     user = api.user.test_user_register(phone, password)
     return user.json
+
+@app.route('/api/test/verify', methods=['POST'])
+def test_verify():
+    phone = request.form['phone']
+    return api.user.generate_vcode()
 
 ### end
 
@@ -95,7 +136,7 @@ def api_send_verification_sms():
         raise APIError(e.message)
 
 
-@app.route('/api/user/register', methods=['POST'])
+@app.route('/api/register', methods=['POST'])
 def api_user_register():
     try:
         phone = request.form['phone']
@@ -688,3 +729,7 @@ def get_city():
 def get_school():
     return json.dumps(api.common.get_schools())
 
+
+@app.route('/api/common/major', methods=['GET', 'POST'])
+def get_major():
+    return json.dumps(api.common.get_majors())
