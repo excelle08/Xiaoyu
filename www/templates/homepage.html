@@ -5,11 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>homepage</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/homepage.css" rel="stylesheet">
-    <script src="js/jq.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/homepage.js"></script>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/homepage.css" rel="stylesheet">
+    <script src="/static/js/jq.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/homepage.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;z-index:9999;">
@@ -111,6 +111,9 @@
   var alert_t = (alert_h - $(".choose").height())/2;
   $(".choose").css("margin-top",alert_t);
   $(".publish").css("margin-top",alert_h);
+  $(".back").click(function(){
+    window.history.back(-1);
+  });
   $(".equalnav").css("height",alert_h);
   $(".sex_man").click(function(){
     $(".sex_woman").removeAttr("checked");

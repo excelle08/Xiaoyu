@@ -5,10 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>消息中心</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/message.css" rel="stylesheet">
-    <script src="js/jq.js"></script>
-    <script src="js/angular.min.js"></script>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/message.css" rel="stylesheet">
+    <script src="/static/js/jq.js"></script>
+    <script src="/static/js/angular.min.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
@@ -107,6 +107,9 @@
   var alert_t = (alert_h - $(".choose").height())/2;
   $(".choose").css("margin-top",alert_t);
   $(".nav_nav").css("margin-top",alert_h);
+  $(".back").click(function(){
+    window.history.back(-1);
+  });
   $(".apply_mes_").click(function(){
     $(this).parent().find(".apply_mes_oper").slideToggle();
   });

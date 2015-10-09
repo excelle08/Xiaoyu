@@ -70,7 +70,7 @@ html,body{
 }
 .com_pic_change{
   height: 2em;
-  background: url(../img/change.png) no-repeat;
+  background: url(/static/images/change.png) no-repeat;
   background-size: 100% 100%;
   position: relative;
 }
@@ -107,7 +107,7 @@ html,body{
 .ImgUploadContainer{
   height: 2em;
   width: 6em;
-  background: url(../img/changecover.png) no-repeat;
+  background: url(/static/images/changecover.png) no-repeat;
   background-size: 100% 100%;
   position: relative;
   right: 0;
@@ -154,7 +154,7 @@ html,body{
 }
 .com_add_img{
   height: 2em;
-  background: url(../img/addimg.png) no-repeat;
+  background: url(/static/images/addimg.png) no-repeat;
   background-size: 100% 100%;
   position: relative;
 }
