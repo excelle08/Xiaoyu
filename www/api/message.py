@@ -47,7 +47,7 @@ def reply_message(target_message, content, visibility=Visibility.All):
 def get_messages(uid, offset=0, limit=10, later_than=0):
     current_uid = session['uid']
 
-    messages = Message.query.filter_by(user==uid, created_at>=later_than).all()
+    messages = Message.query.filter(Message.user==uid, Message.created_at>=later_than).all()
     for i in messages:
         if i.visibility == Visibility.Mutual and not (current_uid == i.user or current_uid == i.target):
             messages.remove(i)
@@ -60,7 +60,7 @@ def get_replies(target_reply, offset=0, limit=10, later_than=0):
     current_uid = session['uid']
 
     message = Message.query.filter_by(id=target_reply).first()
-    replies = MessageReply.query.filter(target==target_reply, created_at>=later_than).all()
+    replies = MessageReply.query.filter(MessageReply.target==target_reply, MessageReply.created_at>=later_than).all()
     for i in replies:
         if i.visibility == Visibility.Mutual and not (current_uid == message.user or current_uid == i.user):
             replies.remove(i)

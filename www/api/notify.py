@@ -16,7 +16,7 @@ def send_notification(content):
 
 
 def get_notifications(later_than):
-    return Notification.query.filter(created_at >= later_than).ordered_by(Notification.created_at.desc()).all()
+    return Notification.query.filter(Notification.created_at >= later_than).order_by(Notification.created_at.desc()).all()
 
 
 def delete_notification(id):

@@ -7,7 +7,7 @@ import time
 
 
 def send(_from, to, content):
-    f = Friend.query.filter_by(user=_from, to=to).first()
+    f = Friend.query.filter(Friend.user==_from, Friend.to==to).first()
     if not f:
         raise APIError('非好友关系不能发送信息~')
 
@@ -25,7 +25,7 @@ def send(_from, to, content):
 
 
 def receive(uid, _from):
-    messages = ChatMessage.query.filter_by(_from=_from, to=uid, read=False).ordered_by(ChatMessage.created_at.desc()).all()
+    messages = ChatMessage.query.filter(ChatMessage._from==_from, ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).all()
     for i in messages:
         i.read = True
 
@@ -34,7 +34,7 @@ def receive(uid, _from):
 
 
 def receive_all(uid):
-    messages = ChatMessage.query.filter_by(to=uid, read=False).ordered_by(ChatMessage.created_at.desc()).all()
+    messages = ChatMessage.query.filter(ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).all()
     for i in messages:
         i.read = True
 

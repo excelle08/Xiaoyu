@@ -90,13 +90,18 @@
         $.ajax({
           url: "/api/register",
           data: $(".reg_form").serialize(),
-          dataType: "application/json",
+          dataType: "json",
+          method: "POST",
           error: function(data){
             alert(data.message);
           },
           success: function(data){
-            alert("注册成功");
-            setTimeout(function(){window.location = "/index" + data.uid},1000);
+            if(data.message){
+              alert("注册成功");
+              setTimeout(function(){window.location = "/" + data.uid},200);
+            } else {
+              alert(data.message);
+            }
           }
         });
       });

@@ -5,19 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>首页</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/bootstrap-switch.css" rel="stylesheet">
-    <link href="css/index.css" rel="stylesheet">
-    <script src="js/jq.js"></script>
-    <script src="js/angular.min.js"></script>
-    <script src="js/bootstrap-switch.min.js"></script>
-    <script src="js/index.js"></script>
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/css/bootstrap-switch.css" rel="stylesheet">
+    <link href="static/css/index.css" rel="stylesheet">
+    <script src="static/js/jq.js"></script>
+    <script src="static/js/angular.min.js"></script>
+    <script src="static/js/bootstrap-switch.min.js"></script>
+    <script src="static/js/index.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
       <div class="container row" style="">
         <div class="col-xs-2 col-md-2" style="padding:0;">
-          <img src="img/test.jpg" class="headicon" ><div class="circle"></div>
+          <img src="static/images/test.jpg" class="headicon" ><div class="circle"></div>
         </div>
         <div class="col-xs-8 col-md-8" style="text-align:center;">
           <span class="index_kind">首页</span>
@@ -29,24 +29,24 @@
     </nav>
     <div class="UserInfor_">
       <div class="U_head">
-        <img src="img/test.jpg" class="U_headicon col-xs-5" style="padding:0;">
+        <img src="static/images/test.jpg" class="U_headicon col-xs-5" style="padding:0;">
         <div class="col-xs-7" style="float:left;margin-top:0.5em;margin-left:0.5em;padding:0;"><span class="UserName">UserName</span><br><span class="U_check">未认证</span></div>
         <div class="U_circle"></div>
       </div>
       <div class="U_">
-        <img src="img/test.jpg" class="U_img">
+        <img src="static/images/test.jpg" class="U_img">
         <div class="U_circle2"><span class="fri_update">3</span></div>
         <span style="font-size:1.5em;line-height:2em;">好友</span>
         <span id="rec_fri" style="float:right;font-size:1em;line-height:3em;">有新的消息</span>
       </div>
       <div class="U_">
-        <img src="img/test.jpg" class="U_img">
+        <img src="static/images/test.jpg" class="U_img">
         <div class="U_circle3"><span class="mes_update">3</span></div>
         <span style="font-size:1.5em;line-height:2em;">消息</span>
         <span id="rec_mes" style="float:right;font-size:1em;line-height:3em;">收到<span class="mes_update">3</span>个赞</span>
       </div>
       <div class="U_">
-        <img src="img/test.jpg" class="U_img">
+        <img src="static/images/test.jpg" class="U_img">
         <div class="U_circle4"><span class="note_update">3</span></div>
         <span style="font-size:1.5em;line-height:2em;">公告</span>
         <span id="rec_note" style="float:right;font-size:1em;line-height:3em;">最近<span class="note_update">3</span>条更新</span>
@@ -154,7 +154,7 @@
           <span class="wall_more">></span>
         </div>
         <div class="wall_pic">
-          <img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg">
+          <img src="static/images/test.jpg"><img src="static/images/test.jpg"><img src="static/images/test.jpg"><img src="static/images/test.jpg"><img src="static/images/test.jpg">
         </div>
       </div>
     </div>
@@ -202,7 +202,7 @@
               <div class="col-xs-9">
                 <div class="avatar_nav">
                   <b>{{online.nickname}}</b>♂<span class="age">{{online.age}}</span>
-                  <span class="like_num">{{online.upvotes}}</span><img src="img/dz.png" class="like_">
+                  <span class="like_num">{{online.upvotes}}</span><img src="static/images/dz.png" class="like_">
                 </div>
                 <div class="tags"><span class="tag">{{online.schoolname}}</span><span class="tag">{{online.degree}}</span></div>
                 <div class="motto">{{online.motto}}</div>
@@ -226,7 +226,7 @@
               <div class="col-xs-9">
                 <div class="avatar_nav">
                   <b>{{recent.nickname}}</b><span class="sex">{{recent.gender}}</span><span class="age">{{recent.age}}</span>
-                  <span class="like_num">{{recent.upvotes}}</span><img src="img/dz.png" class="like_">
+                  <span class="like_num">{{recent.upvotes}}</span><img src="static/images/dz.png" class="like_">
                 </div>
                 <div class="tags"><span class="tag">{{recent.schoolname}}</span><span class="tag">{{recent.degree}}</span></div>
                 <div class="motto">{{recent.motto}}</div>
@@ -250,7 +250,7 @@
               <div class="col-xs-9">
                 <div class="avatar_nav">
                   <b>{{hot.nickname}}</b><span class="sex">{{hot.gender}}</span><span class="age">{{hot.age}}</span>
-                  <span class="like_num">{{hot.upvotes}}</span><img src="img/dz.png" class="like_">
+                  <span class="like_num">{{hot.upvotes}}</span><img src="static/images/dz.png" class="like_">
                 </div>
                 <div class="tags"><span class="tag">{{hot.schoolname}}</span><span class="tag">{{hot.degree}}</span></div>
                 <div class="motto">{{hot.motto}}</div>
@@ -304,9 +304,10 @@
     $.post("/api/common/province",function(province){
       var provinces = [];
       for(var i=1;i<=province.length;i++){
+        var p_name = province[i].name;
         $.post("/api/common/city?province=",{"province":i},function(city){
           var id = i;
-          provinces.push({"id":id,"name":province[i].name,"cities":city});
+          provinces.push({"id":id,"name":p_name,"cities":city});
         });
       }
       window.localStorage.setItem("provinces",JSON.stringify(provinces));

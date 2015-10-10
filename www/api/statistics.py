@@ -3,11 +3,11 @@ import time
 
 
 def get_pageviews(later_than):
-    return PageView.query.filter(time >= later_than).all()
+    return PageView.query.filter(PageView.time >= PageView.later_than).all()
 
 
 def get_pv_counts(later_than):
-    return {"pv": PageView.query.filter(time >= later_than).count()}
+    return {"pv": PageView.query.filter(PageView.time >= PageView.later_than).count()}
 
 
 def pageview(uid, ip, path):

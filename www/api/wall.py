@@ -91,7 +91,7 @@ def upvote_user(uid):
 
 
 def get_new_upvotes(uid):
-    upvotes = WallUpvote.query.filter_by(new=True).ordered_by(WallUpvote.time.desc()).all()
+    upvotes = WallUpvote.query.filter_by(new=True).order_by(WallUpvote.time.desc()).all()
     for i in upvotes:
         i.new = False
 
@@ -100,7 +100,7 @@ def get_new_upvotes(uid):
 
 
 def get_all_my_upvotes(uid):
-    return WallUpvote.query.ordered_by(WallUpvote.time.desc()).all()
+    return WallUpvote.query.order_by(WallUpvote.time.desc()).all()
 
 
 def filter_users(uid):
@@ -136,13 +136,13 @@ def filter_users(uid):
     uids = [ user.uid for user in users ]
 
     # School filter
-    schools_query = UserSchool.query.filter_by(UserSchool.auth_pass == True)
+    schools_query = UserSchool.query.filter(UserSchool.auth_pass == True)
 
     if condition['school'] != -1:
-        schools_query = schools_query.filter_by(UserSchool.school_id == condition['school'])
+        schools_query = schools_query.filter(UserSchool.school_id == condition['school'])
 
     if condition['degree'] != -1:
-        schools_query = schools_query.filter_by(UserSchool.degree == condition['degree'])
+        schools_query = schools_query.filter(UserSchool.degree == condition['degree'])
 
     user_schools = schools_query.all()
     uids2 = [ item.uid for item in user_schools ]
@@ -169,7 +169,7 @@ def get_guest_wall_items(uid):
         return initial[:30]
 
     numbers = 7 - initial.__len__()
-    ids = [ item.id for item in Wall.query.ordered_by(Wall.upvotes.desc()).limit(numbers)]
+    ids = [ item.id for item in Wall.query.order_by(Wall.upvotes.desc()).limit(numbers)]
     result = []
 
     for i in ids:

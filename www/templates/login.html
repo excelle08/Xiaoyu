@@ -5,11 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>login</title>
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/login.css" rel="stylesheet">
-    <script src="/static/js/jq.js"></script>
-    <script src="/static/js/angular.min.js"></script>
-    <script src="/static/js/angular-cookies.min.js"></script>
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/css/login.css" rel="stylesheet">
+    <script src="static/js/jq.js"></script>
+    <script src="static/js/angular.min.js"></script>
+    <script src="static/js/angular-cookies.min.js"></script>
   </head>
   <body ng-controller="myController">
     <div class="login-logo"></div>
@@ -41,16 +41,20 @@
     $("#submit").click(function(){
       $(".b_flame").submit(function(){
         $.ajax({
-          url: "/api/login",
+          url: "/api/user/login",
           data: $(".b_flame").serialize(),
-          dataType: "application/json",
+          dataType: "json",
+          method: "POST",
           error: function(data){
             alert(data.message);
           },
           success: function(data){
-            alert("登录成功");
-            var id = data.uid;
-            setTimeout(function(){ window.location = "/index" + id;}, 2000);
+            if(data.uid){
+              alert("登录成功");
+              setTimeout(function(){ window.location = "/";}, 200);
+            } else {
+              alert(data.message);
+            }
           }
         });
       });

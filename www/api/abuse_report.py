@@ -25,7 +25,7 @@ def get_reports(filter_read = True):
     if not check_admin():
         raise APIError('You are not the admin.')
 
-    return AbuseReport.query.filter_by(read=(not filter_read)).ordered_by(AbuseReport.created_at.desc()).all()
+    return AbuseReport.query.filter_by(read=(not filter_read)).order_by(AbuseReport.created_at.desc()).all()
 
 
 def mark_as_read(id):
