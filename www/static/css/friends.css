@@ -36,7 +36,7 @@ ul li{
   color: #888;
 }
 .fn_active{
-  background: #555;
+  background: #08a;
   color: white;
 }
 .group{
@@ -82,17 +82,31 @@ ul li{
   font-size: 1.3em;
   line-height: 2em;
   display: none;
+  color: white;
 }
 .f_trans{
   border-right:1px solid #666;padding:0;
+  background: #add8e6;
 }
 .f_index{
   border-right:1px solid #666;padding:0;
+  background: #66cd00;
+}
+.f_delete{
+  background: #b22222;
 }
 .chats_list{
   display: none;
 }
+.blacks_list{
+  display: none;
+}
 .chat_{
+  width: 100%;
+  height: auto;
+  font-size: 1em;
+}
+.black_{
   width: 100%;
   height: auto;
   font-size: 1em;
@@ -102,7 +116,19 @@ ul li{
   width: 100%;
   background: #fff;
 }
+.black_main{
+  height: 4.5em;
+  width: 100%;
+  background: #fff;
+}
 .chat_user_head{
+  float: left;
+  width: 3.5em;
+  height: 3.5em;
+  border-radius: 100px;
+  margin: 0.5em;
+}
+.black_user_head{
   float: left;
   width: 3.5em;
   height: 3.5em;
@@ -122,6 +148,14 @@ ul li{
   float: left;
   margin-top: 0.5em;
 }
+.black_con{
+  width: 60%;
+  height: auto;
+  font-size: 1.3em;
+  vertical-align: middle;
+  float: left;
+  margin-top: 0.5em;
+}
 .chat_content{
   overflow: hidden;
   height: 1.5em;
@@ -134,7 +168,29 @@ ul li{
   line-height: 2em;
   font-size: 1.2em;
   display: none;
+  color: white;
+}
+.black_oper{
+  width: 100%;
+  height: 2em;
+  background: #aaa;
+  text-align: center;
+  line-height: 2em;
+  font-size: 1.2em;
+  display: none;
+  color: white;
 }
 .c_index{
   border-right:1px solid #666;padding:0;
+  background: #66cd00;
+}
+.c_reply{
+  background: #87ceeb;
+}
+.b_index{
+  border-right:1px solid #666;padding:0;
+  background: #66cd00;
+}
+.b_delete{
+  background: #b22222;
 }

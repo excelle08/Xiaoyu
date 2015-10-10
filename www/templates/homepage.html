@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>homepage</title>
+    <title>编辑我的资料</title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/homepage.css" rel="stylesheet">
     <script src="/static/js/jq.js"></script>
@@ -18,7 +18,7 @@
           <span class="back" ><</span>
         </div>
         <div class="col-xs-8 col-md-8" style="text-align:center;">
-          <span class="index_kind">TA的主页</span>
+          <span class="index_kind">编辑我的资料</span>
         </div>
         <div class="col-xs-2 col-md-2" style="padding:0;">
           <a class="choose" href="#">保存</a>
@@ -300,9 +300,9 @@
   $(".choose").click(function(){
     var check = 0;
     $.post("/api/photo/upload",{"avatar":avatar,"avatar_photos":photos},function(data){
-      if(data != ""{
+      if(data != ""){
         check++;
-      })
+      }
     });
     var nickname = $(".nickname").val();
     var gender;

@@ -8,6 +8,7 @@
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/reply.css" rel="stylesheet">
     <script src="/static/js/jq.js"></script>
+    <script src="/static/js/Jquery.Query.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
@@ -33,5 +34,18 @@
   var alert_t = (alert_h - $(".choose").height())/2;
   $(".choose").css("margin-top",alert_t);
   $(".reply").css("margin-top",alert_h);
+  var user = $.query.get("uid"),name;
+  $.get("/api/user/meta",{"uid":uid},function(data){
+    name = data.nickname
+  });
+  $(".reply").attr("placeholder","回复："+name);
+  $(".choose").click(function(){
+    var url0 = window.location.pathname.substr(2,5);
+    if(url0 == "reply"){
+      
+    }else{
+
+    }
+  });
   </script>
 </html>

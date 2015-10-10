@@ -96,7 +96,7 @@
           },
           success: function(data){
             alert("注册成功");
-            setTimeout(function(){window.location = "/login"},1000);
+            setTimeout(function(){window.location = "/index" + data.uid},1000);
           }
         });
       });

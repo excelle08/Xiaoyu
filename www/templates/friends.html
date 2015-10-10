@@ -22,8 +22,9 @@
       </div>
     </nav>
     <div class="fri_nav">
-      <div class="col-xs-6 chat_list" style="border-right:1px solid #666;">聊天</div>
-      <div class="col-xs-6 fn_active f_list">好友</div>
+      <div class="col-xs-4 chat_list" style="border-right:1px solid #666;">聊天</div>
+      <div class="col-xs-4 fn_active f_list" style="border-right:1px solid #666;">好友</div>
+      <div class="col-xs-4 b_list">黑名单</div>
     </div>
     <ul class="friends_list" ng-controller="myfriends">
       <li ng-repeat="group in groups">
@@ -70,6 +71,22 @@
         </div>
       </li>
     </ul>
+    <ul class="blacks_list" ng-controller="blacklist">
+      <li ng-repeat="black in blacks">
+        <div class="black_" id="{{black.uid}}">
+          <div class="black_main">
+            <div class="black_con">
+              <img ng-src="{{black.avatar}}" class="black_user_head">
+              <div class="black_user"><b>{{black.nickname}}</b>{{black.gender}}{{black.age}}</div>
+            </div>
+          </div>
+          <div class="black_oper">
+            <div class="col-xs-6 b_index">Ta的主页</div>
+            <div class="col-xs-6 b_delete">删除</div>
+          </div>
+        </div>
+      </li>
+    </ul>
     <ul class="chats_list">
       <li>
         <div class="chat_">
@@ -83,7 +100,7 @@
           </div>
           <div class="chat_oper">
             <div class="col-xs-6 c_index">Ta的主页</div>
-            <div class="col-xs-6 c_delete">删除</div>
+            <div class="col-xs-6 c_reply">回复</div>
           </div>
         </div>
       </li>
@@ -98,16 +115,28 @@
     window.history.back(-1);
   });
   $(".chat_list").click(function(){
+    $(".b_list").removeClass("fn_active");
     $(".f_list").removeClass("fn_active");
     $(this).addClass("fn_active");
     $(".chats_list").fadeIn();
     $(".friends_list").hide();
+    $(".blacks_list").hide();
   });
   $(".f_list").click(function(){
+    $(".b_list").removeClass("fn_active");
     $(".chat_list").removeClass("fn_active");
     $(this).addClass("fn_active");
     $(".chats_list").hide();
+    $(".blacks_list").hide();
     $(".friends_list").fadeIn();
+  });
+  $(".b_list").click(function(){
+    $(".f_list").removeClass("fn_active");
+    $(".chat_list").removeClass("fn_active");
+    $(this).addClass("fn_active");
+    $(".chats_list").hide();
+    $(".friends_list").hide();
+    $(".blacks_list").fadeIn();
   });
   $(".user_infor").click(function(){
     $(this).next().slideToggle();
@@ -147,7 +176,15 @@
       });
     }
   });
-
+  $(".c_delete").click(function(){
+    var uid = $(this).parent().parent().attr("id");
+    var id = $.query.get('id');
+    window.location = "/reply/" + id + "?to=" + uid;
+  });
+  $(".c_index").click(function(){
+    var uid = $(this).parent().parent().attr("id");
+    window.location = "/friends/" + uid;
+  });
   var myApp = angular.module('myApp',[]);
   myApp.controller('myfriends',function($scope,$http){
     var groups = [];
@@ -159,6 +196,7 @@
     });
     $http.post("/api/user/friends").success(function(data){
       for(var i=0;i<data.length;i++){
+        var friends = [];
         var uid = data[i].to;
         var index = data[i].group;
         $http.get("/api/user/meta",{"uid":uid}).success(function(data){
@@ -167,12 +205,12 @@
           }else{
             data.gender = "♀";
           }
-          var friends = [], friend = {};
-          $.extend({},friend,{"uid":uid});
-          $.extend({},friend,{"avatar":data.avatar});
-          $.extend({},friend,{"nickname":data.nickname});
-          $.extend({},friend,{"gender":data.gender});
-          $.extend({},friend,{"age":data.age});
+          var friend = {};
+          friend = $.extend({},friend,{"uid":uid});
+          friend = $.extend({},friend,{"avatar":data.avatar});
+          friend = $.extend({},friend,{"nickname":data.nickname});
+          friend = $.extend({},friend,{"gender":data.gender});
+          friend = $.extend({},friend,{"age":data.age});
           friends.push(friend);
         });
         $.extend({},groups[index],{"friends":friends});
@@ -180,12 +218,134 @@
     });
     $scope.groups = groups;
   });
+  myApp.controller('chatlist',function($scope,$http){
+    var friend = [];
+    $http.post("/api/chat/recv").success(function(data){
+      var uid;
+      for(var i=0;i<data.length;i++){
+        uid = data[i].from;
+        var user = {};
+        $.get("/api/user/meta",{"uid":uid},function(data){
+          if(data.gender == 0){
+            data.gender ="♂";
+          }else{
+            data.gender = "♀";
+          }
+          user = $.extend({},user,{"uid":uid});
+          user = $.extend({},user,{"nickname":data.nickname});
+          user = $.extend({},user,{"avatar":data.avatar});
+          user = $.extend({},user,{"gender":data.gender});
+          user = $.extend({},user,{"age":data.age});
+        });
+        $.extend({},user,{"content":data[i].message});
+        var second = 1000;
+        var minite = second * 60;
+        var hour = minite * 60;
+        var day = hour * 24;
+        var month = day * 30;
+        var now = new Date().getTime();
+        var time = now - parseInt(data[i].create_at * 1000);
+        if(time < 0){
+          alert("error");
+        }else{
+          var monthC = time/month;
+          var weekC = time/(7*day);
+          var dayC = time/day;
+          var hourC = time/hour;
+          var miniteC = time/minite;
+          var secondC = time/second;
+          if(monthC > 1){
+            data[i].create_at = parseInt(monthC) + "个月前";
+          }else if(weekC > 1){
+            data[i].create_at = parseInt(weekC) + "个星期前";
+          }else if(dayC > 1){
+            data[i].create_at = parseInt(dayC) + "天前";
+          }else if(hourC > 1){
+            data[i].create_at = parseInt(hourC) + "小时前";
+          }else if(miniteC > 1){
+            data[i].create_at = parseInt(miniteC) + "分钟前";
+          }else if(secondC > 1){
+            data[i].create_at = parseInt(secondC) + "秒前";
+          }else{
+            data[i].create_at = "刚刚";
+          }
+        }
+        $.extend({},user,{"create_at":data[i].create_at});
+        friend.push(user);
+      }
+    });
+    $scope.chats = friend;
+  });
+  myApp.controller('blacklist',function($scope,$http){
+    $http.post("/api/user/blacklist/get").success(function(data){
+      for(var i=0;i<data.length;i++){
+        var friends = [];
+        var uid = data[i].to;
+        $http.get("/api/user/meta",{"uid":uid}).success(function(data){
+          if(data.gender == 0){
+            data.gender ="♂";
+          }else{
+            data.gender = "♀";
+          }
+          var friend = {};
+          friend = $.extend({},friend,{"uid":uid});
+          friend = $.extend({},friend,{"avatar":data.avatar});
+          friend = $.extend({},friend,{"nickname":data.nickname});
+          friend = $.extend({},friend,{"gender":data.gender});
+          friend = $.extend({},friend,{"age":data.age});
+          friends.push(friend);
+        });
+        $.extend({},groups[index],{"friends":friends});
+      }
+      $scope.blacks = friends;
+    });
+  });
   $(".f_delete").click(function(){
     var uid = $(this).parent().parent().attr("id");
     var check = window.confirm("你确定要删除此好友吗?");
     if(check){
       $.post("/api/user/friends/delete",{"uid":uid},function(data){
         if(data.id == uid){
+          var success = window.confirm("删除成功!");
+          if(success){
+            window.location.reload();
+          }
+          window.setTimeout("window.location.reload()",1000);
+        }
+      });
+    }
+  });
+  $(".f_index").click(function(){
+    var uid = $(this).parent().parent().attr("id");
+    var id = window.location.pathname.substr(9);
+    window.location = "/friends/" + id + "?uid=" + uid;
+  });
+  $(".f_delete").click(function(){
+    var uid = $(this).parent().parent().attr("id");
+    var check = window.confirm("你确定要删除此好友吗?");
+    if(check){
+      $.post("/api/user/friends/delete",{"uid":uid},function(data){
+        if(data.id == uid){
+          var success = window.confirm("删除成功!");
+          if(success){
+            window.location.reload();
+          }
+          window.setTimeout("window.location.reload()",1000);
+        }
+      });
+    }
+  });
+  $(".b_index").click(function(){
+    var uid = $(this).parent().parent().attr("id");
+    var id = window.location.pathname.substr(9);
+    window.location = "/friends/" + id + "?uid=" + uid;
+  });
+  $(".b_delete").click(function(){
+    var uid = $(this).parent().parent().attr("id");
+    var check = window.confirm("你确定要将TA从黑名单里面删除吗?");
+    if(check){
+      $.post("/api/user/blacklist/delete",{"uid":uid},function(data){
+        if(data != ""){
           var success = window.confirm("删除成功!");
           if(success){
             window.location.reload();

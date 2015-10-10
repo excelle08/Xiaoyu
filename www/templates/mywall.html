@@ -27,8 +27,14 @@
     <div class="equalnav"></div>
     <ul ng-controller="thewall">
       <div class="title">《{{wall.title}}》</div>
+      <li>
+        <img ng-src="{{cover.url}}" class="cover">
+        <div class="describe">
+          {{cover.description}}
+        </div>
+      </li>
       <li ng-repeat="photo in photos">
-        <img ng-src="{{photo.url}}" class="cover">
+        <img ng-src="{{photo.url}}" class="photo">
         <div class="describe">
           {{photo.description}}
         </div>
@@ -46,6 +52,7 @@
   var myApp = angular.module('myApp',[]);
   myApp.controller('thewall',function($scope,$http){
     $http.get("/api/wall/guestwall").success(function(data){
+      $scope.cover = data.photos.shift();
       $scope.photos = data.photos;
       $scope.wall = data;
     });

@@ -13,6 +13,8 @@ a{
   background: #000;
   display: block;
   margin-bottom: 20px;
+  background: url(/static/images/pic2.jpg);
+  background-size: 100% 100%;
 }
 .b_flame{
   padding: 0 10px;
@@ -29,4 +31,8 @@ a{
 }
 .forget{
   margin: 0 auto;
+}
+.reg,#submit{
+  background: #0a8;
+  color: white;
 }

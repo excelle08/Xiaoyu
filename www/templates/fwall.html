@@ -11,7 +11,7 @@
     <script src="/static/js/angular.min.js"></script>
   </head>
   <body>
-    <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
+    <nav class="navbar navbar-default navbar-fixed-top" style="background:#ddd;margin-bottom:0;">
       <div class="container row" style="">
         <div class="col-xs-3 col-md-3" style="padding:0;">
           <span class="back" ><</span>
@@ -33,8 +33,8 @@
           {{wall.photo.description}}
         </div>
         <div class="infor">
-          <span class="user">{{wall.nickname}}<span class="sex">{{wall.gender}}</span>{{wall.age}}</span>
-          <span class="update">1分钟前更新</span>
+          <span class="user"><b>{{wall.nickname}}</b><span class="sex">{{wall.gender}}</span><span class="age">{{wall.age}}</span></span>
+          <span class="update">{{wall.time}}更新</span>
         </div>
       </li>
     </ul>
@@ -49,29 +49,57 @@
   $(".equalnav").css("height",alert_h);
   var myApp = angular.module('myApp',[]);
   myApp.controller('guestwalls',function($scope,$http){
-    var wall_init,user;
     var walls = [];
     $http.get("/api/wall/guestwall").success(function(data){
-      wall_init = data;
-    });
-    for(var i = 0; i < wall_init.length; i++){
-      var wall0 = {uid:wall_init[i].uid,photo:wall_init[i].photos[0],title:wall_init[i].title};
-      $.post("/api/user/meta",{uid:wall_init[i].uid},function(data){
-        user = data;
-        for(var i = 0;i < user.length; i++){
-          var user0 = {nickname:user[i].nickname,gender:user[i].gender,age:user[i].age};
-          var wall_m = $.extend({},wall0,user0);
-          g_walls.push(wall_m);
-          if(wall_m[i].gender == "man"){
-            wall_m[i].gender = "♂";
-          }
-          else{
-            wall_m[i].gender = "♀";
+      for(var i = 0; i < data.length; i++){
+        var second = 1000;
+        var minite = second * 60;
+        var hour = minite * 60;
+        var day = hour * 24;
+        var month = day * 30;
+        var now = new Date().getTime();
+        var time = now - parseInt(data[i].create_at * 1000);
+        if(time < 0){
+          alert("error");
+        }else{
+          var monthC = time/month;
+          var weekC = time/(7*day);
+          var dayC = time/day;
+          var hourC = time/hour;
+          var miniteC = time/minite;
+          var secondC = time/second;
+          if(monthC > 1){
+            data[i].create_at = parseInt(monthC) + "个月前";
+          }else if(weekC > 1){
+            data[i].create_at = parseInt(weekC) + "个星期前";
+          }else if(dayC > 1){
+            data[i].create_at = parseInt(dayC) + "天前";
+          }else if(hourC > 1){
+            data[i].create_at = parseInt(hourC) + "小时前";
+          }else if(miniteC > 1){
+            data[i].create_at = parseInt(miniteC) + "分钟前";
+          }else if(secondC > 1){
+            data[i].create_at = parseInt(secondC) + "秒前";
+          }else{
+            data[i].create_at = "刚刚";
           }
         }
-      });
-    }
-    $scope.walls = g_walls;
+        var wall0 = {"uid":data[i].uid,"photo":data[i].photos[0],"title":data[i].title,"time":data[i].ceate_at};
+        $.post("/api/user/meta",{"uid":data[i].uid},function(data){
+          var user = data;
+          if(user.gender == "man"){
+            user.gender = "♂";
+          }
+          else{
+            user.gender = "♀";
+          }
+          var user0 = {"nickname":user[i].nickname,"gender":user[i].gender,"age":user[i].age};
+          var wall_m = $.extend({},wall0,user0);
+          walls.push(wall_m);
+        });
+      }
+    });
+    $scope.walls = walls;
   });
   </script>
 </html>

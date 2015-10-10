@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>others</title>
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/others.css" rel="stylesheet">
-    <script src="/static/js/jq.js"></script>
-    <script src="/static/js/angular.min.js"></script>
-    <script src="/static/js/Jquery.Query.js"></script>
+    <title>TA的主页</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/others.css" rel="stylesheet">
+    <script src="js/jq.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/Jquery.Query.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
@@ -35,7 +35,7 @@
       <div class="other_head">
         <img ng-src="{{user.avatar}}" class="head">
         <div class="dz">
-          <img src="/static/images/dz.jpg"><br>
+          <img src="img/dz.jpg"><br>
           <span class="num_dz">{{user.upvotes}}</span>
         </div>
       </div>
@@ -54,41 +54,41 @@
         </div>
       </div>
       <div class="heads">
-        <img src="/static/images/test.jpg"><img src="/static/images/test.jpg"><img src="/static/images/test.jpg"><img src="/static/images/test.jpg"><img src="/static/images/test.jpg"><img src="/static/images/test.jpg">
+        <img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg">
       </div>
       <div class="more">
         <div class="visit"><span class="visit_num">{{user.contact}}</span>访客</div><a class="moreinfor">详细资料</a>
       </div>
     </div>
-    <div class="share">
-      <div class="s_title">说说（123）</div>
+    <div class="share" ng-controller="usershares">
+      <div class="s_title">说说（{{number}}）</div>
       <ul>
-        <li>
-          <img src="/static/images/test.jpg"><div class="desc">1一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+        <li ng-repeat="tweet in tweets">
+          <img ng-src="{{tweet.photos}}"><div class="desc">{{tweet.content}}</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">2一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">2一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">3一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">3一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">4一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">4一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">5一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">5一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">6一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">6一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">7一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">7一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">8一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">8一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">9一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">9一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
       </ul>
       <div class="spread">
@@ -98,17 +98,17 @@
         <a class="last">上一页</a><a class="first">首页</a><a class="next">下一页</a><a class="end">末页</a>
       </div>
     </div>
-    <div class="message">
-      <div class="s_title">留言板（123）</div>
+    <div class="message" ng-controller="usermessages">
+      <div class="s_title">留言板（{{number}}）</div>
       <ul>
-        <li>
-          <img src="/static/images/test.jpg"><div class="r_con"><a>Username</a>：仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+        <li ng-repeat="message in messages">
+          <img ng-src="{{message.avatar}}"><div class="r_con"><a>{{message.nickname}}</a>：{{message.content}}</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="r_con"><a>Username</a>：图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="r_con"><a>Username</a>：图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="r_con"><a>Username</a>：起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="r_con"><a>Username</a>：起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
       </ul>
       <div class="spread">
@@ -324,8 +324,53 @@
   });
   myApp.controller('usershares',function($scope,$http){
     $http.post("/api/tweet/user",{"uid":uid}).success(function(data){
+      var pathname = window.location.pathname;
+      var id = pathname.substr(9);
+      $.post("/api/user/friends",{"uid":uid},function(data){
 
+      });
+      $scope.number = data.length;
+      $scope.tweets = data;
     });
+  });
+  myApp.controller('usermessages',function($scope,$http){
+    var message = [];
+    $http.post("/api/message/get",{"uid":uid}).success(function(data){
+      for(var i=0;i<data.length;i++){
+        var uid = data[i].user;
+        message[i] = data[i];
+        $http.get("/api/user/meta",{"uid":uid}).success(function(data){
+          $.extend({},message[i],{"nickname":data.nickname});
+          $.extend({},message[i],{"avatar":data.avatar});
+        });
+      }
+    });
+    $scope.number = message.length;
+    $scope.messages = message;
+  });
+  $("#public").click(function(){
+    if($(".p_con").val() != ""){
+      $.post("/api/message/add",{"uid":uid,"content":$(".p_con").val(),"visibility":0},function(data){
+        if(data != ""){
+          alert("发送成功!");
+          setTimeout("window.location.reload()",1000);
+        }
+      });
+    }else{
+      return;
+    }
+  });
+  $("#privacy").click(function(){
+    if($(".p_con").val() != ""){
+      $.post("/api/message/add",{"uid":uid,"content":$(".p_con").val(),"visibility":2},function(data){
+        if(data != ""){
+          alert("发送成功!");
+          setTimeout("window.location.reload()",1000);
+        }
+      });
+    }else{
+      return;
+    }
   });
   </script>
 </html>

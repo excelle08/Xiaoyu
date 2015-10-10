@@ -19,9 +19,9 @@
         <input type="password" class="flame_disp" name="password" placeholder="  密码:最小长度为8" required ng-minlength='8' ng-model="pass"/>
         <br><span ng-show="myForm.password.$dirty && myForm.password.$valid"></span>
         <div style="margin-top:-1em;line-height:2em;"><input type="checkbox" class="remember" name="remember" /><span style="line-height:2em;">记住我</span></div>
-      <input type="submit" class="btn btn-default form-control flame_disp" id="submit" ng-disabled="myForm.phone.$invalid || myForm.password.$invalid" style="background:#777;" value="登录">
+      <input type="submit" class="btn btn-default form-control flame_disp" id="submit" ng-disabled="myForm.phone.$invalid || myForm.password.$invalid" value="登录">
     </form>
-    <div style="padding:0 10px;"><button type="submit" class="btn btn-default form-control flame_disp reg" style="background:#999;">注册</button></div>
+    <div style="padding:0 10px;"><button type="submit" class="btn btn-default form-control flame_disp reg">注册</button></div>
     <a class="forget">忘记密码</a>
   </body>
   <script type="text/javascript">

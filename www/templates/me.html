@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" ng-app="myApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>me</title>
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/me.css" rel="stylesheet">
-    <script src="/static/js/jq.js"></script>
+    <title>我的主页</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/me.css" rel="stylesheet">
+    <script src="js/jq.js"></script>
+    <script src="js/angular.min.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
@@ -16,81 +17,77 @@
           <span class="back" ><</span>
         </div>
         <div class="col-xs-8 col-md-8" style="text-align:center;">
-          <span class="index_kind">TA的主页</span>
+          <span class="index_kind">我的主页</span>
         </div>
         <div class="col-xs-2 col-md-2" style="padding:0;">
           <a class="choose" href="#">编辑</a>
         </div>
       </div>
     </nav>
-    <div class="control">
-      <div class="makefriends">加为好友</div>
-      <div class="sendmessage">发消息</div>
-      <div class="blacklist">黑名单</div>
-      <div class="report">举报</div>
-    </div>
-    <div class="main">
+    <div class="main" style="background:url({{user.cover}} no-repeat);" ng-controller="userinfor">
       <div class="other_head">
-        <img src="/static/images/test.jpg" class="head">
+        <img ng-src="{{user.avatar}}" class="head">
         <div class="dz">
-          <img src="/static/images/dz.jpg"><br>
-          <span class="num_dz">123</span>
+          <img src="img/dz.jpg"><br>
+          <span class="num_dz">{{user.upvotes}}</span>
         </div>
       </div>
       <div class="other_intro">
         <div class="user">
-          <div class="user_name"><b>aoliweila</b> ♀21</div>
-          <div class="user_check">认证中</div>
+          <div class="user_name"><b>{{user.nickname}}</b> {{user.gender}}{{user.age}}</div>
+          <div class="user_check">{{user.permission}}</div>
           <div class="tags">
             <ul>
-              <li>hhh</li><li>hhh</li><li>hhh</li><li>hhh</li><li>hhh</li><li>hhh</li><li>hhh</li><li>hhh</li>
+              <li>{{user.schoolname}}</li><li>{{user.degree}}</li>
             </ul>
           </div>
           <div class="motto">
-            一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好
+            {{user.motto}}
           </div>
         </div>
       </div>
       <div class="heads">
-        <img src="/static/images/test.jpg"><img src="/static/images/test.jpg"><img src="/static/images/test.jpg"><img src="/static/images/test.jpg"><img src="/static/images/test.jpg"><img src="/static/images/test.jpg">
+        <img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg"><img src="img/test.jpg">
       </div>
       <div class="more">
-        <div class="visit"><span class="visit_num">222</span>访客</div><a class="moreinfor">详细资料</a>
+        <div class="visit"><span class="visit_num">{{user.contact}}</span>访客</div><a class="moreinfor">详细资料</a>
       </div>
     </div>
-    <div class="share">
+    <div class="share" ng-controller="usershares">
       <div class="s_title">
-        <div style="float:left;">说说（<span class="share_num">123</span>）</div>
-        <div class="update" style="float:right;"><span class="update_num">3</span>条说说更新</div>
+        <div style="float:left;">说说（<span class="share_num">{{number}}</span>）</div>
+        <div class="update" style="float:right;"><span class="update_num">{{lnum}}</span>条说说更新</div>
       </div>
       <button class="pub_share">发布说说+</button>
       <ul>
-        <li>
-          <img src="/static/images/test.jpg"><div class="desc">1一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+        <li ng-repeat="ltweet in ltweets" id="{{ltweet.user}}">
+          <img ng-src="{{ltweet.photos[0]}}"><div class="desc">{{ltweet.content}}</div>
+          <div class="circle"></div>
+        </li>
+        <li ng-repeat="tweet in tweets" id="{{tweet.user}}">
+          <img ng-src="{{tweet.photos[0]}}"><div class="desc">{{tweet.content}}</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">2一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">3一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <div class="circle"></div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">3一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">4一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">4一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">5一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">5一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">6一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">6一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">7一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">7一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">8一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="desc">8一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
-        </li>
-        <li>
-          <img src="/static/images/test.jpg"><div class="desc">9一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="desc">9一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
       </ul>
       <div class="spread">
@@ -100,17 +97,17 @@
         <a class="last">上一页</a><a class="first">首页</a><a class="next">下一页</a><a class="end">末页</a>
       </div>
     </div>
-    <div class="message">
-      <div class="s_title">留言板（123）</div>
+    <div class="message" ng-controller="usermessages">
+      <div class="s_title">留言板（{{number}}）</div>
       <ul>
-        <li>
-          <img src="/static/images/test.jpg"><div class="r_con"><a>Username</a>：仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+        <li ng-repeat="message in messages" id="{{message.user}}">
+          <img ng-src="{{message.avatar}}"><div class="r_con"><a>{{message.nickname}}</a>：{{message.content}}</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="r_con"><a>Username</a>：图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="r_con"><a>Username</a>：图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
         <li>
-          <img src="/static/images/test.jpg"><div class="r_con"><a>Username</a>：起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
+          <img src="img/test.jpg"><div class="r_con"><a>Username</a>：起发仙侣图中的美好一起发仙侣图中的美好一起发仙侣</div>
         </li>
       </ul>
       <div class="spread">
@@ -118,13 +115,6 @@
       </div>
       <div class="page">
         <a class="last">上一页</a><a class="first">首页</a><a class="next">下一页</a><a class="end">末页</a>
-      </div>
-      <div class="publish">
-        <form method="post" action="">
-          <input type="text" name="content" placeholder="我来说两句" class="p_con">
-          <input type="submit" name="public" id="public" value="公开">
-          <input type="submit" name="privacy" id="privacy" value="私密">
-        </form>
       </div>
     </div>
   </body>
@@ -134,11 +124,17 @@
   $(".choose").css("margin-top",alert_t);
   $(".main").css("margin-top",alert_h);
   $(".share ul li:gt(2)").hide();
-  $(".back").click(function(){
-    window.history.back(-1);
+  $(".pub_share").click(function(){
+    window.location = "/publish/" + id;
   });
   //pages of share
-
+  $(".share>ul>li").click(function()[
+    var uid = $(this).attr("id");
+    var check = window.confirm("您要回复此说说吗？");
+    if(check){
+      window.location = "/reply/" + id + "?to=" + uid;
+    }
+  ]);
   $(".share .spread").click(function(){
     $(this).addClass("s_active");
     $(this).hide();
@@ -214,7 +210,34 @@
   });
 
   //pages of message
-
+  var timeOutEvent = 0;
+  $(".message>ul>li").on({
+    touchstart: function(e){
+      timeOutEvent = setTimeout("longPress()",500);
+      e.preventDefault();
+    },
+    touchmove: function(){
+      clearTimeout(timeOutEvent);
+      timeOutEvent = 0;
+    },
+    touchend: function(){
+      clearTimeout(timeOutEvent);
+      if(timeOutEvent != 0){
+        return;
+      }
+    };
+  });
+  function longPress(){
+    var uid = $(this).attr("id");
+    var check = window.confirm("您确定要删除此条留言？")：
+    if(check){
+      $.post("/api/message/delete",{"id":uid},function(data){
+        if(data.id != ""){
+          alert("操作成功");
+        }
+      });
+    }
+  }
   $(".message .spread").click(function(){
     $(this).hide();
     var length = $(".message ul li").length;
@@ -286,6 +309,69 @@
       $(".message ul li").hide();
       $(".message ul li").slice(length-6,length).fadeIn();
     }
+  });
+
+  var pathname = window.location.pathname;
+  var id = pathname.substr(6);
+  var myApp = angular.module('myApp',[]);
+  myApp.controller('userinfor',function($scope,$http){
+    var user;
+    $http.get("/api/user/meta",{"uid":id}).success(function(data){
+      if(data.gender == 0){
+        data.gender = "♂";
+      }else{
+        data.gender = "♀";
+      }
+      user = data;
+    });
+    $http.post("/api/wall/get",{"uid":id}).success(function(data){
+      var user0 = {"upvotes":data.upvotes,"cover":data.photos[0]};
+      $.extend({},user,user0);
+    });
+    $http.post("/api/user").success(function(data){
+      var user2 = {"permission":data.permission};
+      $.extend({},user,user2);
+    });
+    $http.post("/api/user/school/get",{"uid":id}).success(function(data){
+      var user1 = {"schoolname":data.school_name,"degree":data.degree};
+      $.extend({},user,user1);
+    });
+    $scope.user = user;
+  });
+  var date = new Date().getTime();
+  var half_month = (date - 1000*60*60*24*15)/1000;
+  myApp.controller('usershares',function($scope,$http){
+    $http.post("/api/tweet/getall",{"later_than":half_month}).success(function(data){
+      $scope.number = data.length;
+      var later = [];
+      var l_time = window.localStorage.getItem("later_time");
+      for(var i=0;i<data.length;i++){
+        if(data[i].create_at > l_time){
+          later.push(data[i]);
+          data.splice(i,1);
+        }
+      }
+      $scope.lnum = later.length;
+      var last_time = later[0].create_at;
+      window.localStorage.setItem("later_time",last_time);
+      $scope.ltweets = later;
+      $scope.tweets = data;
+    });
+  });
+  myApp.controller('usermessages',function($scope,$http){
+    var message = [];
+    $http.post("/api/message/get",{"uid":id}).success(function(data){
+      for(var i=0;i<data.length;i++){
+        var uid = data[i].user;
+        message[i] = data[i];
+        $http.get("/api/user/meta",{"uid":id}).success(function(data){
+          $.extend({},message[i],{"nickname":data.nickname});
+          $.extend({},message[i],{"avatar":data.avatar});
+        });
+      }
+    });
+    $scope.number = message.length;
+    $scope.messages = message;
   });
   </script>
 </html>
