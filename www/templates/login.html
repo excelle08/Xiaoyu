@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>login</title>
+    <title>登录 - 校遇</title>
     <link href="static/css/bootstrap.css" rel="stylesheet">
     <link href="static/css/login.css" rel="stylesheet">
     <script src="static/js/jq.js"></script>
@@ -12,27 +12,40 @@
     <script src="static/js/angular-cookies.min.js"></script>
   </head>
   <body ng-controller="myController">
-    <div class="login-logo"></div>
+    <img src="/static/images/login/login_logo.png" style="margin-bottom:20px;max-width:100%;">
     <form class="b_flame" method="post" ng-submit="submitForm(myForm.$valid)" name="myForm" novalidate>
-        <input type="number" class="flame_disp" name="phone" placeholder="  手机号:" required ng-model="tel" ng-minlength='11' ng-maxlength='11'/>
+        <div class="input-group" style="border-top-left-radius:10px; border-top-right-radius:10px; width:100%; height:50px; background-color: rgba(255, 255, 255, 0.5);">
+          <div class="input-group-addon" style="background:none; border:0;"><img src="/static/images/login/login_icon1.png" height="40px"></div>
+          <input type="text" class="flame_disp phone_input" name="phone" placeholder="手机号" required ng-model="tel" ng-minlength='11' ng-maxlength='11'/>
+        </div>
+        <div class="input-group" style="border-bottom-left-radius:10px; border-bottom-right-radius:10px; width:100%; height:50px; background-color: rgba(255, 255, 255, 0.5); border-top:solid 1px #356ed6;">
+          <div class="input-group-addon" style="background:none; border:0;"><img src="/static/images/login/login_icon2.png" height="40px"></div>
+          <input type="password" class="flame_disp" name="password" placeholder="密码" required ng-minlength='8' ng-model="pass"/>
+        </div>
+        <br>
+        <span style="color:red" id="hint_span"></span>
         <span ng-show="myForm.tel.$dirty && myForm.tel.$valid"></span>
-        <input type="password" class="flame_disp" name="password" placeholder="  密码:最小长度为8" required ng-minlength='8' ng-model="pass"/>
-        <br><span ng-show="myForm.password.$dirty && myForm.password.$valid"></span>
-        <div style="margin-top:-1em;line-height:2em;"><input type="checkbox" class="remember" name="remember" /><span style="line-height:2em;">记住我</span></div>
-      <input type="submit" class="btn btn-default form-control flame_disp" id="submit" ng-disabled="myForm.phone.$invalid || myForm.password.$invalid" value="登录">
+        <span ng-show="myForm.password.$dirty && myForm.password.$valid"></span>
+        <div style="margin-top:-1em;line-height:2em; display:none;"><input type="checkbox" class="remember" name="remember" /><span style="line-height:2em;">记住我</span></div>
+
+        <input type="submit" class="login_btn" id="submit"  value="登录">
+      <!--ng-disabled="myForm.phone.$invalid || myForm.password.$invalid"-->
     </form>
-    <div style="padding:0 10px;"><button type="submit" class="btn btn-default form-control flame_disp reg">注册</button></div>
+    
     <a class="forget">忘记密码</a>
+
+    <footer style="margin-top:30px; padding-top:20px; width:100%; border-top: solid 1px #777;">
+      <a href="/reg" class="reg">新用户注册</a>
+    </footer>
+
   </body>
   <script type="text/javascript">
-    $(".reg").click(function(){
-      window.location = "/reg";
-    });
+   
     var myApp = angular.module('login', [])
     myApp.controller('myController', function($scope) {
       $scope.submitForm = function(isValid) {
             if (!isValid) {
-                alert('请注意格式');
+                //alert('请注意格式');
             }
         };
       }
@@ -46,14 +59,14 @@
         dataType: "json",
         method: "POST",
         error: function(data){
-          alert(data.message);
+          $('#hint_span').text(data.message);
         },
         success: function(data){
           if(data.uid){
             //alert("登录成功");
             setTimeout(function(){ window.location = "/";}, 200);
           } else {
-            alert(data.message);
+            $('#hint_span').text(data.message);
           }
         }
       });

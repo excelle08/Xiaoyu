@@ -1,38 +1,48 @@
-html,body{
-  height: 100%;
-  width: 100%;
-  margin: 0;
+body {
   text-align: center;
+  background: url(/static/images/login/login_background.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  padding-left:30px;
+  padding-right:30px;
+  padding-top:50px;
+  padding-bottom:30px;
 }
 a{
-  text-decoration: none;
+  color: #777;
 }
-.login-logo{
-  width:100%;
-  height:35%;
-  background: #000;
-  display: block;
-  margin-bottom: 20px;
-  background: url(/static/images/pic2.jpg);
-  background-size: 100% 100%;
+a:hover {
+  color: #888;
 }
 .b_flame{
-  padding: 0 10px;
+  margin-bottom: 30px;
 }
 .flame_disp{
   width: 100%;
-  height: 50px;
-  border-radius: 0;
-  margin-bottom: 20px;
+  height: 100%;
+  border:0;
+  background:none;
 }
 .login_password{
   width: 100%;
   border:1px solid #aaa;
 }
 .forget{
-  margin: 0 auto;
+  
 }
-.reg,#submit{
-  background: #0a8;
-  color: white;
+
+.login_btn {
+  border-radius: 10px;
+  color:white;
+  background-color: #356ed6;
+  width:100%;
+  height:50px;
+  border: 0;
+  font-size:20px;
+}
+
+.login_btn:hover {
+  background-color: #2158be;
 }
