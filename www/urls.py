@@ -5,7 +5,6 @@ from flask import jsonify, session, request
 from flask import render_template, make_response
 from flask import redirect, url_for
 from api import APIError, check_admin
-from captcha import generate_captcha
 from model import db
 import api.common, api.user, api.tweets, api.message, api.friends
 import api.photo, api.album, api.wall, api.chat, api.notify, api.abuse_report, api.statistics
@@ -381,6 +380,11 @@ def api_add_to_blacklist():
         raise APIError(e.message)
 
     return Response(api.friends.add_to_blacklist(uid).json, mimetype='text/json')
+
+
+@app.route('/api/user/blacklist/get', methods=['GET', 'POST'])
+def api_get_blacklist():
+    return return_json(api.friends.get_blacklist())
 
 
 @app.route('/api/user/blacklist/delete', methods=['GET', 'POST'])

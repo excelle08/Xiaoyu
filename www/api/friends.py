@@ -173,6 +173,12 @@ def remove_from_blacklist(target_id):
     return {"id": b_id}
 
 
+def get_blacklist():
+    uid = session['uid']
+    blacklist = BlackList.query.filter(BlackList.user==uid).all()
+    return blacklist
+
+
 def am_i_friend(whose):
     return True if Friend.query.filter(Friend.user==whose, Friend.to==session['uid']).first() else False
 

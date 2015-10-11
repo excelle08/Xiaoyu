@@ -303,10 +303,10 @@
     });
     $.post("/api/common/province",function(province){
       var provinces = [];
-      for(var i=1;i<=province.length;i++){
-        var p_name = province[i].name;
-        $.post("/api/common/city?province=",{"province":i},function(city){
-          var id = i;
+      for(var i=0;i<province.length;i++){
+        var p_name = province[i][i+1];
+        var id = i+1;
+        $.get("/api/common/city",{"province":i+1},function(city){
           provinces.push({"id":id,"name":p_name,"cities":city});
         });
       }
@@ -349,7 +349,7 @@
     loadonlines();
   }
   window.localStorage.setItem("later_time",0);
-  myApp.controller('SchoolName',function($scope){
+/*  myApp.controller('SchoolName',function($scope){
     var schools = JSON.parse(window.localStorage.getItem("schools"));
     $scope.schools = schools;
   });
@@ -371,6 +371,31 @@
       }
     }
     $scope.cities = citys;
+  });
+*/
+  myApp.controller('SchoolName',function($scope){
+    var schools0 = JSON.parse(window.localStorage.getItem("schools")),schools = [];
+    for(var i=0;i<schools0.length;i++){
+      var school = {"id":schools0[i][0],"name":schools0[i][1]};
+      schools.push(school);
+    }
+    $scope.schools = schools;
+  });
+  myApp.controller('MajorName',function($scope){
+    var majors0 = JSON.parse(window.localStorage.getItem("majors")),majors = [];
+    for(var i=0;i<majors0.length;i++){
+      var major = {"id":majors0[i][0],"name":majors0[i][1]};
+      majors.push(major);
+    }
+    $scope.majors = majors;
+  });
+  myApp.controller('HoroscopeName',function($scope){
+    var horoscopes0 = JSON.parse(window.localStorage.getItem("horoscopes")),horoscopes = [];
+    for(var i=0;i<horoscopes0.length;i++){
+      var horoscope = {"id":horoscopes0[i][0],"name":horoscopes0[i][1]};
+      horoscopes.push(horoscope);
+    }
+    $scope.horoscopes = horoscopes;
   });
   $(".b_switch").click(function(){
     if(window.localStorage){

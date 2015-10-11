@@ -36,15 +36,27 @@
   $(".reply").css("margin-top",alert_h);
   var user = $.query.get("uid"),name;
   $.get("/api/user/meta",{"uid":uid},function(data){
-    name = data.nickname
+    name = data.nickname;
   });
   $(".reply").attr("placeholder","回复："+name);
   $(".choose").click(function(){
     var url0 = window.location.pathname.substr(2,5);
+    var uid = $.query.get("uid");
+    var content = $(".reply").val();
     if(url0 == "reply"){
-      
+      $.post("/api/message/reply/add",{"uid":uid,"content":content,"visibility":1},function(data){
+        if(data){
+          alert("发送成功");
+          setTimeout("window.history.back(-1)",500);
+        }
+      });
     }else{
-
+      $.post("/api/message/reply/add",{"uid":uid,"content":content,"visibility":2},function(data){
+        if(data){
+          alert("发送成功");
+          setTimeout("window.history.back(-1)",500);
+        }
+      });
     }
   });
   </script>
