@@ -22,11 +22,11 @@
       <input type="submit" class="btn btn-default form-control flame_disp" id="submit" ng-disabled="myForm.phone.$invalid || myForm.password.$invalid" value="登录">
     </form>
     <div style="padding:0 10px;"><button type="submit" class="btn btn-default form-control flame_disp reg">注册</button></div>
-    <a class="forget">忘记密码</a>
+    <a class="forget" href="/change">忘记密码</a>
   </body>
   <script type="text/javascript">
     $(".reg").click(function(){
-      window.location = "reg.html";
+      window.location = "/reg";
     });
     var myApp = angular.module('login', [])
     myApp.controller('myController', function($scope) {

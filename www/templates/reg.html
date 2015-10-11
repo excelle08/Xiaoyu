@@ -57,13 +57,14 @@
       alert("手机格式错误");
     }
     else{
-      $.post("/api/user/verify",{phone:$(".reg_f1").val()},function(data){
-        if(data.code == 0 && data.msg == "OK"){
+      $.post("/api/test/verify",{phone:$(".reg_f1").val()},function(data){
+        /*if(data.code == 0 && data.msg == "OK"){
           alert("短信已发送");
         }
         else{
           alert("发生错误:"+data.msg);
-        }
+        }*/
+        alert(data.vcode);
         var count = 60;
         var countdown = setInterval(CountDown, 1000);
         function CountDown() {
@@ -96,7 +97,7 @@
             alert(data.message);
           },
           success: function(data){
-            if(data.message){
+            if(data.uid){
               alert("注册成功");
               setTimeout(function(){window.location = "/" + data.uid},200);
             } else {

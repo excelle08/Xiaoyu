@@ -302,16 +302,24 @@
       window.localStorage.setItem("horoscopes",horoscopes);
     });
     $.post("/api/common/province",function(province){
-      var provinces = [];
-      for(var i=0;i<province.length;i++){
-        var p_name = province[i][i+1];
-        var id = i+1;
-        $.get("/api/common/city",{"province":i+1},function(city){
-          provinces.push({"id":id,"name":p_name,"cities":city});
+      /*var provinces = [],j=0;
+      for(var i=8;i<province.length;i++){
+        $.post("/api/common/city",{"province":i+1},function(city){
+          j++;alert(j);
+          provinces.push({"id":i+1,"name":province[i][i+1],"cities":city});
+          console.log(provinces);
         });
-      }
-      window.localStorage.setItem("provinces",JSON.stringify(provinces));
+      }*/
+      window.localStorage.setItem("provinces",JSON.stringify(province));
     });
+    var provinces = JSON.parse(window.localStorage.getItem("provinces"));
+    alert(provinces.length);
+    for(var i=0;i<provinces.length;i++){
+      $.get("/api/common/city",{"province":i+1},function(data){
+        provinces[i] = {"id":i+1,"name":provinces[i][i+1],"cities":data};
+      });
+    }
+    window.localStorage.setItem("provinces",JSON.stringify(provinces));
     $.post("/api/common/major",function(data){
       var majors = JSON.stringify(data);
       window.localStorage.setItem("majors",majors);
@@ -332,7 +340,7 @@
         $scope.onlines = onlines;
       });
     }else{
-      $("#c_school").attr({placeholder:"选择学校",disabled:true});
+      /*$("#c_school").attr({placeholder:"选择学校",disabled:true});
       $("#c_subject").attr({"placeholder":"选择专业",disabled:true});
       $("#c_degree").attr({"placeholder":"选择学历","disabled":true});
       $("#c_age_min").attr({"placeholder":"最小年龄",disabled:true});
@@ -342,7 +350,7 @@
       $("#c_tall_min").attr({"placeholder":"最低身高(cm)",disabled:true});
       $("#c_tall_max").attr({"placeholder":"最高身高(cm)",disabled:true});
       $("#c_permission").attr({"placeholder":"选择认证",disabled:true});
-      $("#c_hometown").attr({"placeholder":"选择家乡",disabled:true});
+      $("#c_hometown").attr({"placeholder":"选择家乡",disabled:true});*/
       loadonlines();
     }
   }else{
