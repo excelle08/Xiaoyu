@@ -132,7 +132,7 @@ def test_user_register():
 @app.route('/api/test/verify', methods=['POST'])
 def test_verify():
     phone = request.form['phone']
-    return api.user.generate_vcode()
+    return return_json({"vcode": api.user.generate_vcode()})
 
 ### end
 
