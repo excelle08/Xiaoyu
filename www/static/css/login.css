@@ -39,6 +39,7 @@ a:hover {
   background-color: #356ed6;
   width:100%;
   height:50px;
+  line-height: 50px;
   border: 0;
   font-size:20px;
 }
