@@ -165,7 +165,7 @@ def api_user_login():
     try:
         phone = request.form['phone']
         password = request.form['password']
-        remember = request.form['remember']
+        remember = request.form['remember'] if 'remember' in request.form else False
 
         user = api.user.user_login(phone, password, remember)
         return return_json({"uid": user.uid})
