@@ -17,23 +17,23 @@ def get_license():
 
 def get_horoscopes():
     horoscopes = Horoscope.query.all()
-    return [{item.id : item.name} for item in horoscopes]
+    return [{"id": item.id, "name": item.name} for item in horoscopes]
 
 
 def get_provinces():
     provinces = Province.query.all()
-    return [{item.id : item.name} for item in provinces]
+    return [{"id": item.id, "name": item.name} for item in provinces]
 
 
 def get_cities(province):
     cities = City.query.filter_by(province=province).all()
-    return [{item.id : item.name} for item in cities]
+    return [{"id": item.id, "name": item.name} for item in cities]
 
 
 def get_schools():
     schools = School.query.all()
-    return [{item.id : item.name} for item in schools]
+    return [{"id": item.id, "name": item.name} for item in schools]
 
 def get_majors():
     majors = Major.query.all()
-    return [{item.id : item.name} for item in majors]
+    return [{"id": item.id, "name": item.name} for item in majors]
