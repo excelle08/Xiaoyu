@@ -31,6 +31,30 @@ def to_json(inst, cls):
     return json.dumps(d)
 
 
+def to_dict(inst, cls):
+    """
+    Jsonify the sql alchemy query result.
+    """
+    convert = dict()
+    # add your coversions for things like datetime's 
+    # and what-not that aren't serializable.
+    d = dict()
+    for c in cls.__dict__.keys():
+        if c.startswith('_'):
+            continue
+        v = getattr(inst, c)
+        if type(v) in convert.keys() and v is not None:
+            try:
+                d[c] = convert[c.type](v)
+            except:
+                d[c] = "Error:  Failed to covert using ", str(convert[type(v)])
+        elif v is None:
+            d[c] = str()
+        else:
+            d[c] = v
+    return d
+
+
 def enum(**enums):
     return type('Enum', (), enums)
 
@@ -43,6 +67,11 @@ class Base():
     @property
     def json(self):
         return to_json(self, self.__class__)
+
+
+    @property
+    def dict(self):
+        return to_dict(self, self.__class__)
 
 
 class User(db.Model, Base):
@@ -63,6 +92,7 @@ class UserSchool(db.Model, Base):
     __tablename__ = 'user_school'
     uid = db.Column('uid', db.Integer, primary_key=True, nullable=False)
     school_name = db.Column('school_name', db.Text)
+    major = db.Column('major', db.Integer)
     degree = db.Column('degree', db.Integer)
     school_id = db.Column('school_id', db.Integer)
     school_province = db.Column('school_province', db.Integer)
@@ -77,6 +107,7 @@ class UserMeta(db.Model, Base):
     nickname = db.Column('nickname', db.String(32))
     realname = db.Column('realname', db.String(32))
     avatar = db.Column('avatar', db.Text)
+    small_avatar = db.Column('small_avatar', db.Text)
     gender = db.Column('gender', db.Integer)
     age = db.Column('age', db.Integer)
     height = db.Column('height', db.Float)
@@ -109,6 +140,7 @@ class Wall(db.Model, Base):
     wall_filter = db.Column('filter', db.Text)
     created_at = db.Column('created_at', db.Float)
     modified_at = db.Column('modified_at', db.Float)
+    published = db.Column('published', db.Boolean)
 
 
 class WallUpvote(db.Model, Base):

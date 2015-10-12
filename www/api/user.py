@@ -5,6 +5,7 @@ from model import UserSchool, UserMeta, UserExt, Wall, FriendGroup, Friend, Blac
 from model import Tweet
 from flask import session
 from api import APIError
+from api.wall import filter_default
 import re, json, requests, random, time, hashlib
 
 _PHONENUM = re.compile(r'^[0-9\-]+$')
@@ -55,10 +56,18 @@ def user_register(phone, password, vcode):
 
     meta = UserMeta()
     meta.uid = user.uid
+    meta.avatar = 'static/images/default_avatar.png'
+    meta.small_avatar = '{}'
 
     ext = UserExt()
     ext.uid = user.uid
     ext.content = '{}'
+
+    wall = Wall()
+    wall.uid = user.uid
+    wall.wall_filter = json.dumps(filter_default)
+    wall.created_at = time.time()
+    wall.published = False
 
     fgroup = FriendGroup()
     fgroup.user = user.uid
@@ -67,6 +76,7 @@ def user_register(phone, password, vcode):
     db.session.add(school)
     db.session.add(meta)
     db.session.add(ext)
+    db.session.add(wall)
     db.session.add(fgroup)
     db.session.commit()
     del session['vcode']
@@ -98,6 +108,20 @@ def user_login(phone, password, remember):
     return user
 
 
+def validate_user(uid, phone, password):
+    user = User.query.filter_by(uid=uid).first()
+    if not user:
+        return False
+
+    if not phone == user.phone:
+        return False
+
+    if not password == user.password:
+        return False
+
+    return True
+
+
 def user_logout():
     try:
         user = User.query.filter_by(phone=session['phone']).first()
@@ -118,12 +142,13 @@ def get_online_users(offset=0, limit=10):
 
 
 def get_recent_logins(offset=0, limit=10):
-    users = User.query.filter_by(online=UserStatus.Offline).order_by(User.last_login.desc()).offset(offset).limit(limit).all()
+    users = User.query.order_by(User.last_login.desc()).offset(offset).limit(limit).all()
     return [ UserMeta.query.filter_by(uid=item.uid).first() for item in users ]
 
 
 def get_hot_users(offset=0, limit=10):
-    return Wall.query.order_by(Wall.upvotes.desc()).offset(offset).limit(limit).all()
+    walls = Wall.query.order_by(Wall.upvotes.desc()).offset(offset).limit(limit).all()
+    return [ UserMeta.query.filter_by(uid=item.uid).first() for item in walls ]
 
 
 def get_user(uid):
@@ -227,55 +252,3 @@ def set_user_login_state(uid, state):
 
     db.session.commit()
     return u
-
-
-#### This function is intended for test.
-#### Will remove in production mode
-
-
-def __user_register(phone, password):
-
-    exist = User.query.filter_by(phone=phone.strip()).first()
-    if exist:
-        raise APIError('该手机号已经注册过')
-
-    user = User()
-    user.phone = phone.strip()
-    user.password = password.strip().lower()
-    user.permission = UserPermission.Unvalidated
-    user.created_at = time.time()
-    user.last_login = time.time()
-    user.online = UserStatus.Online
-    db.session.add(user)
-    db.session.commit()
-
-    school = UserSchool()
-    school.uid = user.uid
-
-    meta = UserMeta()
-    meta.uid = user.uid
-
-    ext = UserExt()
-    ext.uid = user.uid
-    ext.content = '{}'
-
-    wall = Wall()
-    wall.uid = user.uid
-
-    fgroup = FriendGroup()
-    fgroup.user = user.uid
-    fgroup.content = json.dumps(['好友', '密友'])
-
-    db.session.add(school)
-    db.session.add(meta)
-    db.session.add(ext)
-    db.session.add(wall)
-    db.session.add(fgroup)
-    db.session.commit()
-    del session['vcode']
-
-    # login
-    session['uid'] = user.uid
-    session['phone'] = phone.strip()
-    session['password'] = password.strip().lower()
-    return user
