@@ -84,7 +84,7 @@ def user_register(phone, password, vcode):
     # login
     session['uid'] = user.uid
     session['phone'] = phone.strip()
-    session['password'] = password.strip().lower()
+    session['password'] = user.password
     return user
 
 
@@ -104,19 +104,26 @@ def user_login(phone, password, remember):
         session.permanent = True
     session['uid'] = user.uid
     session['phone'] = phone.strip()
-    session['password'] = password.strip().lower()
+    session['password'] = user.password
     return user
 
 
 def validate_user(uid, phone, password):
     user = User.query.filter_by(uid=uid).first()
     if not user:
+        print  'User does not exist'
         return False
 
     if not phone == user.phone:
+        print 'Phone does not match'
+        print phone
+        print user.phone
         return False
 
     if not password == user.password:
+        print password
+        print user.password
+        print 'pwd does not match'
         return False
 
     return True
