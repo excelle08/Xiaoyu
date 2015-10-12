@@ -98,7 +98,7 @@
             alert(data.message);
           },
           success: function(data){
-            if(data.created_at){
+            if(data.uid){
               setTimeout(function(){window.location = "/"},200);
             } else {
               alert(data.message);

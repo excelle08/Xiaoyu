@@ -135,7 +135,7 @@ class Wall(db.Model, Base):
     __tablename__ = 'wall'
     uid = db.Column('uid', db.Integer, primary_key=True, nullable=False)
     photos = db.Column('photos', db.Text)
-    title = db.Column('text', db.Text)
+    title = db.Column('title', db.Text)
     upvotes = db.Column('upvotes', db.Integer)
     wall_filter = db.Column('filter', db.Text)
     created_at = db.Column('created_at', db.Float)
