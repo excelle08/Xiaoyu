@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+ <html ng-app="app">
+ <head><script src="../static/js/angular.min.js"></script></head>
+ <body>
+ <h1>控制器嵌套</h1>
+ <div ng-controller="ParentController" style="border:1px solid black">
+ <span>{{person}}</span>
+ <input type="text" ng-model="person.age">
+ <div ng-controller="ChildController" style="border:1px solid red">
+<a ng-click="addName()">I add a name{{ladygaga}}{{person}} </a>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+var app= angular.module('app',[]);
+app.controller('ParentController', function ($scope) {
+    $scope.person = {
+       age:15
+    };
+});
+app.controller('ChildController',function ($scope){
+    $scope.ladygaga="ladygaga";
+    $scope.addName = function(){
+        $scope.person.name=$scope.ladygaga;
+    }    
+});
+</script> 
+</body>
+ </html>
