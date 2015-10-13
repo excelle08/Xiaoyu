@@ -261,11 +261,12 @@ def api_edit_user_school():
         uid = session['uid']
         school_id = request.form['school']
         degree = request.form['degree']
+        major = request.form['major']
         photo = request.form['photo']
     except KeyError, e:
         raise APIError(e.message)
 
-    return Response(api.user.set_user_school(uid, school_id, degree, photo).json, mimetype='text/json')
+    return Response(api.user.set_user_school(uid, school_id, major, degree, photo).json, mimetype='text/json')
 
 
 @app.route('/api/user/school/get', methods=['GET'])
@@ -481,7 +482,7 @@ def api_add_tweet():
 def api_get_friends_tweets():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
-    later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
+    later_than = request.args['later_than'].strip() if 'later_than' in request.args else 0
     return return_json(api.tweets.get_friends_tweets(offset, limit, later_than), default=lambda obj: obj.dict)
 
 
@@ -494,7 +495,7 @@ def api_get_ones_tweets():
 
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
-    later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
+    later_than = request.args['later_than'].strip() if 'later_than' in request.args else 0
     return return_json(api.tweets.get_users_tweets(uid, offset, limit, later_than), default=lambda obj:obj.dict)
 
 
@@ -517,7 +518,7 @@ def api_reply_get():
         raise APIError(e.message)
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
-    later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
+    later_than = request.args['later_than'].strip() if 'later_than' in request.args else 0
     return return_json(api.tweets.get_replies(tweet_id, offset, limit, later_than), default=lambda obj: obj.dict)
 
 
@@ -603,27 +604,27 @@ def api_message_get():
     uid = request.args['uid'].strip() if 'uid' in request.args else session['uid']
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
-    later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
+    later_than = request.args['later_than'].strip() if 'later_than' in request.args else 0
     return return_json(api.message.get_messages(uid, offset, limit, later_than), default=lambda obj: obj.dict)
 
 
 @app.route('/api/message/reply/get', methods=['GET', 'POST'])
 def api_message_reply_get():
     try:
-        message_id = request.form['id']
+        message_id = request.args['id']
     except KeyError, e:
         raise APIError(e.message)
 
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
-    later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
+    later_than = request.args['later_than'].strip() if 'later_than' in request.args else 0
     return return_json(api.message.get_replies(message_id, offset, limit, later_than), default=lambda obj: obj.dict)
 
 
 @app.route('/api/message/delete', methods=['GET', 'POST'])
 def api_message_delete():
     try:
-        message_id = request.form['id']
+        message_id = request.args['id']
         return return_json(api.message.remove_message(message_id))
     except KeyError, e:
         raise APIError(e.message)

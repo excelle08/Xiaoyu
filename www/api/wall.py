@@ -130,10 +130,10 @@ def filter_users(uid):
             UserMeta.height >= (condition['height_min'] if 'height_min' in condition else 0), 
             UserMeta.height <= (condition['height_max'] if 'height_max' in condition else 9999))
     
-        if condition['gender'] != -1:
+        if 'gender' in condition and condition['gender'] != -1:
             users_query = users_query.filter(UserMeta.gender == condition['gender'])
     
-        if condition['hometown_province']:
+        if 'hometown_province' in condition and condition['hometown_province']: 
             users_query = users_query.filter(UserMeta.hometown_province == condition['hometown_province'])
     
         if condition['hometown_city']:
