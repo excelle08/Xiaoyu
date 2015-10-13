@@ -76,7 +76,7 @@
         <tr>
           <td class="td_left" ng-controller="SchoolName">
             <select class="form-control s_check" id="c_school" name="school" ng-model="filter.school" ng-options="school.id as school.name for school in schools">
-              <option value="" disabled selected style="display:none;">选择学校</option>
+              <option value="" disabled selected style="display:none;">{{filter.school}}</option>
             </select>
             <!--<input class="s_check" name="school" id="c_school" type="text" ng-model="filter.school" placeholder="选择学校" style="text-align:left;"/>
             <ul class="SchoolName Fliter_Name">
@@ -85,7 +85,7 @@
           </td>
           <td class="td_right" ng-controller="MajorName">
             <select class="form-control s_check" name="major" id="c_subject" ng-model="filter.major" ng-options="major.id as major.name for major in majors">
-              <option value="" disabled selected style="display:none;">选择专业</option>
+              <option value="" disabled selected style="display:none;">{{filter.major}}</option>
             </select>
             <!--<input class="s_check" name="major" id="c_subject" type="text" ng-model="filter.major" placeholder="选择专业" style="text-align:left;"/>
             <ul class="SubjectName Fliter_Name" ng-controller="MajorName">
@@ -96,7 +96,7 @@
         <tr>
           <td class="td_left">
             <select name="degree" name="degree" id="c_degree" class="form-control s_check">
-              <option value="" disabled selected style="display:none;">选择学历</option>
+              <option value="" disabled selected style="display:none;">{{filter.degree}}</option>
               <option value="0">未知</option>
               <option value="1">本科生</option>
               <option value="2">研究生</option>
@@ -111,8 +111,8 @@
             </ul>-->
           </td>
           <td class="td_right" ng-controller="HoroscopeName" >
-            <select placeholder="选择星座" class="form-control s_check" name="horoscope" id="c_horoscope" ng-model="filter.horoscope" ng-options="horoscope.id as horoscope.name for horoscope in horoscopes">
-              <option value="" disabled selected style="display:none;">选择星座</option>
+            <select class="form-control s_check" name="horoscope" id="c_horoscope" ng-model="filter.horoscope" ng-options="horoscope.id as horoscope.name for horoscope in horoscopes">
+              <option value="" disabled selected style="display:none;">{{filter.horoscope}}</option>
             </select>
             <!--<input class="s_check" name="horoscope" id="c_horoscope" type="text" ng-model="filter.horoscope" placeholder="选择星座" style="text-align:left;"/>
             <ul class="HoroscopeName Fliter_Name" ng-controller="HoroscopeName">
@@ -120,7 +120,7 @@
             </ul>-->
           </td>
           <td class="td_left">
-            <input class="form-control s_check" name="tall_min" id="c_tall_min" type="number" ng-model="filter.height_min" placeholder="最低身高" style="text-align:left;"/>
+            <input class="form-control s_check" name="tall_min" id="c_tall_min" type="number" ng-model="filter.height_min" style="text-align:left;"/>
           </td>
           <td class="td_right">
             <input class="s_check form-control" name="tall_max" id="c_tall_max" type="number" ng-model="filter.height_max" placeholder="最高身高" style="text-align:left;"/>
@@ -129,7 +129,7 @@
         <tr>
           <td class="td_left" ng-controller="CityName">
             <select class="form-control s_check" ng-model="filter.hometown_city" name="hometown_city" id="c_hometown" ng-options="city.id as city.name for city in cities">
-              <option value="" disabled selected style="display:none;">选择家乡</option>
+              <option value="" disabled selected style="display:none;">{{filter.hometown_city}}</option>
             </select>
             <!--<input class="s_check" name="hometown_city" id="c_hometown" type="text" ng-model="filter.hometown_city" placeholder="选择家乡" style="text-align:left;"/>
             <ul class="HometownName Fliter_Name" ng-controller="CityName">
@@ -138,7 +138,7 @@
           </td>
           <td class="td_right" ng-controller="CityName">
             <select class="form-control s_check" ng-model="filter.work_city" name="work_city" id="c_work_city" ng-options="city.id as city.name for city in cities">
-              <option value="" disabled selected style="display:none;">准备工作地</option>
+              <option value="" disabled selected style="display:none;">{{filter.work_city}}</option>
             </select>
             <!--<input class="s_check" name="work_city" id="c_work_city" type="text" ng-model="filter.work_city" placeholder="选择工作地" style="text-align:left;"/>
             <ul class="WorkplaceName Fliter_Name" ng-controller="CityName">
@@ -294,9 +294,6 @@
     </div>
   </body>
   <script>
-  $("#c_degree").click(function(){
-    alert($("#c_horoscope option:selected").text());
-  });
   var myApp = angular.module('myApp',[]);
   $(".add_fri").click(function(){
     var user = $(this).parent().attr("id");
@@ -347,40 +344,60 @@
       var majors = JSON.stringify(data);
       window.localStorage.setItem("majors",majors);
     });
+    $.get("/api/wall/get",function(data){
+      if(data.wall_filter.on == false){
+        window.localStorage.setItem("switch","on");
+      }else{
+        window.localStorage.setItem("switch","off");
+      }
+    });
       myApp.controller('filters',function($scope){
         var filter,onlines = [];
         $.get("/api/wall/get",function(data){
           filter = data.wall_filter;
-          var provinces = JSON.parse(window.localStorage.getItem("provinces"));
-        for(var i=0;i<provinces.length;i++){
-          if(provinces[i].id == filter.hometown_province){
-            filter.hometown_province = provinces[i].name;
-          }else if(provinces[i].id == filter.workplace_province){
-            filter.workplace_province = provinces[i].name;
-          }
-          for(j=0;j<provinces[i].length;j++){
-            if(provinces[i][j].id == filter.hometown_city){
-              filter.hometown_city = provinces[i][j].name;
-            }else if(provinces[i][j].id == filter.workplace_city){
-              filter.workplace_city = provinces[i][j].name;
+          var cities = JSON.parse(window.localStorage.getItem("cities"));
+          if(filter.hometown_city != "" && filter.hometown_city != 0){
+            for(var i=0;i<cities.length;i++){
+              for(var j=0;j<cities[i].length;j++){
+               if(cities[i][j].id == filter.hometown_city){
+                  filter.hometown_city = cities[i][j].name;
+                }
+              }
             }
+          }else{
+            filter.hometown_city = "选择家乡";
           }
-        }
+          if(filter.work_city != "" && filter.work_city != 0){
+            for(var i=0;i<cities.length;i++){
+              for(var j=0;j<cities[i].length;j++){
+               if(cities[i][j].id == filter.workplace_city){
+                 filter.workplace_city = cities[i][j].name;
+                }
+              }
+            }
+          }else{
+            filter.work_city = "准备工作地";
+          }
         if(filter.degree == 0){
-        filter.degree = "未知";
+        filter.degree = "选择学历";
       }else if(filter.degree == 1){
         filter.degree = "本科生";
       }else if(filter.degree == 2){
         filter.degree = "研究生";
-      }else{
+      }else if(filter.degree == 3){
         filter.degree = "博士";
       }
         var majors = JSON.parse(window.localStorage.getItem("majors"));
+        if(filter.major != "" && filter.major != -1){
       for(var i=0;i<majors.length;i++){
         if(majors[i].id == filter.major){
           filter.major = majors[i].name;
         }
         }
+      }else{
+        filter.major = "选择专业";
+      }
+      if(filter.school != "" && filter.school != -1){
          var schools = JSON.parse(window.localStorage.getItem("schools"));
       for(var i=0;i<schools.length;i++){
         if(schools[i].id == filter.school){
@@ -388,6 +405,10 @@
           break;
         }
       }
+    }else{
+      filter.school = "选择学校";
+    }
+    if(filter.horoscope != "" && filter.horoscope != 0){
         var horoscopes = JSON.parse(window.localStorage.getItem("horoscopes"));
         for(var i=0;i<horoscopes.length;i++){
           if(horoscopes[i].id == filter.horoscope){
@@ -395,6 +416,29 @@
             break;
           }
         }
+      }else{
+        filter.horoscope = "选择星座";
+      }
+      if(filter.age_min != "" && filter.age_min != 0){
+        filter.age_min = filter.age_min;
+      }else{
+        filter.age_min = "最小年龄";
+      }
+      if(filter.age_max != "" && filter.age_max != 0){
+        filter.age_max = filter.age_max;
+      }else{
+        filter.age_max = "最大年龄";
+      }
+      if(filter.height_min != "" && filter.height_min != 0){
+        filter.height_min = filter.height_min;
+      }else{
+        filter.height_min = "最小年龄";
+      }
+      if(filter.height_max != "" && filter.height_max != 9999){
+        filter.height_max = filter.height_max;
+      }else{
+        filter.height_max = "最大身高";
+      }
         });
         $scope.filter = filter;
       });
@@ -473,17 +517,17 @@
   });
     }else{
       $(".switchoff").addClass("s_active");
-      $("#c_school").attr({placeholder:"选择学校",disabled:true});
-      $("#c_subject").attr({"placeholder":"选择专业",disabled:true});
-      $("#c_degree").attr({"placeholder":"选择学历","disabled":true});
-      $("#c_age_min").attr({"placeholder":"最小年龄",disabled:true});
-      $("#c_age_max").attr({"placeholder":"最大年龄",disabled:true});
-      $("#c_horoscope").attr({"placeholder":"选择星座",disabled:true});
-      $("#c_work_city").attr({"placeholder":"（准备）工作地",disabled:true});
-      $("#c_tall_min").attr({"placeholder":"最低身高(cm)",disabled:true});
-      $("#c_tall_max").attr({"placeholder":"最高身高(cm)",disabled:true});
-      $("#c_permission").attr({"placeholder":"选择认证",disabled:true});
-      $("#c_hometown").attr({"placeholder":"选择家乡",disabled:true});
+      $("#c_school").attr({disabled:true});
+      $("#c_subject").attr({disabled:true});
+      $("#c_degree").attr({"disabled":true});
+      $("#c_age_min").attr({disabled:true});
+      $("#c_age_max").attr({disabled:true});
+      $("#c_horoscope").attr({disabled:true});
+      $("#c_work_city").attr({disabled:true});
+      $("#c_tall_min").attr({disabled:true});
+      $("#c_tall_max").attr({disabled:true});
+      $("#c_permission").attr({disabled:true});
+      $("#c_hometown").attr({disabled:true});
       loadonlines();
     }
   }else{
