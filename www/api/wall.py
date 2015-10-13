@@ -43,7 +43,7 @@ def set_my_filter(uid, args):
         'age_min' : args['age_min'] if 'age_min' in args else 0,
         'age_max' : args['age_max'] if 'age_max' in args else 9999,
         'height_min' : args['height_min'] if 'height_min' in args else 0,
-        'height_min' : args['height_max'] if 'height_max' in args else 9999,
+        'height_max' : args['height_max'] if 'height_max' in args else 9999,
         'hometown_province' : args['hometown_province'] if 'hometown_province' in args else 0,
         'hometown_city' : args['hometown_city'] if 'hometown_city' in args else 0,
         'work_province' : args['work_province'] if 'work_province' in args else 0,
@@ -65,7 +65,7 @@ filter_default = {
     'age_min' : 0,
     'age_max' : 9999,
     'height_min' : 0,
-    'height_min' : 9999,
+    'height_max' : 9999,
     'hometown_province' : 0,
     'hometown_city' : 0,
     'work_province' : 0,
@@ -118,11 +118,13 @@ def get_all_my_upvotes(uid):
 def filter_users(uid):
     wall = Wall.query.filter_by(uid=uid).first()
 
-    condition = json.loads(wall.wall_filter)
+    condition = json.loads(wall.wall_filter.replace('\\', ''))
 
     # User filter
-    users_query = UserMeta.query.filter(UserMeta.age >= condition['age_min'], UserMeta.age <= condition['age_max'], \
-        UserMeta.height >= condition['height_min'], UserMeta.height <= condition['height_max'])
+    users_query = UserMeta.query.filter(UserMeta.age >= (condition['age_min'] if 'age_min' in condition else 0), 
+        UserMeta.age <= (condition['age_max'] if 'age_max' in condition else 9999),
+        UserMeta.height >= (condition['height_min'] if 'height_min' in condition else 0), 
+        UserMeta.height <= (condition['height_max'] if 'height_max' in condition else 9999))
 
     if condition['gender'] != -1:
         users_query = users_query.filter(UserMeta.gender == condition['gender'])
@@ -170,7 +172,7 @@ def filter_users(uid):
     uids2 = [ item.uid for item in user_schools ]
 
     # Will only display users on the wall.
-    users_onwall = [ item.uid for item in Wall.query.filter_by(published=True).all() ]
+    users_onwall = [ item.uid for item in Wall.query.all() ]
 
     result_ids = list(set.intersection(set(uids), set(uid1), set(uids2), set(users_onwall)))
 
@@ -191,7 +193,7 @@ def get_guest_wall_items(uid):
         return initial[:30]
 
     numbers = 7 - initial.__len__()
-    ids = [ item.id for item in Wall.query.order_by(Wall.upvotes.desc()).limit(numbers)]
+    ids = [ item.id for item in Wall.query.filter_by(published=True).order_by(Wall.upvotes.desc()).limit(numbers)]
     result = []
 
     for i in ids:
