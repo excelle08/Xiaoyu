@@ -56,11 +56,12 @@ def get_friends_tweets(offset=0, limit=10, later_than=0):
     current_uid = session['uid']
     
     friends = api.friends.get_friends()
+    print later_than
     tweets = [ Tweet.query.filter(Tweet.user==item.to, Tweet.created_at>=later_than).all() for item in friends ]
     res = []
     for i in tweets:
         res.extend(i)
-    res.extend(Tweet.query.filter_by(user=current_uid).all())
+    res.extend(Tweet.query.filter(Tweet.user==current_uid, Tweet.created_at>=later_than).all())
     res.sort(key=lambda tweet: tweet.created_at, reverse=True)
 
     return res[offset: offset+limit]

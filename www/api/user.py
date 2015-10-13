@@ -53,6 +53,7 @@ def user_register(phone, password, vcode):
 
     school = UserSchool()
     school.uid = user.uid
+    school.auth_pass = False
 
     meta = UserMeta()
     meta.uid = user.uid
@@ -195,13 +196,13 @@ def get_user_school(uid):
     return UserSchool.query.filter_by(uid=uid).first()
 
 
-def set_user_school(uid, school_id, degree, auth_photo):
-    school = UserSchool()
-    s = School.query.filter_by(id=school_id)
+def set_user_school(uid, school_id, major, degree, auth_photo):
+    school = UserSchool.query.filter_by(uid=uid).first()
+    s = School.query.filter_by(id=school_id).first()
     if not s:
         raise APIError('指定的学校不存在')
-    school.uid = uid
     school.school_name = s.name
+    school.major = major
     school.degree = degree
     school.school_id = school_id
     school.auth_photo = auth_photo
@@ -209,7 +210,6 @@ def set_user_school(uid, school_id, degree, auth_photo):
     user = User.query.filter_by(uid=uid)
     user.permission = UserPermission.InProgress
 
-    db.session.add(school)
     db.session.commit()
     return school
 

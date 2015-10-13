@@ -4,20 +4,22 @@ from model import User
 from api import APIError
 from werkzeug.datastructures import FileStorage
 from PIL import Image
-import time
+import time, hashlib, random
 
 accepted_mime = ['image/jpeg', 'image/gif', 'image/png', 'image/tiff']
 suffix = ['jpg', 'gif', 'png', 'tiff']
 
 # imagedata should be a FileStorage object
-def upload_photo(imgdata, **args):
+def upload_photo(imgdata, args):
     if not isinstance(imgdata, FileStorage):
         raise APIError('Field "imgdata" is supposed to be a FileStorage object')
     if not imgdata.mimetype in accepted_mime:
         raise APIError('只能接受JPEG, GIF, PNG或者TIFF格式的图像。')
     if imgdata.content_length > 4*1048576:
         raise APIError('图片大小不能超过4MB')
-    name = 'static/upload/%s.%s' % (str(time.time()), suffix[accepted_mime.index(imgdata.mimetype)])
+    randstr = str(time.time()) + str(random.randint(1,5436))
+    randstr = hashlib.md5(randstr).hexdigest()
+    name = 'static/upload/%s.%s' % (randstr, suffix[accepted_mime.index(imgdata.mimetype)])
     imgdata.save(name)
     try:
         image = Image.open(name)
