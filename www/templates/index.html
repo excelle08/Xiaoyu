@@ -70,7 +70,7 @@
     <div class="menu">
       <div class="b_switch">
         <div class="switchon">开启</div>
-        <div class="switchoff s_active" >关闭</div>
+        <div class="switchoff" >关闭</div>
       </div>
       <table class="c_" ng-controller="filters">
         <tr>
@@ -171,7 +171,7 @@
       </div>
       <div class="now male">
         <ul>
-          <li ng-repeat="online in onlines | filter:{'gender':1} | filter1">
+          <li ng-repeat="online in onlines | filter:{'gender':1}">
             <div class="user_">
               <div class="col-xs-3">
                 <img ng-src="{{online.avatar}}" class="avatar">
@@ -195,7 +195,7 @@
       </div>
       <div class="now female">
         <ul>
-          <li ng-repeat="online in onlines | filter:{'gender':0} | filter1">
+          <li ng-repeat="online in onlines | filter:{'gender':0}">
             <div class="user_">
               <div class="col-xs-3">
                 <img ng-src="{{online.avatar}}" class="avatar">
@@ -209,7 +209,7 @@
                 <div class="motto">{{online.motto}}</div>
               </div>
             </div>
-            <div class="user_oper" id="{{school.uid}}">
+            <div class="user_oper" id="{{online.uid}}">
               <div class="col-xs-4 add_fri" style="border-right:1px solid #777;padding:0;">加为好友</div>
               <div class="col-xs-4 send_mes" style="border-right:1px solid #777;padding:0;">发私信</div>
               <div class="col-xs-4 add_black">黑名单</div>
@@ -219,7 +219,7 @@
       </div>
       <div class="near">
         <ul>
-          <li ng-repeat="recent in recents | filter1">
+          <li ng-repeat="recent in recents">
             <div class="user_">
               <div class="col-xs-3">
                 <img ng-src="{{recent.avatar}}" class="avatar">
@@ -243,7 +243,7 @@
       </div>
       <div class="weak-hot">
         <ul>
-          <li ng-repeat="hot in hots | filter1">
+          <li ng-repeat="hot in hots">
             <div class="user_">
               <div class="col-xs-3">
                 <img ng-src="{{hot.avatar}}" class="avatar">
@@ -322,7 +322,7 @@
     })
     var provinces = window.localStorage.getItem("provinces");
     var cities = [];
-    for(var i=0;i<provinces.length;i++){
+    for(var i=0;i<34;i++){
       $.get("/api/common/city",{"province":i+1},function(city){
         cities.push(city);
       });
@@ -332,14 +332,13 @@
       var majors = JSON.stringify(data);
       window.localStorage.setItem("majors",majors);
     });
-    if(window.localStorage.getItem("switch") == "on"){
       myApp.controller('filters',function($scope){
         var filter,onlines = [];
         $.get("/api/wall/get",function(data){
           filter = data.wall_filter;
           var provinces = JSON.parse(window.localStorage.getItem("provinces"));
         for(var i=0;i<provinces.length;i++){
-          if(provinces[i].id == wall_filter.hometown_province){
+          if(provinces[i].id == filter.hometown_province){
             filter.hometown_province = provinces[i].name;
           }else if(provinces[i].id == filter.workplace_province){
             filter.workplace_province = provinces[i].name;
@@ -384,9 +383,82 @@
         });
         $scope.filter = filter;
       });
-      loadonlines();
+    if(window.localStorage.getItem("switch") == "on"){
+      $(".switchon").addClass("s_active");
+      myApp.controller('user',function($scope){
+    $.get("/api/user/onlines",function(data){
+      for(var i = 0;i < data.length;i++){
+        var uid = data[i].uid;
+        $.get("/api/wall/school/get",{"uid":uid},function(result){
+          var schoolname = result.school_name;
+          var degree = result.degree;
+          if(degree == 0){
+            degree = "未知";
+          }else if(degree == 1){
+            degree = "本科生";
+          }else if(degree == 2){
+            degree = "研究生";
+          }else{
+            degree = "博士";
+          }
+          var a = {"schoolname":schoolname,"degree":degree};
+          data[i] = $.extend({},data[i],a);
+        });
+        $.get("/api/wall/guestwall",{"uid":uid},function(result){
+          var upvote = {"upvotes":result.upvotes};
+          data[i] = $.extend({},data[i],upvote);
+        });
+      }
+      $scope.onlines = data;
+    });
+    $.get("/api/user/hot",function(data){
+      for(var i = 0;i < data.length;i++){
+        var uid = data[i].uid;
+        $.get("/api/wall/guestwall",{"uid":uid},function(result){
+          var upvote = {"upvotes":result.upvotes};
+          data[i] = $.extend({},data[i],upvote);
+        });
+        $.get("/api/user/school/get",{"uid":uid},function(result){
+          var schoolname = result.school_name;
+          var degree = result.degree;
+          var a = {"schoolname":schoolname,"degree":degree};
+          data[i] = $.extend({},data[i],a);
+        });
+        if(data[i].gender == 0){
+          data[i].gender == "♂";
+        }
+        else{
+          data[i].gender == "♀";
+        }
+      }
+      $scope.hots = data;
+    });
+    $.get("/api/user/recent_login",function(data){
+      for(var i = 0;i < data.length;i++){
+        var uid = data[i].uid;
+        $.get("/api/wall/guestwall",{"uid":uid},function(result){
+          var upvote = {"upvotes":result.upvotes};
+          data[i] = $.extend({},data[i],upvote);
+        });
+        $.get("/api/user/school/get",{"uid":uid},function(result){
+          var schoolname = result.school_name;
+          var degree = result.degree;
+          var a = {"schoolname":schoolname,"degree":degree};
+          data[i] = $.extend({},data[i],a);
+        });
+        if(data[i].gender == 0){
+          data[i].gender == "♂";
+        }
+        else{
+          data[i].gender == "♀";
+        }
+      }
+      $scope.recents = data;
+    });
+  });
     }else{
-      /*$("#c_school").attr({placeholder:"选择学校",disabled:true});
+      $(".switchoff").addClass("s_active");
+      $("#c_school").attr({placeholder:"选择学校",disabled:true});
       $("#c_subject").attr({"placeholder":"选择专业",disabled:true});
       $("#c_degree").attr({"placeholder":"选择学历","disabled":true});
       $("#c_age_min").attr({"placeholder":"最小年龄",disabled:true});
@@ -396,7 +468,7 @@
       $("#c_tall_min").attr({"placeholder":"最低身高(cm)",disabled:true});
       $("#c_tall_max").attr({"placeholder":"最高身高(cm)",disabled:true});
       $("#c_permission").attr({"placeholder":"选择认证",disabled:true});
-      $("#c_hometown").attr({"placeholder":"选择家乡",disabled:true});*/
+      $("#c_hometown").attr({"placeholder":"选择家乡",disabled:true});
       loadonlines();
     }
   }else{
@@ -464,25 +536,11 @@
     }
     $scope.cities = cities;
   });
-  $.post("/api/message/get",function(result){
-    if(result.limit == 0 || result.limit == undefined ){
-      return;
-    }else{
-      $(".U_circle2").show();
-      $("#rec_fri").show();
-      $(".fri_update").text(result.limit);
-    }
-  });
-  $.post("/api/wall/get",function(data){
-    $(".U_circle3").show();
-    $("#rec_mes").show();
-    $(".mes_update").text(data.upvotes);
-  });
   $.get("/api/user/meta",function(data){
     if(data.avatar == ""){
        data.avatar = "/static/images/test.jpg";
     }
-    $(".headicon") = data;
+    $(".headicon").attr("src",data.avatar);
   });
   myApp.controller('UserInfor_',function($scope){
     var user;
