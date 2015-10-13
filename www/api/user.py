@@ -5,7 +5,7 @@ from model import UserSchool, UserMeta, UserExt, Wall, FriendGroup, Friend, Blac
 from model import Tweet
 from flask import session
 from api import APIError
-from api.wall import filter_default
+from api.wall import filter_default, filter_users
 import re, json, requests, random, time, hashlib
 
 _PHONENUM = re.compile(r'^[0-9\-]+$')
@@ -145,17 +145,26 @@ def user_logout():
 
 def get_online_users(offset=0, limit=10):
     users = User.query.filter_by(online=UserStatus.Online).offset(offset).limit(limit).all()
-    return [ UserMeta.query.filter_by(uid=item.uid).first() for item in users ]
+    filters = set(filter_users(session['uid']))
+    onlines = set([UserMeta.query.filter_by(uid=item.uid).first() for item in users])
+    res = set.intersection(filters, onlines)
+    return list(res)
 
 
 def get_recent_logins(offset=0, limit=10):
     users = User.query.order_by(User.last_login.desc()).offset(offset).limit(limit).all()
-    return [ UserMeta.query.filter_by(uid=item.uid).first() for item in users ]
+    recents = set([ UserMeta.query.filter_by(uid=item.uid).first() for item in users ])
+    filters = set(filter_users(session['uid']))
+    res = set.intersection(filters, recents)
+    return list(res)
 
 
 def get_hot_users(offset=0, limit=10):
     walls = Wall.query.order_by(Wall.upvotes.desc()).offset(offset).limit(limit).all()
-    return [ UserMeta.query.filter_by(uid=item.uid).first() for item in walls ]
+    hots = set([ UserMeta.query.filter_by(uid=item.uid).first() for item in walls ])
+    filters = set(filter_users(session['uid']))
+    res = set.intersection(filters, hots)
+    return list(res)
 
 
 def get_user(uid):
@@ -183,7 +192,7 @@ def get_blacklist(uid):
 
 
 def get_user_school(uid):
-    return UserSchool.query.filter_by(user=uid).first()
+    return UserSchool.query.filter_by(uid=uid).first()
 
 
 def set_user_school(uid, school_id, degree, auth_photo):
