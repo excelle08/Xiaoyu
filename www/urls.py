@@ -22,8 +22,8 @@ def render_html(filename):
     return Response(html_str, mimetype='text/html')
 
 
-def return_json(data):
-    return Response(json.dumps(data), mimetype='text/json')
+def return_json(data, default=None):
+    return Response(json.dumps(data, default=default), mimetype='text/json')
 
 
 @app.errorhandler(APIError)
@@ -60,13 +60,21 @@ def user_interceptor():
     ]
 
     auth_flag = False
+
+    if 'uid' in session and 'phone' in session and 'password' in session:
+        uid = session['uid']
+        phone = session['phone']
+        password = session['password']
+        if api.user.validate_user(uid, phone, password):
+            auth_flag = True
+
     for item in nopriv_allowed:
         regex = '^' + item + '$'
         if re.match(regex, request.path):
             auth_flag = True
             break
 
-    if not auth_flag and not 'uid' in session:
+    if not auth_flag:
         return redirect('/login')
 
 
@@ -183,21 +191,21 @@ def api_user_logout():
 def api_get_online_users():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
-    return json.dumps([ i.json for i in api.user.get_online_users(offset, limit)])
+    return return_json(api.user.get_online_users(offset, limit), default=lambda obj: obj.dict)
 
 
 @app.route('/api/user/hot', methods=['GET', 'POST'])
 def api_get_hot_users():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
-    return return_json([ i.json for i in api.user.get_hot_users(offset, limit)])
+    return return_json(api.user.get_hot_users(offset, limit), default=lambda obj: obj.dict)
 
 
 @app.route('/api/user/recent_login', methods=['GET', 'POST'])
 def api_get_recent_logins():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
-    return return_json([ i.json for i in api.user.get_recent_logins(offset, limit)])
+    return return_json(api.user.get_recent_logins(offset, limit), default=lambda obj: obj.dict)
 
 
 @app.route('/api/user', methods=['GET', 'POST'])
@@ -205,7 +213,7 @@ def api_get_user():
     try:
         uid = session['uid']
         u = api.user.get_user(uid)
-        return u.json
+        return Response(u.json, mimetype='text/json')
     except KeyError, e:
         raise APIError(e.message)
 
@@ -289,7 +297,7 @@ def api_add_friend():
 
 @app.route('/api/user/friends', methods=['GET', 'POST'])
 def api_get_friends():
-    return return_json([ i.json for i in api.friends.get_friends()])
+    return return_json(api.friends.get_friends(), default=lambda obj: obj.dict)
 
 
 @app.route('/api/user/friends/groups', methods=['GET', 'POST'])
@@ -348,7 +356,7 @@ def api_reject_friend_request():
 
 @app.route('/api/user/friends/get_requests', methods=['GET', 'POST'])
 def api_retrieve_friend_request():
-    return return_json([i.json for i in api.friends.get_friend_requests()])
+    return return_json(api.friends.get_friend_requests(), default=lambda obj: obj.dict)
 
 
 @app.route('/api/user/friends/transgroup', methods=['GET', 'POST'])
@@ -400,13 +408,7 @@ def api_delete_from_blacklist():
 #    -------------W A L L---------------
 @app.route('/api/wall/go', methods=['POST'])
 def api_go_to_wall():
-    try:
-        uid = session['uid']
-        photos = request.form.getlist('photos[]')
-    except KeyError, e:
-        raise APIError(e.message)
-
-    return Response(api.wall.user_upwall(uid, photos).json, mimetype='text/json')
+    return Response(api.wall.user_upwall().json, mimetype='text/json')
 
 
 @app.route('/api/wall/get', methods=['GET', 'POST'])
@@ -415,10 +417,10 @@ def api_get_wall():
     return Response(api.wall.get_user_wall(uid).json, mimetype='text/json')
 
 
-@app.route('/api/wall/delete', methods=['GET', 'POST'])
+@app.route('/api/wall/cancel', methods=['GET', 'POST'])
 def api_delete_wall():
     uid = session['uid']
-    return Response(json.dumps(api.wall.remove_wall(uid)), mimetype='text/json')
+    return Response(json.dumps(api.wall.cancel_wall(uid)), mimetype='text/json')
 
 
 @app.route('/api/wall/edit_filter', methods=['POST'])
@@ -447,20 +449,20 @@ def api_upvote_user():
 @app.route('/api/wall/upvote/new', methods=['GET', 'POST'])
 def api_get_my_new_upvotes():
     uid = request.args['uid'] if 'uid' in request.args else session['uid']
-    return return_json([ i.json for i in api.wall.get_new_upvotes(uid) ])
+    return return_json(api.wall.get_new_upvotes(uid), default=lambda obj: obj.dict)
 
 
 @app.route('/api/wall/upvote/all', methods=['GET', 'POST'])
 def api_get_all_upvotes():
     uid = request.args['uid'] if 'uid' in request.args else session['uid']
-    return return_json([ i.json for i in api.wall.get_all_my_upvotes(uid) ])
+    return return_json(api.wall.get_all_my_upvotes(uid), default=lambda obj: obj.dict)
 
 
 @app.route('/api/wall/guestwall', methods=['GET', 'POST'])
 def api_get_guest_wall():
     uid = session['uid']
     guests = api.wall.get_guest_wall_items(uid)
-    return return_json([item.json for item in guests])
+    return return_json(guests, default=lambda obj: obj.dict)
 
 
 #  -------- Tweet system -----------
@@ -480,7 +482,7 @@ def api_get_friends_tweets():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
     later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
-    return return_json([ i.json for i in api.tweets.get_friends_tweets(offset, limit, later_than) ])
+    return return_json(api.tweets.get_friends_tweets(offset, limit, later_than), default=lambda obj: obj.dict)
 
 
 @app.route('/api/tweet/user', methods=['GET', 'POST'])
@@ -493,7 +495,7 @@ def api_get_ones_tweets():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
     later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
-    return return_json([ i.json for i in api.tweets.get_users_tweets(uid, offset, limit, later_than)])
+    return return_json(api.tweets.get_users_tweets(uid, offset, limit, later_than), default=lambda obj:obj.dict)
 
 
 @app.route('/api/tweet/reply', methods=['POST'])
@@ -516,7 +518,7 @@ def api_reply_get():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
     later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
-    return return_json([ i.json for i in api.tweets.get_replies(tweet_id, offset, limit, later_than)])
+    return return_json(api.tweets.get_replies(tweet_id, offset, limit, later_than), default=lambda obj: obj.dict)
 
 
 @app.route('/api/tweet/delete', methods=['GET', 'POST'])
@@ -561,7 +563,7 @@ def api_upload_to_album():
 @app.route('/api/album/get', methods=['GET', 'POST'])
 def api_get_album_photos():
     uid = request.args['uid'] if 'uid' in request.args else session['uid']
-    return return_json([ i.json for i in api.album.get_all_photos(uid)])
+    return return_json( api.album.get_all_photos(uid), default=lambda obj: obj.dict)
 
 
 @app.route('/api/album/delete', methods=['GET', 'POST'])
@@ -602,7 +604,7 @@ def api_message_get():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
     later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
-    return return_json([ i.json for i in api.message.get_messages(uid, offset, limit, later_than)])
+    return return_json(api.message.get_messages(uid, offset, limit, later_than), default=lambda obj: obj.dict)
 
 
 @app.route('/api/message/reply/get', methods=['GET', 'POST'])
@@ -615,7 +617,7 @@ def api_message_reply_get():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
     later_than = request.args['later_than'].strip if 'later_than' in request.args else 0
-    return return_json([ i.json for i in api.message.get_replies(message_id, offset, limit, later_than)])
+    return return_json(api.message.get_replies(message_id, offset, limit, later_than), default=lambda obj: obj.dict)
 
 
 @app.route('/api/message/delete', methods=['GET', 'POST'])
@@ -664,7 +666,7 @@ def api_chat_recvmsg():
 @app.route('/api/notifications', methods=['GET', 'POST'])
 def api_get_notifications():
     later_than = request.args['later_than'] if 'later_than' in request.args else 0    
-    return return_json([i.json for i in api.notify.get_notifications(later_than)])
+    return return_json(api.notify.get_notifications(later_than), default=lambda obj: obj.dict)
 
 
 @app.route('/api/abuse_report', methods=['POST'])
@@ -703,7 +705,7 @@ def api_delete_notification():
 @app.route('/api/admin/abuse_report/get', methods=['GET', 'POST'])
 def api_process_abuse_report():
     filter_read = request.args['filter_read'] if 'filter_read' in request.args else True
-    return return_json([i.json for i in api.abuse_report.get_reports(filter_read)])
+    return return_json(api.abuse_report.get_reports(filter_read), default=lambda obj: obj.dict)
 
 
 @app.route('/api/admin/abuse_report/read', methods=['GET', 'POST'])

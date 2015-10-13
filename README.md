@@ -220,11 +220,6 @@ This section shows some user-related APIs that will return an array of data. For
 
 - POST: `/api/wall/go`
 
-- Data: 
-
-    * `photos` - The array of JSON object string which contain photos URL and description message. No more than 8 pictures.
-    * `title` - The name/title of the wall.
-
 - Returned data: The Wall object
 
 
@@ -238,9 +233,9 @@ This section shows some user-related APIs that will return an array of data. For
 
 - Returned value: the Wall object
 
-### Remove my wall 
+### Cancel my wall 
 
-- GET/POST: `/api/wall/delete`
+- GET/POST: `/api/wall/cancel`
 
 - Returned value: `data.id` the UID.
 
@@ -262,6 +257,7 @@ This section shows some user-related APIs that will return an array of data. For
     * `work_province` Province ID of work place
     * `work_city` City ID of work place
     * `horoscope` Horoscope ID
+    * `last_active` Have logged in after this timestamp
 
 - Returned data: the Wall object
 
@@ -466,6 +462,32 @@ This section shows some user-related APIs that will return an array of data. For
     * `uid` The UID of the friend you want to remove
 
 - Return value: `data.id` - The UID.
+
+### Add a user to black list
+
+- GET/POST: `/api/user/blacklist/add`
+
+- Data: 
+
+    * `uid` UID
+
+- Return value: the Blacklist object
+
+### Get my black list
+
+- GET/POST: `/api/user/blacklist/get`
+
+- Return value: the array of BlackList object
+
+### Delete a user from black list
+
+- GET/POST: `/api/user/blacklist/delete`
+
+- Data:
+
+    * `uid` UID
+
+- Return value: the ID
 
 ### Get my friend groups
 

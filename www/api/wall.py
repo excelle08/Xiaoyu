@@ -6,23 +6,17 @@ from api import APIError
 import json, time
 
 
-def user_upwall(uid, title, photo_array):
-    if photo_array.__len__() > 8:
-        raise APIError('照片不能超过8张')
+def user_upwall():
+
+    uid = session['uid']
 
     user = User.query.filter_by(uid=uid).first()
     if user.permission < UserPermission.Validated:
         raise APIError('你没有权限上墙')
 
-    wall = Wall()
-    wall.uid = uid
-    wall.photos = json.dumps(photo_array)
-    wall.title = title
-    wall.upvotes = 0
-    wall.created_at = time.time()
-    wall.modified_at = time.time()
+    wall = Wall.query.filter_by(uid=uid).first()
+    wall.published = True
 
-    db.session.add(wall)
     db.session.commit()
 
     return set_my_filter(uid, {})
@@ -44,6 +38,7 @@ def set_my_filter(uid, args):
     condition = {
         'school' : args['school'] if 'school' in args else -1,
         'degree' : args['degree'] if 'degree' in args else -1,
+        'major' : args['major'] if 'major' in args else -1,
         'gender' : args['gender'] if 'gender' in args else -1,
         'age_min' : args['age_min'] if 'age_min' in args else 0,
         'age_max' : args['age_max'] if 'age_max' in args else 9999,
@@ -53,7 +48,8 @@ def set_my_filter(uid, args):
         'hometown_city' : args['hometown_city'] if 'hometown_city' in args else 0,
         'work_province' : args['work_province'] if 'work_province' in args else 0,
         'work_city': args['work_city'] if 'work_city' in args else 0,
-        'horoscope': args['horoscope'] if 'horoscope' in args else 0
+        'horoscope': args['horoscope'] if 'horoscope' in args else 0,
+        'last_active': args['last_active'] if 'last_active' in args else 0
     }
     wall = Wall.query.filter_by(uid=uid).first()
     wall.wall_filter = json.dumps(condition)
@@ -62,11 +58,27 @@ def set_my_filter(uid, args):
     db.session.commit()
     return wall
 
+filter_default = {
+    'school' : -1,
+    'degree' : -1,
+    'gender' : -1,
+    'age_min' : 0,
+    'age_max' : 9999,
+    'height_min' : 0,
+    'height_min' : 9999,
+    'hometown_province' : 0,
+    'hometown_city' : 0,
+    'work_province' : 0,
+    'work_city': 0,
+    'horoscope': 0,
+    'last_active': 0
+}
 
-def remove_wall(uid):
+
+def cancel_wall(uid):
     wall = Wall.query.filter_by(uid=uid)
     wid = wall.uid
-    db.session.delete(wall)
+    wall.published = False
     db.session.commit()
     return {"id": wid}
 
@@ -128,12 +140,19 @@ def filter_users(uid):
         users_query = users_query.filter(UserMeta.workplace_city == condition['work_city'])
 
     if condition['horoscope']:
-        users_query = users_query.filter(UserMeta.horoscop == condition['horoscope'])
+        users_query = users_query.filter(UserMeta.horoscope == condition['horoscope'])
 
     users = users_query.all()
     if not users:
         return []
     uids = [ user.uid for user in users ]
+
+    user2 = User.query.filter(User.last_login >= 0)
+
+    if condition['last_active']:
+        user2 = user2.filter(User.last_login >= condition['last_active']).all()
+
+    uid1 = [ user.uid for user in user2 ]
 
     # School filter
     schools_query = UserSchool.query.filter(UserSchool.auth_pass == True)
@@ -144,13 +163,16 @@ def filter_users(uid):
     if condition['degree'] != -1:
         schools_query = schools_query.filter(UserSchool.degree == condition['degree'])
 
+    if condition['major'] != -1:
+        schools_query = schools_query.filter(UserSchool.major == condition['major'])
+
     user_schools = schools_query.all()
     uids2 = [ item.uid for item in user_schools ]
 
     # Will only display users on the wall.
-    users_onwall = [ item.uid for item in Wall.query.all() ]
+    users_onwall = [ item.uid for item in Wall.query.filter_by(published=True).all() ]
 
-    result_ids = list(set.intersection(set(uids), set(uids2), set(users_onwall)))
+    result_ids = list(set.intersection(set(uids), set(uid1), set(uids2), set(users_onwall)))
 
     result = []
     for uid in result_ids:
