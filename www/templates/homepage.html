@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" ng-app="myApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>编辑我的资料</title>
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/homepage.css" rel="stylesheet">
-    <script src="/static/js/jq.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/homepage.js"></script>
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/homepage.css" rel="stylesheet">
+    <script src="static/js/jq.js"></script>
+    <script src="static/js/angular.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/homepage.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;z-index:9999;">
@@ -28,23 +29,23 @@
     <div class="equalnav" style="width:100%;"></div>
     <div class="main" style="z-index:1000;">
       <form id="userform" method="post" action="/api/user">
-        <table border="1">
+        <table border="1" ng-controller="UserInfor">
           <tr>
             <div class="head">
-              <img class="avatar" src="/static/images/test.jpg">
+              <img class="avatar" ng-src="{{user.avatar}}">
               <div class="change_ava_Container">
                 <input capture="camera" class="change_ava_Upload" id="change_ava_Upload" type="file" accept="image/*">
               </div>
             </div>
             <div class="photo">
-              <div id="add_photo"></div>
+              <div id="add_photo"><img ng-repeat="photo in user.small_avatar" ng-src="{{photo.url}}"></div>
               <div class="ImgUploadContainer">
                 <input capture="camera" class="ImgUpload" id="ImgUpload" type="file" accept="image/*">
               </div>
             </div>
           </tr>
           <tr>
-            <input type="text" name="nickname" placeholder="  昵称：" class="nickname">
+            <input type="text" name="nickname" ng-model="{{user.nickname}}" placeholder="  昵称：" class="nickname">
           </tr>
           <tr>
             <div class="sex">
@@ -55,25 +56,25 @@
           <tr>
             <div class="birth">
               <div class="btn-group col-xs-4" style="padding:0;">
-                <input class="input__ c_year" type="text" placeholder="出生年"/>
+                <input class="input__ c_year" type="text"  ng-model="user.birth_year" placeholder="出生年"/>
               </div>
               <div class="btn-group col-xs-4" style="padding:0;">
-                <input class="input__ c_month" type="text" placeholder="出生月"/>
+                <input class="input__ c_month" type="text" ng-model="user.birth_month" placeholder="出生月"/>
               </div>
               <div class="btn-group col-xs-4" style="padding:0;">
-                <input class="input__ c_day" type="text" placeholder="出生日"/>
+                <input class="input__ c_day" type="text" ng-model="user.birth_day" placeholder="出生日"/>
               </div>
           </tr>
           <tr>
             <div class="btn-group form_" style="margin-top:1em">
               <div class="btn-group form_">
-                <input class="input_ c_height" type="text" placeholder="身高"/>
+                <input class="input_ c_height" type="text" ng-model="user.height" placeholder="身高"/>
               </div>
             </div>
           </tr>
           <tr>
               <div class="btn-group form_">
-                <input class="input_ c_horoscope" type="text" placeholder="星座"/>
+                <input class="input_ c_horoscope" type="text" ng-model="user.horoscope" placeholder="星座"/>
                 <ul class="horoscopeul" ng-controller="horoscopelist">
                   <li ng-repeat="horoscope in horoscopes" id="{{horoscope.id}}">{{horoscope.name}}</li>
                 </ul>
@@ -81,62 +82,56 @@
           </tr>
           <tr>
             <div class="form_">
-              <input class="input_ c_home_p" type="text" placeholder="选择家乡（省）"/>
+              <input class="input_ c_home_p" type="text" ng-model="user.hometown_province" placeholder="选择家乡（省）"/>
               <ul class="phomeul" ng-controller="provincelist">
                 <li ng-repeat="province in provinces" id="{{province.id}}">{{privince.name}}</li>
-                <li>ssss</li>
-                <li>ssss</li>
               </ul>
             </div>
           </tr>
           <tr>
             <div class="form_">
-              <input class="input_ c_home_c" type="text" placeholder="选择家乡（市）"/>
+              <input class="input_ c_home_c" type="text" ng-model="hometown_city" placeholder="选择家乡（市）"/>
               <ul class="chomeul" ng-controller="citylist">
                 <li ng-repeat="city in citys" id="{{city.id}}">{{city.name}}</li>
-                <li>ssss</li>
-                <li>ssss</li>
               </ul>
             </div>
           </tr>
           <tr>
             <div class="form_">
-              <input class="input_ c_work_p" type="text" placeholder="准备工作地（省）"/>
+              <input class="input_ c_work_p" type="text" ng-model="user.workplace_province" placeholder="准备工作地（省）"/>
               <ul class="pworkul" ng-controller="provincelist">
                 <li ng-repeat="province in provinces" id="{{province.id}}">{{province.name}}</li>
-                <li>ssss</li>
               </ul>
             </div>
           </tr>
           <tr>
             <div class="form_">
-              <input class="input_ c_work_c" type="text" placeholder="准备工作地（市）"/>
+              <input class="input_ c_work_c" type="text" ng-model="user.workplace_city" placeholder="准备工作地（市）"/>
               <ul class="cworkul" ng-controller="citylist">
                 <li ng-repeat="city in citys" id="{{city.id}}">{{city.name}}</li>
-                <li>ssss</li>
               </ul>
             </div>
           </tr>
           <tr>
             <div class="real_name1">
-              <input class="real_name" type="text" name="real_name" placeholder="  真实姓名：" value="">
+              <input class="real_name" type="text" name="real_name" ng-model="user.realname" placeholder="  真实姓名：" value="">
               <div style="float:right;font-size:1.1em;margin:0.7em 0.2em;"><input class="pub_" name="pub_real_name" type="radio"><span style="vertical-align:top;">公开</span></div>
             </div>
           </tr>
           <tr>
             <div class="tel1" style="margin-bottom:1em;">
-              <input class="tel" type="text" name="tel" placeholder="  联系方式：">
+              <input class="tel" type="text" name="contact" ng-model="user.contact" placeholder="  联系方式：">
               <div style="float:right;font-size:1.1em;margin:0.7em 0.2em;"><input class="pub_" name="pub_tel" type="radio"><span style="vertical-align:top;">公开</span></div>
             </div>
           </tr>
           <tr>
             <div class="school">
-              <span style="float:left;">学校信息</span><span id="auth" style="float:right;">还未认证</span>
+              <span style="float:left;">学校信息</span><span id="auth" style="float:right;">{{school.auth_pass}}</span>
             </div>
           </tr>
           <tr>
             <div class="btn-group form_">
-              <input class="input_ c_school" type="text" placeholder="选择学校"/>
+              <input class="input_ c_school" ng-model="school.school_id" type="text" placeholder="选择学校"/>
               <ul ng-controller="schoollist" class="schoolul">
                 <li ng-repeat="school in schools" id="{{school.id}}">{{school.name}}</li>
               </ul>
@@ -144,7 +139,7 @@
           </tr>
           <tr>
             <div class="btn-group form_">
-              <input class="input_ c_subject" type="text" placeholder="选择专业"/>
+              <input class="input_ c_subject" type="text" ng-model="user.major_name"  placeholder="选择专业"/>
               <ul ng-controller="subjectlist" class="subjectul">
                 <li ng-repeat="subject in subjects" id="{{subject.id}}">{{subject.name}}</li>
               </ul>
@@ -152,13 +147,20 @@
           </tr>
           <tr>
             <div class="btn-group form_">
-              <input class="input_ c_degree" type="text" placeholder="选择学历"/>
+              <input class="input_ c_degree" type="text" ng-model="user.degree" placeholder="选择学历"/>
               <ul class="degreeul">
                 <li id="0">未知</li>
                 <li id="1">本科生</li>
                 <li id="2">研究生</li>
                 <li id="3">博士</li>
               </ul>
+            </div>
+          </tr>
+          <tr>
+            <div class="btn-group form_">
+              <div class="SchoolContainer">
+                <input capture="camera" class="SchoolUpload" id="SchoolUpload" type="file" accept="image/*">
+              </div>
             </div>
           </tr>
         </table>
@@ -244,6 +246,17 @@
       $(".ImgUploadContainer").hide();
     }
   });
+  $("#SchoolUpload").on('change',function(){
+    //if (that.files.length === 0) return;
+    var $that = $(this).parent();
+    lrz(this.files[0])
+      .then(function(rst){
+        $that.css("background",rst.base64);
+      })
+      .catch(function(err){
+        alert(err);
+      });
+  });
   var avatar;
   $("#change_ava_Upload").on('change',function(){
     //if (that.files.length === 0) return;
@@ -257,6 +270,72 @@
       });
   });
   var myApp = angular.module('myApp',[]);
+  myApp.controller('UserInfor',function($scope,$http){
+    $http.get("/api/user/meta").success(function(data){
+      if(data.gender == "0"){
+            $(".sex_man").attr("checked",true);
+          }
+          else{
+            $(".sex_woman").attr("checked",true);
+          }
+        var date = new Date(data.birthday*1000);
+        data = $.extend({},data,{"birth_year":date.getYear(),"birth_month":date.getMonth()+1,"birth_day":date.getDay()});
+        var horoscopes = JSON.parse(window.localStorage.getItem("horoscopes"));
+        for(var i=0;i<horoscopes.length;i++){
+          if(horoscopes[i].id == data.horoscope){
+            data.horoscope = horoscopes[i].name;
+            break;
+          }
+        }
+        var provinces = JSON.parse(window.localStorage.getItem("provinces"));
+        for(var i=0;i<provinces.length;i++){
+          if(provinces[i].id == data.hometown_province){
+            data.hometown_province = provinces[i].name;
+          }else if(provinces[i].id == data.workplace_province){
+            data.workplace_province = provinces[i].name;
+          }
+          for(j=0;j<provinces[i].length;j++){
+            if(provinces[i][j].id == data.hometown_city){
+              data.hometown_city = provinces[i][j].name;
+            }else if(provinces[i][j].id == data.workplace_city){
+              data.workplace_city = provinces[i][j].name;
+            }
+          }
+        }
+      $scope.user = data;
+    });
+    $http.get("/api/user/school/get").success(function(data){
+      if(data.auth_pass == true){
+        data.auth_pass = "已通过验证";
+        $(".c_school,.c_subject").attr("disabled",true);
+      }else{
+        data.auth_pass = "未通过验证";
+      }
+      var schools = JSON.parse(window.localStorage.getItem("schools"));
+      for(var i=0;i<schools.length;i++){
+        if(schools[i].id == data.school_id){
+          data.school_id = schools[i].name;
+          break;
+        }
+      }
+      var majors = JSON.parse(window.localStorage.getItem("majors"));
+      for(var i=0;i<majors.length;i++){
+        if(majors[i].id == data.major_id){
+          data.major_name = majors[i].name;
+        }
+      }
+      if(data.degree == 0){
+        data.degree = "未知";
+      }else if(data.degree == 1){
+        data.degree = "本科生";
+      }else if(data.degree == 2){
+        data.degree = "研究生";
+      }else{
+        data.degree = "博士";
+      }
+      $scope.school = data;
+    });
+  });
   myApp.controller('schoollist',function($scope){
     var schools = JSON.parse(window.localStorage.getItem("schools"));
     $scope.schools = schools;
@@ -276,10 +355,11 @@
   $(".c_home_c").click(function(){
     myApp.controller('citylist',function($scope){
       var provinces = JSON.parse(window.localStorage.getItem("provinces"));
+      var cities = JSON.parse(window.localStorage.getItem("cities"));
       var province = $(".c_home_p").val(),citys = [];
       for(var i=0;i<provinces.length;i++){
         if(provinces[i].name == province){
-          citys = provinces[i].cities;
+          citys = cities[i];
         }
       }
       $scope.citys = citys;
@@ -288,10 +368,11 @@
   $(".c_work_c").click(function(){
     myApp.controller('citylist',function($scope){
       var provinces = JSON.parse(window.localStorage.getItem("provinces"));
+      var cities = JSON.parse(window.localStorage.getItem("cities"));
       var province = $(".c_work_p").val(),citys = [];
       for(var i=0;i<provinces.length;i++){
         if(provinces[i].name == province){
-          citys = provinces[i].cities;
+          citys = cities[i];
         }
       }
       $scope.citys = citys;
