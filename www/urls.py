@@ -109,12 +109,45 @@ def changepass():
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    return render_html('homepage.html')
+    return render_html('me.html')
 
 
 @app.route('/friends', methods=['GET', 'POST'])
 def friends():
+    if 'uid' in request.args:
+        return render_html('others.html')
+
     return render_html('friends.html')
+
+
+@app.route('/reply', methods=['GET', 'POST'])
+def reply():
+    return render_html('reply.html')
+
+
+@app.route('/chat', methods=['GET', 'POST'])
+def chat():
+    return render_html('reply.html')
+
+
+@app.route('/edit', methods=['GET', 'POST'])
+def edit_info():
+    return render_html('homepage.html')
+
+
+@app.route('/friendwall', methods=['GET', 'POST'])
+def guestwall():
+    return render_html('fwall.html')
+
+
+@app.route('/mywall', methods=['GET', 'POST'])
+def mywall():
+    return render_html('mywall.html')
+
+
+@app.route('/compile', methods=['GET', 'POST'])
+def compile():
+    return render_html('compile.html')
 
 
 @app.route('/publish', methods=['GET', 'POST'])

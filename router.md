@@ -8,43 +8,37 @@
 	/changepass
 	changepass.html
 ###首页
-	/index/id
-	id为本用户uid
+	/index
 	index.html
 ###我的主页
-	/home/id
-	id为本用户uid
+	/home
 	me.html
 ###好友和聊天页面
 	/friends/id
 	id为本用户id
 	friends.html
 ###好友的主页
-	/friends/id?uid=
-	其中uid为好友的id
+	/friends?uid=
 	others.html
 ###回复chat/tweet
-	/reply/id？to=uid
-	其中id为本用户id，uid为回复对象的id
-	若为私聊则：/privacy/id?to=uid
+	/reply?to=uid
+	若为私聊则：/chat?to=uid
 	reply.html
 ###发布说说
-	/publish/id
-	其中id为本用户id
+	/publish
 	publish.html
 ###消息中心
-	/message/id
-	其中id为本用户id
+	/message
 	message.html
 ###编辑个人信息
-	/edit/id
+	/edit
 	homepage.html
 ###嘉宾墙
-	/friendwall/id
+	/friendwall
 	fwall.html
 ###我的墙
-	/mywall/id
+	/mywall
 	mywall.html
 ###编辑我的墙
-	/compile/id
+	/compile
 	compile.html
