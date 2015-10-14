@@ -5,13 +5,38 @@ from flask import jsonify, session, request
 from flask import render_template, make_response
 from flask import redirect, url_for
 from api import APIError, check_admin
-from model import db
+from model import db, UserPermission
 import api.common, api.user, api.tweets, api.message, api.friends
 import api.photo, api.album, api.wall, api.chat, api.notify, api.abuse_report, api.statistics
 import json, re
 
 app = Flask(__name__)
 db.init_app(app)
+
+nopriv_allowed = [
+    '/static/.*',
+    '/login',
+    '/reg',
+    '/api/common/.*',
+    '/api/user/verify',
+    '/api/user/login',
+    '/api/register',
+    '/api/test/.*',
+    '/test.*'
+]
+
+blocked_allowed = [
+    '/static/.*',
+    '/changepass',
+    '/home',
+    '/',
+    '/edit',
+    '/api/user.*',
+    '/api/common/.*',
+    '/api/notification.*',
+    '/api/test/.*',
+    '/test.*'
+]
 
 
 def render_html(filename):
@@ -47,17 +72,7 @@ def admin_interceptor():
 
 @app.before_request
 def user_interceptor():
-    nopriv_allowed = [
-        '/static/.*',
-        '/login',
-        '/reg',
-        '/api/common/.*',
-        '/api/user/verify',
-        '/api/user/login',
-        '/api/register',
-        '/api/test/.*',
-        '/test.*'
-    ]
+    global nopriv_allowed
 
     auth_flag = False
 
@@ -76,6 +91,27 @@ def user_interceptor():
 
     if not auth_flag:
         return redirect('/login')
+
+
+@app.before_request
+def blockeds_interceptor():
+    global blocked_allowed
+
+    auth_flag = False
+
+    if 'uid' in session:
+        user = api.user.get_user(session['uid'])
+        if user.permission == UserPermission.Blocked:
+            for item in blocked_allowed:
+                regex = '^' + item + '$'
+                if re.match(regex, request.path):
+                    auth_flag = True
+                    break
+        else:
+            auth_flag = True
+
+        if not auth_flag:
+            raise APIError('您被封禁，无法使用此功能。')
 
 
 @app.after_request
