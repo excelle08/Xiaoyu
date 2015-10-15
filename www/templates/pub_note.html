@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN" ng-app="myApp">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>公告系统</title>
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/css/pub_note.css" rel="stylesheet">
+    <script src="static/js/jq.js"></script>
+    <script src="static/js/Jquery.Query.js"></script>
+    <script src="static/js/angular.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" style="background:#356ed6;color:white;margin-bottom:0;">
+      <div class="container row">
+        <div class="col-xs-2 col-md-2" style="padding:0;">
+          <span class="back" ><</span>
+        </div>
+        <div class="col-xs-8 col-md-8" style="text-align:center;">
+          <span class="index_kind">公告系统</span>
+        </div>
+        <div class="choose">发布</div>
+      </div>
+    </nav>
+    <div class="main">
+      <input type="text" class="title" ><br><span class="alert_t">请输入公告的标题</span>
+      <textarea class="content"></textarea><span class="alert_c">请输入公告的内容</span>
+    </div>
+    <script type="text/javascript">
+      var alert_h = $(".navbar").height() + 10;
+      var alert_t = (alert_h - $(".choose").height())/2;
+      $(".choose").css("margin-top",alert_t);
+      $(".main").css("margin-top",alert_h);
+      $(".back").click(function(){
+        window.history.back(-1);
+      });
+      $(".choose").click(function(){
+        var title = $(".title").val();
+        var content = $(".content").val();
+        if(title == "" || title == undefined){
+          $(".alert_t").show();
+          return;
+        }else if(content == "" || content == undefined){
+          $("alert_c").show();
+          return;
+        }else{
+          $.post("/api/notifications/post",{"title":title,"content":content},function(data){
+            if(data != ""){
+              alert("发布成功");
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

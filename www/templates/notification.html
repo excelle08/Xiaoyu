@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN" ng-app="myApp">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>公告系统</title>
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/css/notification.css" rel="stylesheet">
+    <script src="static/js/jq.js"></script>
+    <script src="static/js/Jquery.Query.js"></script>
+    <script src="static/js/angular.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" style="background:#356ed6;color:white;margin-bottom:0;">
+      <div class="container row">
+        <div class="col-xs-2 col-md-2" style="padding:0;">
+          <span class="back" ><</span>
+        </div>
+        <div class="col-xs-8 col-md-8" style="text-align:center;">
+          <span class="index_kind">公告系统</span>
+        </div>
+        <div class="choose">发布</div>
+      </div>
+    </nav>
+    <div class="main">
+      <ul ng-controller="notify">
+        <li ng-repeat="notification in notifications">
+          <div>{{notification.title}}</div>
+          <div>{{notification.create_at}}</div>
+          <div>{{notification.content}}</div>
+        </li>
+      </ul>
+    </div>
+  </body>
+  <script type="text/javascript">
+    var alert_h = $(".navbar").height();
+    var alert_t = (alert_h - $(".choose").height())/2;
+    $(".choose").css("margin-top",alert_t);
+    $(".main").css("margin-top",alert_h);
+    $(".back").click(function(){
+      window.history.back(-1);
+    });
+    myApp.controller('notify',function($scope,$http){
+      $http.get("/api/notifications").success(function(data){
+        for(var i=0;i<data.length;i++){
+          var second = 1000;
+          var minite = second * 60;
+          var hour = minite * 60;
+          var day = hour * 24;
+          var month = day * 30;
+          var now = new Date().getTime();
+          var time = now - parseInt(data[i].create_at * 1000);
+          if(time < 0){
+            alert("error");
+          }else{
+            var monthC = time/month;
+            var weekC = time/(7*day);
+            var dayC = time/day;
+            var hourC = time/hour;
+            var miniteC = time/minite;
+            var secondC = time/second;
+            if(monthC > 1){
+              data[i].create_at = parseInt(monthC) + "个月前";
+            }else if(weekC > 1){
+              data[i].create_at = parseInt(weekC) + "个星期前";
+            }else if(dayC > 1){
+              data[i].create_at = parseInt(dayC) + "天前";
+            }else if(hourC > 1){
+              data[i].create_at = parseInt(hourC) + "小时前";
+            }else if(miniteC > 1){
+              data[i].create_at = parseInt(miniteC) + "分钟前";
+            }else if(secondC > 1){
+              data[i].create_at = parseInt(secondC) + "秒前";
+            }else{
+              data[i].create_at = "刚刚";
+            }
+          }
+        }
+        $scope.notifications = data;
+      });
+    });
+  </script>
+</html>
