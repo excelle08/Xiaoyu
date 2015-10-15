@@ -759,12 +759,12 @@ def api_get_notifications():
 def api_abuse_report():
     try:
         uid = session['uid']
-        target = request.form['target']
         content = request.form['content']
+        photo = request.files['photo']
     except KeyError, e:
         raise APIError(e.message)
 
-    return Response(api.abuse_report.report_abuse(uid, target, content).json, mimetype='text/json')
+    return Response(api.abuse_report.report_abuse(uid, photo, content).json, mimetype='text/json')
 
 
 # -------------------Admin back-side operations----------------

@@ -161,8 +161,8 @@ create table notification (
 create table abuse_report (
     `id` int(10) not null primary key auto_increment,
     `from` int(10) not null,
-    `target` int(10) not null,
     `content` text,
+    `photo` text,
     `read` boolean,
     `created_at` real
 ) engine=innodb default charset=utf8;
