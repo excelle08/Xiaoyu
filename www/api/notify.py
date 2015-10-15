@@ -4,11 +4,12 @@ from api import APIError, check_admin
 import time
 
 
-def send_notification(content):
+def send_notification(title, content):
     if not check_admin():
         raise APIError('You are not the admin.')
 
     notification = Notification()
+    notification.title = title
     notification.content = content
     notification.created_at = time.time()
     db.session.add(notification)

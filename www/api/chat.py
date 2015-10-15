@@ -2,6 +2,7 @@
 
 from model import db
 from model import ChatMessage, Friend
+from flask import session
 from api import APIError
 import api.friends
 import time
@@ -29,8 +30,12 @@ def send(_from, to, content):
     return msg
 
 
-def receive(uid, _from):
-    messages = ChatMessage.query.filter(ChatMessage._from==_from, ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).all()
+def receive(uid, _from, new):
+    if new:
+        messages = ChatMessage.query.filter(ChatMessage._from==_from, ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).all()
+    else:
+        messages = ChatMessage.query.filter(ChatMessage._from==_from, ChatMessage.to==uid).order_by(ChatMessage.created_at.desc()).all()
+
     for i in messages:
         i.read = True
 
@@ -38,10 +43,20 @@ def receive(uid, _from):
     return messages
 
 
-def receive_all(uid):
-    messages = ChatMessage.query.filter(ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).all()
+def receive_all(uid, new):
+    if new:
+        messages = ChatMessage.query.filter(ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).all()
+    else:
+        messages = ChatMessage.query.filter(ChatMessage.to==uid).order_by(ChatMessage.created_at.desc()).all()
+
     for i in messages:
         i.read = True
 
     db.session.commit()
     return messages
+
+
+def get_my_messages(later_than=0):
+    uid = session['uid']
+    messages = ChatMessage.query.filter(ChatMessage._from == uid, ChatMessage.created_at >= later_than).all()
+    return messages;

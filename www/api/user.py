@@ -227,10 +227,14 @@ def pass_user_school(uid):
 def set_user_meta(uid, args):
     try:
         umeta = UserMeta.query.filter_by(uid=uid).first()
+        if not umeta:
+            umeta = UserMeta()
+
         for key, value in args.iteritems():
             # Skip empty items
             if not value:
                 continue
+            print 'key=' + key + ';value=' + value
             umeta.__setattr__(key, value)
         db.session.commit()
         return umeta

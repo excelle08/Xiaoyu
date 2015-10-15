@@ -196,6 +196,15 @@ def message_center():
     return render_html('message.html')
 
 
+@app.route('/notification', methods=['GET', 'POST'])
+def notification():
+    return render_html('notification.html')
+
+
+@app.route('/admin/pub_note', methods=['GET', 'POST'])
+def admin_publish_nofitication():
+    return render_html('pub_note.html')
+
 ### This is for test.
 ### Will be removed in production mode
 
@@ -724,12 +733,19 @@ def api_chat_sendmsg():
 @app.route('/api/chat/recv', methods=['GET', 'POST'])
 def api_chat_recvmsg():
     uid = session['uid']
+    new = request.args['new'] if 'new' in request.args else False
 
     if 'from' in request.args:
         _from = request.args['from']
-        return return_json([i.json for i in api.chat.receive(uid, _from)])
+        return return_json([i.json for i in api.chat.receive(uid, _from, new)])
     else:
-        return return_json([i.json for i in api.chat.receive_all(uid)])
+        return return_json([i.json for i in api.chat.receive_all(uid, new)])
+
+
+@app.route('/api/chat/my', methods=['GET', 'POST'])
+def api_get_my_messages():
+    later_than = request.args['later_than'] if 'later_than' in request.args else 0
+    return return_json([i.json for i in api.chat.get_my_messages(later_than)])
 
 
 # ----------------Utilities--------------------
@@ -743,12 +759,12 @@ def api_get_notifications():
 def api_abuse_report():
     try:
         uid = session['uid']
-        target = request.form['target']
         content = request.form['content']
+        photo = request.files['photo']
     except KeyError, e:
         raise APIError(e.message)
 
-    return Response(api.abuse_report.report_abuse(uid, target, content).json, mimetype='text/json')
+    return Response(api.abuse_report.report_abuse(uid, photo, content).json, mimetype='text/json')
 
 
 # -------------------Admin back-side operations----------------
@@ -756,10 +772,11 @@ def api_abuse_report():
 def api_send_notification():
     try:
         content = request.form['content']
+        title = request.form['title']
     except KeyError, e:
         raise APIError(e.message)
 
-    return Response(api.notify.send_notification(content).json, mimetype='text/json')
+    return Response(api.notify.send_notification(title, content).json, mimetype='text/json')
 
 
 @app.route('/api/admin/notification/delete', methods=['GET', 'POST'])

@@ -4,13 +4,14 @@ from model import db
 from model import AbuseReport
 from api import check_admin
 from api import APIError
+from api.photo import upload_photo
 import time
 
 
-def report_abuse(_from, target, content):
+def report_abuse(_from, photo, content):
     areport = AbuseReport()
     areport._from = _from
-    areport.target = target
+    areport.photo = upload_photo(photo)
     areport.content = content
     areport.read = False
     areport.created_at = time.time()
