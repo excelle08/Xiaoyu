@@ -3,6 +3,7 @@
 from model import db
 from model import ChatMessage, Friend
 from api import APIError
+import api.friends
 import time
 
 
@@ -10,6 +11,10 @@ def send(_from, to, content):
     f = Friend.query.filter(Friend.user==_from, Friend.to==to).first()
     if not f:
         raise APIError('非好友关系不能发送信息~')
+    bk = BlackList.query.filter()
+
+    if api.friends.am_i_blocked(to):
+        raise APIError('您被拉黑，无法发送消息')
 
     msg = ChatMessage()
     msg._from = _from

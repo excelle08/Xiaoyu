@@ -2,7 +2,7 @@
 
 from model import db, Message, MessageReply, User, Visibility
 from flask import session
-from api import APIError
+from api import APIError, friends
 import time
 
 
@@ -11,6 +11,9 @@ def leave_message(target_user, content, visibility=Visibility.All):
         raise APIError('留言内容不能为空')
     if not User.query.filter_by(uid=target_user).first():
         raise APIError('指向的用户不存在')
+
+    if friends.am_i_blocked(target_user):
+        raise APIError('您被拉黑，无法留言。')
 
     message = Message()
     message.user = session['uid']

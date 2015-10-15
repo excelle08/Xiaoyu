@@ -232,7 +232,7 @@ class FriendGroup(db.Model, Base):
 
 
 class BlackList(db.Model, Base):
-    __tablename__ = 'black_list'
+    __tablename__ = 'blacklist'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     user = db.Column('user', db.Integer, nullable=False)
     to = db.Column('to', db.Integer, nullable=False)
