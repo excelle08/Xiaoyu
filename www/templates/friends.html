@@ -5,10 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>我的好友</title>
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/friends.css" rel="stylesheet">
-    <script src="/static/js/jq.js"></script>
-    <script src="/static/js/angular.min.js"></script>
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/css/friends.css" rel="stylesheet">
+    <script src="static/js/jq.js"></script>
+    <script src="static/js/Jquery.Query.js"></script>
+    <script src="static/js/angular.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" style="background:#333;color:white;margin-bottom:0;">
@@ -17,8 +19,9 @@
           <span class="back" ><</span>
         </div>
         <div class="col-xs-8 col-md-8" style="text-align:center;">
-          <span class="index_kind">TA的主页</span>
+          <span class="index_kind">我的好友</span>
         </div>
+        <div class="col-xs-2 col-md-2"><img src="static/images/search.jpg" class="search" data-toggle="modal" data-target="#search"></div>
       </div>
     </nav>
     <div class="fri_nav">
@@ -39,7 +42,7 @@
             <span class="username"><b>{{friend.nickname}}</b>{{friend.gender}}{{friend.age}}</span>
           </div>
           <div class="user_oper">
-            <div class="col-xs-4 f_trans">转分组</div>
+            <div class="col-xs-4 f_trans" data-toggle="modal" data-target="#myModal" >转分组</div>
             <div class="col-xs-4 f_index">Ta的主页</div>
             <div class="col-xs-4 f_delete">删除</div>
           </div>
@@ -58,13 +61,17 @@
       </li>
       <li>
         <div class="group">b</div>
+        <div class="group_">
+          <div class="col-xs-6 group_change" style="border-right:1px solid #fff;">更改分组名称</div>
+          <div class="col-xs-6 group_del">删除分组</div>
+        </div>
         <div class="user">
           <div class="user_infor">
             <img src="/static/images/test.jpg" class="userhead">
             <span class="username"><b>奥莉薇拉</b>♀21</span>
           </div>
           <div class="user_oper">
-            <div class="col-xs-4 f_trans">转分组</div>
+            <div class="col-xs-4 f_trans" data-toggle="modal" data-target="#change_group">转分组</div>
             <div class="col-xs-4 f_index">Ta的主页</div>
             <div class="col-xs-4 f_delete">删除</div>
           </div>
@@ -105,6 +112,62 @@
         </div>
       </li>
     </ul>
+    <div class="modal fade" id="change_group" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">转分组</h4>
+          </div>
+          <div class="modal-body">
+            <input placeholder="请输入要转入分组的名称" class="changegroup" type="text" style="width:80%;" />
+          </div>
+          <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-primary" id="change_group_verify">确认</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="search" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">搜索好友</h4>
+          </div>
+          <div class="modal-body" style="overflow:hidden;">
+            <input placeholder="请输入要搜索的人的昵称或手机号" class="changegroup" type="text" style="width:80%;height:40px;font-size:17px;" /><button>搜索</button>
+            <ul class="searchers" ng-controller="searchers">
+              <li style="margin-top:10px;">
+                <div class="searcher_infor">
+                  <img class="search_avatar" ng-src="{{avatar}}" ><span class="search_infor"><span style="color:white;background:#0099cc;">name</span><span style="color:white;background:#773245;">gender</span><span style="color:white;background:#00bb66;">age</span></span>
+                </div>
+                <div class="searcher_oper">
+                  <div class="col-xs-4" style="border-right:1px solid #fff;">添加好友</div>
+                  <div class="col-xs-4" style="border-right:1px solid #fff;">TA的主页</div>
+                  <div class="col-xs-4">发送消息</div>
+                </div>
+              </li>
+              <li style="margin-top:10px;">
+               <div class="searcher_infor">
+                  <img class="search_avatar" ng-src="{{avatar}}" ><span class="search_infor"><span style="color:white;background:#0099cc;">name</span><span style="color:white;background:#773245;">gender</span><span style="color:white;background:#00bb66;">age</span></span>
+                </div>
+                <div class="searcher_oper">
+                  <div class="col-xs-4" style="border-right:1px solid #fff;">添加好友</div>
+                  <div class="col-xs-4" style="border-right:1px solid #fff;">TA的主页</div>
+                  <div class="col-xs-4">发送消息</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-primary" id="change_group_verify">确认</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
   <script>
   var alert_h = $(".navbar").height();
@@ -114,29 +177,48 @@
   $(".back").click(function(){
     window.history.back(-1);
   });
+  $(".searcher_infor").click(function(){
+    $(this).next().slideToggle();
+  });
   $(".chat_list").click(function(){
     $(".b_list").removeClass("fn_active");
+    $(".s_list").removeClass("fn_active");
     $(".f_list").removeClass("fn_active");
     $(this).addClass("fn_active");
     $(".chats_list").fadeIn();
     $(".friends_list").hide();
     $(".blacks_list").hide();
+    $(".strangers_list").hide();
   });
   $(".f_list").click(function(){
     $(".b_list").removeClass("fn_active");
+    $(".s_list").removeClass("fn_active");
     $(".chat_list").removeClass("fn_active");
     $(this).addClass("fn_active");
     $(".chats_list").hide();
     $(".blacks_list").hide();
     $(".friends_list").fadeIn();
+    $(".strangers_list").hide();
   });
   $(".b_list").click(function(){
     $(".f_list").removeClass("fn_active");
+    $(".s_list").removeClass("fn_active");
     $(".chat_list").removeClass("fn_active");
     $(this).addClass("fn_active");
     $(".chats_list").hide();
     $(".friends_list").hide();
     $(".blacks_list").fadeIn();
+    $(".strangers_list").hide();
+  });
+  $(".s_list").click(function(){
+    $(".b_list").removeClass("fn_active");
+    $(".f_list").removeClass("fn_active");
+    $(".chat_list").removeClass("fn_active");
+    $(this).addClass("fn_active");
+    $(".strangers_list").fadeIn();
+    $(".chats_list").hide();
+    $(".friends_list").hide();
+    $(".blacks_list").hide();
   });
   $(".user_infor").click(function(){
     $(this).next().slideToggle();
@@ -149,6 +231,7 @@
   });
   $(".group_change").click(function(){
     var name = window.prompt("分组的新名称","");
+    alert(name);
     var id = $(this).parent().prev().attr("id");
     if(name != "" && name != undefined){
       $.post("/api/user/friends/groups/modify",{"title":name,"id":id},function(data){
@@ -162,6 +245,7 @@
     if($(this).parent().has(".user")){
       var mes = confirm('分组内的好友会移动到默认分组，您确定这么做吗？');
       if(mes){
+        var id = $(this).attr("id");
         $.post("/api/user/friends/groups/delete",{"id":id},function(result){
           window.location.reload();
         });
@@ -176,21 +260,21 @@
       });
     }
   });
-  $(".c_delete").click(function(){
+  $(".c_reply").click(function(){
     var uid = $(this).parent().parent().attr("id");
     var id = $.query.get('id');
     window.location = "/reply/" + id + "?to=" + uid;
   });
   $(".c_index").click(function(){
     var uid = $(this).parent().parent().attr("id");
-    window.location = "/friends/" + uid;
+    window.location = "/home/" + uid;
   });
   var myApp = angular.module('myApp',[]);
   myApp.controller('myfriends',function($scope,$http){
     var groups = [];
     $.post("/api/user/friends/groups",function(data){
       for(var i=o;i<data.length;i++){
-        var group = {"id":data[i].index(),"name":data[i]};
+        var group = {"id":i,"name":data[i].content};
         groups.push(group);
       }
     });
@@ -201,9 +285,9 @@
         var index = data[i].group;
         $http.get("/api/user/meta",{"uid":uid}).success(function(data){
           if(data.gender == 0){
-            data.gender ="♂";
+            data.gender ="♀";
           }else{
-            data.gender = "♀";
+            data.gender = "♂";
           }
           var friend = {};
           friend = $.extend({},friend,{"uid":uid});
@@ -213,7 +297,7 @@
           friend = $.extend({},friend,{"age":data.age});
           friends.push(friend);
         });
-        $.extend({},groups[index],{"friends":friends});
+        groups[index] = $.extend({},groups[index],{"friends":friends});
       }
     });
     $scope.groups = groups;
@@ -300,20 +384,21 @@
       $scope.blacks = friends;
     });
   });
-  $(".f_delete").click(function(){
+  $(".f_trans").click(function(){
     var uid = $(this).parent().parent().attr("id");
-    var check = window.confirm("你确定要删除此好友吗?");
-    if(check){
-      $.post("/api/user/friends/delete",{"uid":uid},function(data){
-        if(data.id == uid){
-          var success = window.confirm("删除成功!");
-          if(success){
+    $(".change_group_verify").click(function(){
+      var des_group = $(".changegroup").val(),g_id;
+      if($(body).find(".group").text(des_group)){
+        g_id = $(this).attr("id");
+        $.post("/api/user/friends/transgroup",{"friend_id":uid,"to_group":g_id},function(data){
+          if(data != ""){
             window.location.reload();
           }
-          window.setTimeout("window.location.reload()",1000);
-        }
-      });
-    }
+        });
+      }else{
+        alert("没有这个分组");
+      };
+    });
   });
   $(".f_index").click(function(){
     var uid = $(this).parent().parent().attr("id");
@@ -338,7 +423,7 @@
   $(".b_index").click(function(){
     var uid = $(this).parent().parent().attr("id");
     var id = window.location.pathname.substr(9);
-    window.location = "/friends/" + id + "?uid=" + uid;
+    window.location = "/home/" + id + "?uid=" + uid;
   });
   $(".b_delete").click(function(){
     var uid = $(this).parent().parent().attr("id");
