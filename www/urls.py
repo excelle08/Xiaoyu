@@ -733,12 +733,19 @@ def api_chat_sendmsg():
 @app.route('/api/chat/recv', methods=['GET', 'POST'])
 def api_chat_recvmsg():
     uid = session['uid']
+    new = request.args['new'] if 'new' in request.args else False
 
     if 'from' in request.args:
         _from = request.args['from']
-        return return_json([i.json for i in api.chat.receive(uid, _from)])
+        return return_json([i.json for i in api.chat.receive(uid, _from, new)])
     else:
-        return return_json([i.json for i in api.chat.receive_all(uid)])
+        return return_json([i.json for i in api.chat.receive_all(uid, new)])
+
+
+@app.route('/api/chat/my', methods=['GET', 'POST'])
+def api_get_my_messages():
+    later_than = request.args['later_than'] if 'later_than' in request.args else 0
+    return return_json([i.json for i in api.chat.get_my_messages(later_than)])
 
 
 # ----------------Utilities--------------------
