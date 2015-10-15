@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN" ng-app="myApp">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>举报系统</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/report.css" rel="stylesheet">
+    <script src="../static/js/jq.js"></script>
+    <script src="../static/js/Jquery.Query.js"></script>
+    <script src="../static/js/dist/lrz.bundle.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" style="background:#356ed6;color:white;margin-bottom:0;">
+      <div class="container row">
+        <div class="col-xs-2 col-md-2" style="padding:0;">
+          <span class="back" ><</span>
+        </div>
+        <div class="col-xs-8 col-md-8" style="text-align:center;">
+          <span class="index_kind">举报系统</span>
+        </div>
+        <div class="col-xs-2 col-md-2 choose">举报</div>
+      </div>
+    </nav>
+    <div class="main">
+      <textarea class="report_con" placeholder="举报内容"></textarea>
+      <button class="report_file_body">添加图片<input type="file" class="report_file_child" ></button>
+      <div class="add_img"><img class="img_" src=""></div>
+    </div>
+  </body>
+  <script type="text/javascript">
+      var alert_h = $(".navbar").height();
+      var alert_t = (alert_h - $(".choose").height())/2;
+      $(".choose").css("margin-top",alert_t);
+      $(".main").css("margin-top",alert_h+10);
+      $(".back").click(function(){
+        window.history.back(-1);
+      });
+      $(".report_file_child").on('change',function(){
+        if(this.files.length === 0) return;
+        var that = $(this);
+        lrz(this.files[0])
+          .then(function(rst){
+          $(".img_").attr("src",rst.base64);
+        })
+        .catch(function(err){
+          alert(err);
+        });
+      });
+      $(".choose").click(function(){
+        var img = $(".img_").attr("src");
+        var content = $(".report_con").val();
+        $.post("/api/abuse_report",{"content":content,"iphoto":img},function(data){
+          if(data != ""){
+            alert("举报信息已上传，请等待工作人员审核");
+            setTimeout("window.location.reload()",500);
+          }
+        });
+      });
+    </script>
+</html>
