@@ -42,3 +42,11 @@
 ###编辑我的墙
 	/compile
 	compile.html
+
+### 查看公告
+	/notification
+	notification.html
+
+### 发布公告（管理员功能）
+	/admin/pub_note
+	pub_note.html

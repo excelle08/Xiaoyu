@@ -196,6 +196,15 @@ def message_center():
     return render_html('message.html')
 
 
+@app.route('/notification', methods=['GET', 'POST'])
+def notification():
+    return render_html('notification.html')
+
+
+@app.route('/admin/pub_note', methods=['GET', 'POST'])
+def admin_publish_nofitication():
+    return render_html('pub_note.html')
+
 ### This is for test.
 ### Will be removed in production mode
 
@@ -756,10 +765,11 @@ def api_abuse_report():
 def api_send_notification():
     try:
         content = request.form['content']
+        title = request.form['title']
     except KeyError, e:
         raise APIError(e.message)
 
-    return Response(api.notify.send_notification(content).json, mimetype='text/json')
+    return Response(api.notify.send_notification(title, content).json, mimetype='text/json')
 
 
 @app.route('/api/admin/notification/delete', methods=['GET', 'POST'])

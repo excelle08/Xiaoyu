@@ -241,6 +241,7 @@ class BlackList(db.Model, Base):
 class Notification(db.Model, Base):
     __tablename__ = 'notification'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column('title', db.Text)
     content = db.Column('content', db.Text)
     read = db.Column('read', db.Boolean)
     created_at = db.Column('created_at', db.Float)
