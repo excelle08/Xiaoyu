@@ -202,7 +202,7 @@ def get_guest_wall_items(uid):
         return initial[:30]
 
     numbers = 7 - initial.__len__()
-    ids = [ item.id for item in Wall.query.filter_by(published=True).order_by(Wall.created_at.desc()).limit(numbers)]
+    ids = [ item.uid for item in Wall.query.filter_by(published=True).order_by(Wall.created_at.desc()).limit(numbers)]
     result = []
 
     for i in ids:
