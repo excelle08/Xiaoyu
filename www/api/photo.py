@@ -10,7 +10,7 @@ accepted_mime = ['image/jpeg', 'image/gif', 'image/png', 'image/tiff']
 suffix = ['jpg', 'gif', 'png', 'tiff']
 
 # imagedata should be a FileStorage object
-def upload_photo(imgdata, args):
+def upload_photo(imgdata, args={}):
     if not isinstance(imgdata, FileStorage):
         raise APIError('Field "imgdata" is supposed to be a FileStorage object')
     if not imgdata.mimetype in accepted_mime:

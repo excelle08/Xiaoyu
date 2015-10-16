@@ -31,7 +31,8 @@ def leave_message(target_user, content, visibility=Visibility.All):
 def reply_message(target_message, content, visibility=Visibility.All):
     if not content:
         raise APIError('回复内容不能为空')
-    if not Message.query.filter_by(id=target_message).first():
+    msg = Message.query.filter(Message.id==target_message).first()
+    if not msg:
         raise APIError('指向的留言不存在')
 
     reply = MessageReply()
@@ -50,7 +51,7 @@ def reply_message(target_message, content, visibility=Visibility.All):
 def get_messages(uid, offset=0, limit=10, later_than=0):
     current_uid = session['uid']
 
-    messages = Message.query.filter(Message.user==uid, Message.created_at>=later_than).all()
+    messages = Message.query.filter(Message.target==uid, Message.created_at>=later_than).all()
     for i in messages:
         if i.visibility == Visibility.Mutual and not (current_uid == i.user or current_uid == i.target):
             messages.remove(i)
