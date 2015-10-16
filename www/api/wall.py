@@ -4,6 +4,7 @@ from model import db
 from model import Wall, User, UserMeta, UserSchool, UserPermission, WallUpvote
 from api import APIError
 import json, time
+from flask import session
 
 
 def user_upwall():
