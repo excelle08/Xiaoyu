@@ -101,6 +101,8 @@ def blockeds_interceptor():
 
     if 'uid' in session:
         user = api.user.get_user(session['uid'])
+        if not user:
+            return
         if user.permission == UserPermission.Blocked:
             for item in blocked_allowed:
                 regex = '^' + item + '$'
