@@ -16,19 +16,21 @@ def user_upwall():
 
     wall = Wall.query.filter_by(uid=uid).first()
     wall.published = True
+    wall.created_at = time.time()
 
     db.session.commit()
 
     return set_my_filter(uid, {})
 
 
-def edit_wall(uid, photo_array, title):
+def edit_wall(uid, cover, title, content):
     if photo_array.__len__() > 8:
         raise APIError('照片不能超过8张')
     wall = Wall.query.filter_by(uid=uid).first()
 
+    wall.cover = cover
     wall.title = title
-    wall.photos = json.dumps(photo_array)
+    wall.content = content
     wall.modified_at = time.time()
     db.session.commit()
     return wall
@@ -199,7 +201,7 @@ def get_guest_wall_items(uid):
         return initial[:30]
 
     numbers = 7 - initial.__len__()
-    ids = [ item.id for item in Wall.query.filter_by(published=True).order_by(Wall.upvotes.desc()).limit(numbers)]
+    ids = [ item.id for item in Wall.query.filter_by(published=True).order_by(Wall.created_at.desc()).limit(numbers)]
     result = []
 
     for i in ids:
