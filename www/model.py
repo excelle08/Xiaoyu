@@ -1,4 +1,4 @@
-c# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from flask.ext.sqlalchemy import SQLAlchemy
 from time import time
