@@ -511,9 +511,10 @@ def api_edit_filter():
 @app.route('/api/wall/edit_wall', methods=['POST'])
 def api_edit_wall():
     uid = session['uid']
-    new_photos = request.form.getlist('photos')
-    new_title = request.form['title']
-    return Response(api.wall.set_my_photos(uid, new_photos, title).json, mimetype='text/json')
+    cover = request.form['cover']
+    title = request.form['title']
+    content = request.form['content']
+    return Response(api.wall.set_my_photos(uid, cover, title, content).json, mimetype='text/json')
 
 
 @app.route('/api/wall/upvote', methods=['GET', 'POST'])
