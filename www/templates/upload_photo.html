@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>上传图片</title>
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+    <link href="../static/css/upload_photo.css" rel="stylesheet">
+    <script src="../static/js/jq.js"></script>
+    <script src="../static/js/dist/lrz.bundle.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" style="background:#356ed6;color:#fff;margin-bottom:0;">
+        <div class="col-xs-3 col-md-3" style="padding:0;">
+          <span class="back" ><</span>
+        </div>
+        <div class="col-xs-6 col-md-6" style="text-align:center;">
+          <span class="index_kind">上传图片</span>
+        </div>
+        <div class="col-xs-3 col-md-3" style="padding:0;">
+          <div class="choose">上传</div>
+        </div>
+    </nav>
+    <div class="equalnav"></div>
+    <div class="alert">每次上传三张图片（个人照）</div>
+    <button class="photo_body">添加图片<input type="file" class="photo_child" ></button>
+    <div class="add_img"></div>
+  </body>
+  <script>
+  var photos = [];
+  var alert_h = $(".navbar").height();
+  var alert_t = (alert_h - $(".choose").height())/2;
+  $(".choose").css("margin-top",alert_t);
+  $(".equalnav").css("height",alert_h);
+  $(".back").click(function(){
+    window.history.back(-1);
+  });
+  $(".photo_child").on('change',function(){
+        if(this.files.length === 0) return;
+        var that = $(this);
+        lrz(this.files[0])
+          .then(function(rst){
+            var img = new Image();
+            img.src = rst.base64;
+            img.onload = function(){
+              $(".add_img").append(img);
+            };
+            photos.push(rst.base64);
+        })
+        .catch(function(err){
+          alert(err);
+        });
+        if($(".add_img>img").length > 1){
+          $(".photo_body").hide();
+        }
+      });
+  $(".choose").click(function(){
+    $.post("/api/",{"photos":photos},function(data){
+      if(data != ""){
+        alert("上传成功");
+      }
+    });
+  });
+  </script>
+</html>
