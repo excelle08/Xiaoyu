@@ -487,7 +487,7 @@ def api_delete_from_blacklist():
 
 
 #    -------------W A L L---------------
-@app.route('/api/wall/go', methods=['POST'])
+@app.route('/api/wall/go', methods=['GET', 'POST'])
 def api_go_to_wall():
     return Response(api.wall.user_upwall().json, mimetype='text/json')
 
@@ -516,7 +516,7 @@ def api_edit_wall():
     cover = request.form['cover']
     title = request.form['title']
     content = request.form['content']
-    return Response(api.wall.set_my_photos(uid, cover, title, content).json, mimetype='text/json')
+    return Response(api.wall.edit_wall(uid, cover, title, content).json, mimetype='text/json')
 
 
 @app.route('/api/wall/upvote', methods=['GET', 'POST'])
@@ -626,7 +626,7 @@ def api_reply_delete():
 def api_upload_photo():
     try:
         photo = request.files['photo']
-        url = api.photo.upload_photo(photo, request.args)
+        url = api.photo.upload_photo(photo, request.form)
         return return_json({'url': url})
     except KeyError, e:
         raise APIError(e.message)

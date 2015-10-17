@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from model import db
-from model import ChatMessage, Friend
+from model import ChatMessage, Friend, BlackList
 from flask import session
 from api import APIError
 import api.friends

@@ -24,14 +24,14 @@ def upload_photo(imgdata, args={}):
     try:
         image = Image.open(name)
         width, height = image.size
-        crop_left = args['crop_left'] if 'crop_left' in args else 0
-        crop_right = args['crop_right'] if 'crop_right' in args else width
-        crop_up = args['crop_up'] if 'crop_up' in args else 0
-        crop_down = args['crop_down'] if 'crop_down' in args else height
+        crop_left = int(args['crop_left']) if 'crop_left' in args else 0
+        crop_right = int(args['crop_right']) if 'crop_right' in args else width
+        crop_up = int(args['crop_up']) if 'crop_up' in args else 0
+        crop_down = height - int(args['crop_down']) if 'crop_down' in args else height
         image = image.crop((crop_left, crop_up, crop_right, crop_down))
 
-        resize_x = args['resize_x'] if 'resize_x' in args else width
-        resize_y = args['resize_y'] if 'resize_y' in args else height
+        resize_x = int(args['resize_x']) if 'resize_x' in args else (crop_right - crop_left)
+        resize_y = int(args['resize_y']) if 'resize_y' in args else (crop_down - crop_up)
         image = image.resize((resize_x, resize_y), Image.BILINEAR)
 
         image.save(name)

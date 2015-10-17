@@ -25,8 +25,7 @@ def user_upwall():
 
 
 def edit_wall(uid, cover, title, content):
-    if photo_array.__len__() > 8:
-        raise APIError('照片不能超过8张')
+
     wall = Wall.query.filter_by(uid=uid).first()
 
     wall.cover = cover
@@ -94,7 +93,10 @@ def get_user_wall(uid):
 
 def upvote_user(uid):
     wall = Wall.query.filter_by(uid=uid).first()
-    wall.upvotes += 1
+    if not wall.upvotes:
+        wall.upvotes = 1
+    else:
+        wall.upvotes += 1
 
     upvote = WallUpvote()
     upvote.uid = uid
@@ -179,21 +181,35 @@ def filter_users(uid):
         uids2 = [ item.uid for item in user_schools ]
     
         # Will only display users on the wall.
-        users_onwall = [ item.uid for item in Wall.query.all() ]
+        users_onwall = [ item.uid for item in Wall.query.filter(Wall.published==1).all() ]
     
         result_ids = list(set.intersection(set(uids), set(uid1), set(uids2), set(users_onwall)))
-    
+
+        if session['uid'] in result_ids:
+            result_ids.remove(session['uid'])
+
         result = []
         for uid in result_ids:
             result.append(UserMeta.query.filter_by(uid=uid).first())
     
         return result
     else:
-        return UserMeta.query.all()
+        users_onwall = [ item.uid for item in Wall.query.filter(Wall.published==1).all() ]
+
+        if session['uid'] in users_onwall:
+            users_onwall.remove(session['uid'])
+
+        result = []
+        for uid in users_onwall:
+            result.append(UserMeta.query.filter_by(uid=uid).first())
+
+        return result
     
 
 def get_guest_wall_items(uid):
     initial = filter_users(uid)
+
+    print initial
 
     if initial.__len__() >= 7 and initial.__len__() <= 30 :
         return initial
@@ -202,7 +218,11 @@ def get_guest_wall_items(uid):
         return initial[:30]
 
     numbers = 7 - initial.__len__()
-    ids = [ item.uid for item in Wall.query.filter_by(published=True).order_by(Wall.created_at.desc()).limit(numbers)]
+    ids = [ item.uid for item in Wall.query.filter(Wall.published==1).order_by(Wall.created_at.desc()).limit(numbers)]
+    if session['uid'] in ids:
+        ids.remove(session['uid'])
+
+    print ids
     result = []
 
     for i in ids:
