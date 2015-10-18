@@ -181,7 +181,7 @@ def filter_users(uid):
         uids2 = [ item.uid for item in user_schools ]
     
         # Will only display users on the wall.
-        users_onwall = [ item.uid for item in Wall.query.filter(Wall.published==1).all() ]
+        users_onwall = [ item.uid for item in Wall.query.all() ]
     
         result_ids = list(set.intersection(set(uids), set(uid1), set(uids2), set(users_onwall)))
 
@@ -194,7 +194,7 @@ def filter_users(uid):
     
         return result
     else:
-        users_onwall = [ item.uid for item in Wall.query.filter(Wall.published==1).all() ]
+        users_onwall = [ item.uid for item in Wall.query.all() ]
 
         if session['uid'] in users_onwall:
             users_onwall.remove(session['uid'])
@@ -217,12 +217,16 @@ def get_guest_wall_items(uid):
     if initial.__len__() > 30:
         return initial[:30]
 
+    for item in initial:
+        w = Wall.query.filter(Wall.uid==item.uid, Wall.published==1).first()
+        if not w:
+            initial.remove(item)
+
     numbers = 7 - initial.__len__()
     ids = [ item.uid for item in Wall.query.filter(Wall.published==1).order_by(Wall.created_at.desc()).limit(numbers)]
     if session['uid'] in ids:
         ids.remove(session['uid'])
 
-    print ids
     result = []
 
     for i in ids:
