@@ -30,11 +30,11 @@ def send(_from, to, content):
     return msg
 
 
-def receive(uid, _from, new):
+def receive(uid, _from, new, offset=0, limit=10):
     if new:
-        messages = ChatMessage.query.filter(ChatMessage._from==_from, ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).all()
+        messages = ChatMessage.query.filter(ChatMessage._from==_from, ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).limit(limit).all()
     else:
-        messages = ChatMessage.query.filter(ChatMessage._from==_from, ChatMessage.to==uid).order_by(ChatMessage.created_at.desc()).all()
+        messages = ChatMessage.query.filter(ChatMessage._from==_from, ChatMessage.to==uid).order_by(ChatMessage.created_at.desc()).limit().all()
 
     for i in messages:
         i.read = True
@@ -43,11 +43,11 @@ def receive(uid, _from, new):
     return messages
 
 
-def receive_all(uid, new):
+def receive_all(uid, new, limit=10):
     if new:
-        messages = ChatMessage.query.filter(ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).all()
+        messages = ChatMessage.query.filter(ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).limit(limit).all()
     else:
-        messages = ChatMessage.query.filter(ChatMessage.to==uid).order_by(ChatMessage.created_at.desc()).all()
+        messages = ChatMessage.query.filter(ChatMessage.to==uid).order_by(ChatMessage.created_at.desc()).limit().all()
 
     for i in messages:
         i.read = True

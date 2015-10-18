@@ -737,12 +737,13 @@ def api_chat_sendmsg():
 def api_chat_recvmsg():
     uid = session['uid']
     new = request.args['new'] if 'new' in request.args else False
+    limit = request.args['limit'] if 'limit' in request.args else 10
 
     if 'from' in request.args:
         _from = request.args['from']
-        return return_json([i.json for i in api.chat.receive(uid, _from, new)])
+        return return_json([i.json for i in api.chat.receive(uid, _from, new, limit=limit)])
     else:
-        return return_json([i.json for i in api.chat.receive_all(uid, new)])
+        return return_json([i.json for i in api.chat.receive_all(uid, new, limit=limit)])
 
 
 @app.route('/api/chat/my', methods=['GET', 'POST'])
