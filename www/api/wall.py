@@ -38,21 +38,21 @@ def edit_wall(uid, cover, title, content):
 
 def set_my_filter(uid, args):
     condition = {
-        'on': args['on'] if 'on' in args else False,
-        'school' : args['school'] if 'school' in args else -1,
-        'degree' : args['degree'] if 'degree' in args else -1,
-        'major' : args['major'] if 'major' in args else -1,
-        'gender' : args['gender'] if 'gender' in args else -1,
-        'age_min' : args['age_min'] if 'age_min' in args else 0,
-        'age_max' : args['age_max'] if 'age_max' in args else 9999,
-        'height_min' : args['height_min'] if 'height_min' in args else 0,
-        'height_max' : args['height_max'] if 'height_max' in args else 9999,
-        'hometown_province' : args['hometown_province'] if 'hometown_province' in args else 0,
-        'hometown_city' : args['hometown_city'] if 'hometown_city' in args else 0,
-        'work_province' : args['work_province'] if 'work_province' in args else 0,
-        'work_city': args['work_city'] if 'work_city' in args else 0,
-        'horoscope': args['horoscope'] if 'horoscope' in args else 0,
-        'last_active': args['last_active'] if 'last_active' in args else 0
+        'on': (args['on']=='1') if 'on' in args else False,
+        'school' : int(args['school']) if 'school' in args else -1,
+        'degree' : int(args['degree']) if 'degree' in args else -1,
+        'major' : int(args['major']) if 'major' in args else -1,
+        'gender' : int(args['gender']) if 'gender' in args else -1,
+        'age_min' : int(args['age_min']) if 'age_min' in args else 0,
+        'age_max' : int(args['age_max']) if 'age_max' in args else 9999,
+        'height_min' : int(args['height_min']) if 'height_min' in args else 0,
+        'height_max' : int(args['height_max']) if 'height_max' in args else 9999,
+        'hometown_province' : int(args['hometown_province']) if 'hometown_province' in args else 0,
+        'hometown_city' : int(args['hometown_city']) if 'hometown_city' in args else 0,
+        'work_province' : int(args['work_province']) if 'work_province' in args else 0,
+        'work_city': int(args['work_city']) if 'work_city' in args else 0,
+        'horoscope': int(args['horoscope']) if 'horoscope' in args else 0,
+        'last_active': int(args['last_active']) if 'last_active' in args else 0
     }
     wall = Wall.query.filter_by(uid=uid).first()
     wall.wall_filter = json.dumps(condition)
@@ -138,19 +138,19 @@ def filter_users(uid):
         if 'gender' in condition and condition['gender'] != -1:
             users_query = users_query.filter(UserMeta.gender == condition['gender'])
     
-        if 'hometown_province' in condition and condition['hometown_province']: 
+        if 'hometown_province' in condition and condition['hometown_province']!=0: 
             users_query = users_query.filter(UserMeta.hometown_province == condition['hometown_province'])
     
-        if condition['hometown_city']:
+        if condition['hometown_city']!=0:
             users_query = users_query.filter(UserMeta.hometown_city == condition['hometown_city'])
     
-        if condition['work_province']:
+        if condition['work_province']!=0:
             users_query = users_query.filter(UserMeta.workplace_province == condition['work_province'])
     
-        if condition['work_city']:
+        if condition['work_city']!=0:
             users_query = users_query.filter(UserMeta.workplace_city == condition['work_city'])
     
-        if condition['horoscope']:
+        if condition['horoscope']!=0:
             users_query = users_query.filter(UserMeta.horoscope == condition['horoscope'])
     
         users = users_query.all()
