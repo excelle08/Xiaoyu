@@ -69,11 +69,12 @@ def get_friends_tweets(offset=0, limit=10, later_than=0):
 
 def get_users_tweets(uid, offset=0, limit=10, later_than=0):
     current_uid = session['uid']
-
+    uid=int(uid)
     friends = [ friend.to for friend in Friend.query.filter(Friend.user==current_uid, Friend.agree==True).all() ]
     tweets = Tweet.query.filter(Tweet.user==uid, Tweet.created_at>=later_than).order_by(Tweet.created_at.desc()).all()
+    print(friends)
     for item in tweets:
-        if item.visibility == Visibility.FriendsOnly and not uid in friends:
+        if item.visibility == Visibility.FriendsOnly and not uid in friends and current_uid != uid:
             tweets.remove(item)
     tweets.sort(key=lambda tweet: tweet.created_at, reverse=True)
 
