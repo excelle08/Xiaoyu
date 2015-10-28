@@ -302,7 +302,7 @@ def api_get_user():
 def api_set_user_online_state():
     try:
         uid = session['uid']
-        status = session['status']
+        status = request.args['status']
     except KeyError, e:
         raise APIError(e.message)
 
