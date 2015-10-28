@@ -217,10 +217,12 @@ def get_guest_wall_items(uid):
     if initial.__len__() > 30:
         return initial[:30]
 
+    items_to_remove = []
     for item in initial:
         w = Wall.query.filter(Wall.uid==item.uid, Wall.published==1).first()
         if not w:
-            initial.remove(item)
+            items_to_remove.append(item)
+    initial = [item for item in initial if not item in items_to_remove]
 
     numbers = 7 - initial.__len__()
     ids = [ item.uid for item in Wall.query.filter(Wall.published==1).order_by(Wall.created_at.desc()).limit(numbers)]

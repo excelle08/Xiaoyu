@@ -52,10 +52,12 @@ def get_messages(uid, offset=0, limit=10, later_than=0):
     current_uid = session['uid']
 
     messages = Message.query.filter(Message.target==uid, Message.created_at>=later_than).all()
+    items_to_remove = []
+
     for i in messages:
         if i.visibility == Visibility.Mutual and not (current_uid == i.user or current_uid == i.target):
-            messages.remove(i)
-
+            items_to_remove.append(i)
+    messages = [item for item in messages if not item in items_to_remove]
     messages.sort(key=lambda msg: msg.created_at)
     return messages[offset: offset+limit]
 
@@ -65,10 +67,12 @@ def get_replies(target_reply, offset=0, limit=10, later_than=0):
 
     message = Message.query.filter_by(id=target_reply).first()
     replies = MessageReply.query.filter(MessageReply.target==target_reply, MessageReply.created_at>=later_than).all()
+    
+    items_to_remove = []
     for i in replies:
         if i.visibility == Visibility.Mutual and not (current_uid == message.user or current_uid == i.user):
-            replies.remove(i)
-
+            items_to_remove.append(i)
+    replies = [item for item in replies if not item in items_to_remove]
     replies.sort(key=lambda reply: reply.created_at)
 
     return replies[offset: offset+limit]

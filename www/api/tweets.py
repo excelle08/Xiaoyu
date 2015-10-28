@@ -72,10 +72,12 @@ def get_users_tweets(uid, offset=0, limit=10, later_than=0):
     uid=int(uid)
     friends = [ friend.to for friend in Friend.query.filter(Friend.user==current_uid, Friend.agree==True).all() ]
     tweets = Tweet.query.filter(Tweet.user==uid, Tweet.created_at>=later_than).order_by(Tweet.created_at.desc()).all()
-    print(friends)
+    
+    items_to_delete = []
     for item in tweets:
         if item.visibility == Visibility.FriendsOnly and not uid in friends and current_uid != uid:
-            tweets.remove(item)
+            items_to_delete.append(item)
+    tweets = [item for item in tweets if not item in items_to_delete]
     tweets.sort(key=lambda tweet: tweet.created_at, reverse=True)
 
     return tweets[offset : offset+limit]
@@ -84,12 +86,20 @@ def get_users_tweets(uid, offset=0, limit=10, later_than=0):
 def get_replies(tweet_id, offset=0, limit=10, later_than=0):
     current_uid = session['uid']
 
+    offset = int(offset)
+    limit = int(limit)
+
     this_tweet = Tweet.query.filter_by(id=tweet_id).first()
     replies = Reply.query.filter(Reply.target==tweet_id, Reply.created_at>=later_than).all()
+
+    items_to_delete = []
+
     for item in replies:
-        if item.visibility == Visibility.Mutual and ( current_uid != item.user or current_uid != this_tweet.user):
-            replies.remove(item)
+        if item.visibility == Visibility.Mutual and ( current_uid != item.user and current_uid != this_tweet.user):
+            items_to_delete.append(item)
             continue
+
+    replies = [item for item in replies if not item in items_to_delete]
     db.session.commit()
     
     return replies[offset: limit+offset]
