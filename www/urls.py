@@ -564,7 +564,7 @@ def api_get_friends_tweets():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
     later_than = request.args['later_than'].strip() if 'later_than' in request.args else 0
-    return return_json(api.tweets.get_friends_tweets(offset, limit, later_than), default=lambda obj: obj.dict)
+    return return_json(api.tweets.get_friends_tweets(int(offset), int(limit), later_than), default=lambda obj: obj.dict)
 
 
 @app.route('/api/tweet/user', methods=['GET', 'POST'])
@@ -577,7 +577,7 @@ def api_get_ones_tweets():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
     later_than = request.args['later_than'].strip() if 'later_than' in request.args else 0
-    return return_json(api.tweets.get_users_tweets(uid, offset, limit, later_than), default=lambda obj:obj.dict)
+    return return_json(api.tweets.get_users_tweets(uid, int(offset), int(limit), later_than), default=lambda obj:obj.dict)
 
 
 @app.route('/api/tweet/reply', methods=['POST'])
@@ -686,7 +686,7 @@ def api_message_get():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
     later_than = request.args['later_than'].strip() if 'later_than' in request.args else 0
-    return return_json(api.message.get_messages(uid, offset, limit, later_than), default=lambda obj: obj.dict)
+    return return_json(api.message.get_messages(uid, int(offset), int(limit), later_than), default=lambda obj: obj.dict)
 
 
 @app.route('/api/message/reply/get', methods=['GET', 'POST'])
@@ -741,9 +741,9 @@ def api_chat_recvmsg():
 
     if 'from' in request.args:
         _from = request.args['from']
-        return return_json([i.json for i in api.chat.receive(uid, _from, new, limit=limit)])
+        return return_json([i.json for i in api.chat.receive(uid, _from, new, limit=int(limit))])
     else:
-        return return_json([i.json for i in api.chat.receive_all(uid, new, limit=limit)])
+        return return_json([i.json for i in api.chat.receive_all(uid, new, limit=int(limit))])
 
 
 @app.route('/api/chat/my', methods=['GET', 'POST'])
