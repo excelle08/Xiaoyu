@@ -627,7 +627,7 @@ def api_upload_photo():
     try:
         photo = request.files['photo']
         url = api.photo.upload_photo(photo, request.form)
-        return return_json({'url': url})
+        return json.dumps({'url': url})
     except KeyError, e:
         raise APIError(e.message)
 
