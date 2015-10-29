@@ -637,7 +637,7 @@ def api_upload_to_album():
     try:
         photo = request.files['photo']
         desc = request.form['desc'] if 'desc' in request.form else ''
-        return Response(api.album.upload_photo(photo, desc, request.args).json, mimetype='text/json')
+        return json.dumps(api.album.upload_photo(photo, desc, request.args).json)
     except KeyError, e:
         raise APIError(e.message)
 
