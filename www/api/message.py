@@ -58,7 +58,7 @@ def get_messages(uid, offset=0, limit=10, later_than=0):
         if i.visibility == Visibility.Mutual and not (current_uid == i.user or current_uid == i.target):
             items_to_remove.append(i)
     messages = [item for item in messages if not item in items_to_remove]
-    messages.sort(key=lambda msg: msg.created_at)
+    messages.sort(key=lambda msg: msg.created_at, reverse=True)
     return messages[offset: offset+limit]
 
 

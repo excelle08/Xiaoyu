@@ -522,7 +522,7 @@ def api_edit_wall():
 @app.route('/api/wall/upvote', methods=['GET', 'POST'])
 def api_upvote_user():
     try:
-        uid = session['uid']
+        uid = request.args['uid'] if 'uid' in request.args else session['uid']
     except KeyError, e:
         raise APIError(e.message)
     return Response(api.wall.upvote_user(uid).json, mimetype='text/json')
@@ -699,7 +699,7 @@ def api_message_reply_get():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
     later_than = request.args['later_than'].strip() if 'later_than' in request.args else 0
-    return return_json(api.message.get_replies(message_id, offset, limit, later_than), default=lambda obj: obj.dict)
+    return return_json(api.message.get_replies(message_id, int(offset), int(limit), later_than), default=lambda obj: obj.dict)
 
 
 @app.route('/api/message/delete', methods=['GET', 'POST'])
@@ -714,7 +714,7 @@ def api_message_delete():
 @app.route('/api/message/reply/delete', methods=['GET', 'POST'])
 def api_message_Reply_delete():
     try:
-        reply_id = request.form['id']
+        reply_id = request.args['id']
         return return_json(api.message.remove_reply(reply_id))
     except KeyError, e:
         raise APIError(e.message)

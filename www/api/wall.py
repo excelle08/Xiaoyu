@@ -99,7 +99,7 @@ def upvote_user(uid):
         wall.upvotes += 1
 
     upvote = WallUpvote()
-    upvote.uid = uid
+    upvote.uid = session['uid']
     upvote.target = wall.uid
     upvote.new = True
     upvote.time = time.time()
@@ -110,7 +110,7 @@ def upvote_user(uid):
 
 
 def get_new_upvotes(uid):
-    upvotes = WallUpvote.query.filter_by(new=True).order_by(WallUpvote.time.desc()).all()
+    upvotes = WallUpvote.query.filter_by(new=True, target=uid).order_by(WallUpvote.time.desc()).all()
     for i in upvotes:
         i.new = False
 
@@ -119,7 +119,7 @@ def get_new_upvotes(uid):
 
 
 def get_all_my_upvotes(uid):
-    return WallUpvote.query.order_by(WallUpvote.time.desc()).all()
+    return WallUpvote.query.filter_by(target=uid).order_by(WallUpvote.time.desc()).all()
 
 
 def filter_users(uid):
