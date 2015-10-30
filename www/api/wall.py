@@ -209,7 +209,9 @@ def filter_users(uid):
 def get_guest_wall_items(uid):
     initial = filter_users(uid)
 
-    print initial
+    self_wall = Wall.query.filter(Wall.uid==session['uid']).first()
+    if self_wall.published == 1:
+        initial.insert(0, UserMeta.query.filter_by(uid=session['uid']).first())
 
     if initial.__len__() >= 7 and initial.__len__() <= 30 :
         return initial
@@ -226,8 +228,8 @@ def get_guest_wall_items(uid):
 
     numbers = 7 - initial.__len__()
     ids = [ item.uid for item in Wall.query.filter(Wall.published==1).order_by(Wall.created_at.desc()).limit(numbers)]
-    if session['uid'] in ids:
-        ids.remove(session['uid'])
+    #if session['uid'] in ids:
+    #    ids.remove(session['uid'])
 
     result = []
 
