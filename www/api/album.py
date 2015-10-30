@@ -33,8 +33,10 @@ def remove_photo(id):
         raise APIError('照片不存在')
     if photo.user != session['uid']:
         raise APIError('不是自己的照片')
-
-    os.remove(photo.url)
+    try:
+        os.remove(photo.url)
+    except Exception:
+        pass
     db.session.delete(photo)
     db.session.commit()
     return {"id": id}
