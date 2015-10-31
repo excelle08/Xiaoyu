@@ -80,7 +80,7 @@ filter_default = {
 
 
 def cancel_wall(uid):
-    wall = Wall.query.filter_by(uid=uid)
+    wall = Wall.query.filter_by(uid=uid).first()
     wid = wall.uid
     wall.published = False
     db.session.commit()
