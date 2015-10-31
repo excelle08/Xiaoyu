@@ -741,15 +741,15 @@ def api_chat_recvmsg():
 
     if 'from' in request.args:
         _from = request.args['from']
-        return return_json([i.json for i in api.chat.receive(uid, _from, new, limit=int(limit))])
+        return return_json([json.loads(i.json) for i in api.chat.receive(uid, _from, new, limit=int(limit))])
     else:
-        return return_json([i.json for i in api.chat.receive_all(uid, new, limit=int(limit))])
+        return return_json([json.loads(i.json) for i in api.chat.receive_all(uid, new, limit=int(limit))])
 
 
 @app.route('/api/chat/my', methods=['GET', 'POST'])
 def api_get_my_messages():
     later_than = request.args['later_than'] if 'later_than' in request.args else 0
-    return return_json([i.json for i in api.chat.get_my_messages(later_than)])
+    return return_json([json.loads(i.json) for i in api.chat.get_my_messages(later_than)])
 
 
 # ----------------Utilities--------------------
