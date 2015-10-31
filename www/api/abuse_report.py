@@ -8,9 +8,9 @@ from api.photo import upload_photo
 import time
 
 
-def report_abuse(_from, photo, content):
+def report_abuse(msg_from, photo, content):
     areport = AbuseReport()
-    areport._from = _from
+    areport.msg_from = msg_from
     areport.photo = upload_photo(photo)
     areport.content = content
     areport.read = False

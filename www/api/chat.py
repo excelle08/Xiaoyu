@@ -8,8 +8,8 @@ import api.friends
 import time, json
 
 
-def send(_from, to, content):
-    f = Friend.query.filter(Friend.user==_from, Friend.to==to).first()
+def send(msg_from, to, content):
+    f = Friend.query.filter(Friend.user==msg_from, Friend.to==to).first()
     if not f:
         raise APIError('非好友关系不能发送信息~')
     bk = BlackList.query.filter()
@@ -18,7 +18,7 @@ def send(_from, to, content):
         raise APIError('您被拉黑，无法发送消息')
 
     msg = ChatMessage()
-    msg._from = _from
+    msg.msg_from = msg_from
     msg.to = to
     msg.message = content
     msg.read = False
@@ -30,16 +30,17 @@ def send(_from, to, content):
     return msg
 
 
-def receive(uid, _from, new, offset=0, limit=10):
+def receive(uid, msg_from, new, offset=0, limit=10):
     if new:
-        messages = ChatMessage.query.filter(ChatMessage._from==_from, ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).limit(limit).all()
+        messages = ChatMessage.query.filter(ChatMessage.msg_from==msg_from, ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).limit(limit).all()
     else:
-        messages = ChatMessage.query.filter(ChatMessage._from==_from, ChatMessage.to==uid).order_by(ChatMessage.created_at.desc()).limit().all()
+        messages = ChatMessage.query.filter(ChatMessage.msg_from==msg_from, ChatMessage.to==uid).order_by(ChatMessage.created_at.desc()).limit().all()
 
     for i in messages:
         i.read = True
 
     db.session.commit()
+
     return messages
 
 
@@ -53,10 +54,12 @@ def receive_all(uid, new, limit=10):
         i.read = True
 
     db.session.commit()
+
     return messages
 
 
 def get_my_messages(later_than=0):
     uid = session['uid']
-    messages = ChatMessage.query.filter(ChatMessage._from == uid, ChatMessage.created_at >= later_than).all()
+    messages = ChatMessage.query.filter(ChatMessage.msg_from == uid, ChatMessage.created_at >= later_than).all()
+    
     return messages;
