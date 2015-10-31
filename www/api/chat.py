@@ -47,7 +47,7 @@ def receive_all(uid, new, limit=10):
     if new:
         messages = ChatMessage.query.filter(ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).limit(limit).all()
     else:
-        messages = ChatMessage.query.filter(ChatMessage.to==uid).order_by(ChatMessage.created_at.desc()).limit().all()
+        messages = ChatMessage.query.filter(ChatMessage.to==uid).order_by(ChatMessage.created_at.desc()).limit(limit).all()
 
     for i in messages:
         i.read = True
