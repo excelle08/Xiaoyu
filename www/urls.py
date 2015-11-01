@@ -264,7 +264,7 @@ def api_user_login():
 @app.route('/api/user/logout', methods=['GET', 'POST'])
 def api_user_logout():
     api.user.user_logout()
-    return redirect(url_for('.index'))
+    return return_json({'status':200})
 
 
 @app.route('/api/user/onlines', methods=['GET', 'POST'])
@@ -767,7 +767,7 @@ def api_abuse_report():
     try:
         uid = session['uid']
         content = request.form['content']
-        photo = request.files['photo']
+        photo = request.form['photo']
     except KeyError, e:
         raise APIError(e.message)
 

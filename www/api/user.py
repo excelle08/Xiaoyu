@@ -28,6 +28,7 @@ def send_message(phone):
 def generate_vcode():
     rand_char = [ chr(random.randint(48, 58)) for i in range(0,4) ]
     rand_char = str.join('', rand_char)
+    rand_char = rand_char.replace(':', '0')
     session['vcode'] = rand_char
     return rand_char
 
@@ -146,26 +147,26 @@ def user_logout():
 
 def get_online_users(offset=0, limit=10):
     users = User.query.filter_by(online=UserStatus.Online).offset(offset).limit(limit).all()
-    filters = set(filter_users(session['uid']))
-    onlines = set([UserMeta.query.filter_by(uid=item.uid).first() for item in users])
-    res = set.intersection(filters, onlines)
-    return list(res)
+    filters = filter_users(session['uid'])
+    onlines = [UserMeta.query.filter_by(uid=item.uid).first() for item in users]
+    res = [user for user in onlines if user in filters]
+    return res
 
 
 def get_recent_logins(offset=0, limit=10):
     users = User.query.order_by(User.last_login.desc()).offset(offset).limit(limit).all()
-    recents = set([ UserMeta.query.filter_by(uid=item.uid).first() for item in users ])
-    filters = set(filter_users(session['uid']))
-    res = set.intersection(filters, recents)
-    return list(res)
+    recents = [ UserMeta.query.filter_by(uid=item.uid).first() for item in users ]
+    filters = filter_users(session['uid'])
+    res = [user for user in recents if user in filters]
+    return res
 
 
 def get_hot_users(offset=0, limit=10):
     walls = Wall.query.order_by(Wall.upvotes.desc()).offset(offset).limit(limit).all()
-    hots = set([ UserMeta.query.filter_by(uid=item.uid).first() for item in walls ])
-    filters = set(filter_users(session['uid']))
-    res = set.intersection(filters, hots)
-    return list(res)
+    hots = [ UserMeta.query.filter_by(uid=item.uid).first() for item in walls ]
+    filters = filter_users(session['uid'])
+    res = [user for user in hots if user in filters]
+    return res
 
 
 def get_user(uid):

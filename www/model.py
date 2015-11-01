@@ -252,7 +252,7 @@ class AbuseReport(db.Model, Base):
     __tablename__ = 'abuse_report'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     msg_from = db.Column('from', db.Integer, nullable=False)
-    photo = db.Column('photo', db.Integer, nullable=False)
+    photo = db.Column('photo', db.Text, nullable=False)
     content = db.Column('content', db.Text)
     read = db.Column('read', db.Boolean)
     created_at = db.Column('created_at', db.Float)

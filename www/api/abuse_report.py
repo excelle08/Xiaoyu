@@ -11,7 +11,7 @@ import time
 def report_abuse(msg_from, photo, content):
     areport = AbuseReport()
     areport.msg_from = msg_from
-    areport.photo = upload_photo(photo)
+    areport.photo = photo
     areport.content = content
     areport.read = False
     areport.created_at = time.time()
