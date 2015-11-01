@@ -473,7 +473,7 @@ def api_add_to_blacklist():
 
 @app.route('/api/user/blacklist/get', methods=['GET', 'POST'])
 def api_get_blacklist():
-    return return_json(api.friends.get_blacklist())
+    return return_json([json.loads(user.json) for user in api.friends.get_blacklist()])
 
 
 @app.route('/api/user/blacklist/delete', methods=['GET', 'POST'])
