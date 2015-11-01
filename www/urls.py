@@ -90,7 +90,7 @@ def user_interceptor():
             break
 
     if not auth_flag:
-        return redirect('/login')
+        return return_json({'error':'你未登录'})
 
 
 @app.before_request

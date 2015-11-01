@@ -78,7 +78,7 @@ def add_friends(target_id, group_id):
     if not User.query.filter_by(uid=target_id).first():
         raise APIError('目标用户不存在')
 
-    if Friend.query.filter(Friend.user==uid, Friend.to==target_id).first():
+    if Friend.query.filter(Friend.user==uid, Friend.to==target_id).first() or Friend.query.filter(Friend.user==target_id, Friend.to==uid).first():
         raise APIError('此人已经是好友')
 
     friend = Friend()
