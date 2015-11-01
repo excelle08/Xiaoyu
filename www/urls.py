@@ -311,8 +311,11 @@ def api_set_user_online_state():
 
 @app.route('/api/user/meta', methods=['GET', 'POST'])
 def api_get_user_meta():
+    from model import User
     uid = request.args['uid'].strip() if "uid" in request.args else session['uid']
-    return Response(api.user.get_user_meta(uid).json, mimetype='text/json')
+    userMeta = json.loads(api.user.get_user_meta(uid).json)
+    userMeta['online'] = User.query.filter_by(uid=uid).first().online
+    return return_json(userMeta)
 
 
 @app.route('/api/user/ext', methods=['GET', 'POST'])
