@@ -32,12 +32,13 @@ def send(msg_from, to, content):
 
 def receive(uid, msg_from, new, offset=0, limit=10):
     if new:
-        messages = ChatMessage.query.filter(and_(or_(and_(ChatMessage.msg_from==msg_from , ChatMessage.to==uid) , and_(ChatMessage.msg_from==uid , ChatMessage.to==msg_from)), (ChatMessage.read==False))).order_by(ChatMessage.created_at.desc()).limit(limit).all()
+        messages = ChatMessage.query.filter(ChatMessage.msg_from==msg_from, ChatMessage.to==uid, ChatMessage.read==False).order_by(ChatMessage.created_at.desc()).limit(limit).all()
     else:
         messages = ChatMessage.query.filter(or_(and_(ChatMessage.msg_from==msg_from , ChatMessage.to==uid), and_(ChatMessage.msg_from==uid , ChatMessage.to==msg_from))).order_by(ChatMessage.created_at.desc()).limit(limit).all()
 
     for i in messages:
-        i.read = True
+        if (i.to == uid):
+            i.read = True
 
     db.session.commit()
 
