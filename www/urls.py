@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, Response
-from flask import jsonify, session, request
+from flask import jsonify, session, request, jsonify
 from flask import render_template, make_response
 from flask import redirect, url_for
 from api import APIError, check_admin
@@ -844,3 +844,23 @@ def get_school():
 @app.route('/api/common/major', methods=['GET', 'POST'])
 def get_major():
     return return_json(api.common.get_majors())
+
+#############################################################
+##########  TEST admin API goes here#########################
+##########  Remove code below later #########################
+TEST_ADMIN_PASSWORD = 'xiaoyuadmin2015'
+
+@app.route('/api/test/manage/users', methods=['POST'])
+def test_admin_get_all_users():
+    if (request.form['password'] != TEST_ADMIN_PASSWORD):
+        return return_json({'error':'Invalid password.'})
+    from model import UserMeta
+    all_users_raw = UserMeta.query.all()
+    all_users = [ json.loads(user.json) for user in all_users_raw]
+    return return_json(all_users)
+
+@app.route('/api/test/manage/pass_user', methods=['POST'])
+def test_admin_pass_user_school_info():
+    if (request.form['password'] != TEST_ADMIN_PASSWORD):
+        return return_json({'error':'Invalid password.'})
+    return return_json(json.loads(api.user.pass_user_school(int(request.form['uid'])).json))
