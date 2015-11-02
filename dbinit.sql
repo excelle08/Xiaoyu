@@ -1,3791 +1,4238 @@
+-- phpMyAdmin SQL Dump
+-- version 4.5.0.2
+-- http://www.phpmyadmin.net
+--
+-- Host: localhost
+-- Generation Time: 2015-11-02 11:24:58
+-- 服务器版本： 10.0.21-MariaDB-log
+-- PHP Version: 5.6.14
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `xiaoyu`
+--
 drop database if exists xiaoyu;
 
 create database xiaoyu;
 
 use xiaoyu;
-# Login status: Online, offline, hide to friends, hide to strangers, hide to all
-create table user (
-    `uid` INT(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `phonenum` varchar(32) not null,
-    `password` varchar(32) not null,
-    `permission` tinyint(1),
-    `online` tinyint(2), 
-    `created_at` real,
-    `last_login` real
-) engine=innodb default charset=utf8;
+-- --------------------------------------------------------
 
-create table user_school (
-    `uid` int(10) not null primary key,
-    `school_name` text,
-    `degree` int(9),
-    `major` int(9),
-    `school_id` int(10),
-    `school_province` int(10),
-    `school_city` int(10),
-    `auth_photo` text,
-    `pass` boolean 
-) engine=innodb default charset=utf8;
+--
+-- 表的结构 `abuse_report`
+--
 
-create table user_meta (
-    `uid` int(10) not null primary key,
-    `nickname` varchar(32),
-    `realname` varchar(32),
-    `avatar` text,
-    `small_avatar` text,
-    `gender` tinyint(2),
-    `age` tinyint(3),
-    `height` real,
-    `birthday` real,
-    `horoscope` tinyint(3),
-    `hometown_province` int(9), 
-    `hometown_city` int(9),
-    `hometown_addr` text,
-    `workplace_province` int(9),
-    `workplace_city` int(9),
-    `workplace_addr` text,
-    `contact` text,
-    `motto` text,
-	`show_name` boolean,
-	`show_contact` boolean
-) engine=innodb default charset=utf8;
+CREATE TABLE `abuse_report` (
+  `id` int(10) NOT NULL,
+  `from` int(11) NOT NULL,
+  `photo` text NOT NULL,
+  `content` text,
+  `read` tinyint(1) DEFAULT NULL,
+  `created_at` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-# JSON key-value data
-create table user_ext (
-    `uid` int(10) not null primary key,
-    `content` text  
-) engine=innodb default charset=utf8;
+--
+-- 转存表中的数据 `abuse_report`
+--
 
-create table wall (
-    `uid` int(10) not null primary key,
-    `cover` text, 
-    `title` text,
-    `content` text,
-    `filter` text,
-    `upvotes` int(10),
-    `created_at` real,
-    `modified_at` real,
-    `published` boolean
-);
+INSERT INTO `abuse_report` (`id`, `from`, `photo`, `content`, `read`, `created_at`) VALUES
+(6, 3, 'static/upload/b6479fbfd69461b19dfa69e621eeab6a.jpg', '{"content":"他竟然在公众场合说我帅，最烦这种人了","target_uid":4}', 0, 1446403069.474836);
 
-create table wallupvotes (
-    `id` int(10) not null primary key auto_increment,
-    `uid` int(10),
-    `target` int(10),
-    `new` boolean,
-    `time` real
-);
+-- --------------------------------------------------------
 
-create table photos (
-    `id` int(10) not null primary key auto_increment,
-    `user` int(10) not null,
-    `url` text,
-    `desc` text,
-    `created_at` real
-) engine=innodb default charset=utf8;
+--
+-- 表的结构 `blacklist`
+--
 
-create table tweets (
-    `id` int(10) not null primary key auto_increment,
-    `user` int(10) not null,
-    `content` text,
-    `visibility` tinyint(2),
-    `photos` text,
-    `read` boolean,
-    `created_at` real
-) engine=innodb default charset=utf8;
+CREATE TABLE `blacklist` (
+  `id` int(10) NOT NULL,
+  `user` int(10) NOT NULL,
+  `to` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-create table replies (
-    `id` int(10) not null primary key auto_increment,
-    `user` int(10) not null,
-    `target` int(10) not null,
-    `content` text,
-    `visibility` tinyint(2),
-    `read` boolean,
-    `created_at` real
-) engine=innodb default charset=utf8;
+-- --------------------------------------------------------
 
-create table messages (
-    `id` int(10) not null primary key auto_increment,
-    `user` int(10) not null,
-    `target` int(10) not null,
-    `content` text,
-    `visibility` tinyint(2),
-    `read` boolean,
-    `created_at` real
-) engine=innodb default charset=utf8;
+--
+-- 表的结构 `chatmsg`
+--
 
-create table msgreplies (
-    `id` int(10) not null primary key auto_increment,
-    `user` int(10) not null,
-    `target` int(10) not null,
-    `content` text,
-    `visibility` tinyint(2),
-    `read` boolean,
-    `created_at` real
-) engine=innodb default charset=utf8;
+CREATE TABLE `chatmsg` (
+  `id` int(10) NOT NULL,
+  `from` int(10) NOT NULL,
+  `to` int(10) NOT NULL,
+  `message` text,
+  `read` tinyint(1) DEFAULT NULL,
+  `created_at` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-create table chatmsg (
-    `id` int(10) not null primary key auto_increment,
-    `from` int(10) not null,
-    `to` int(10) not null,
-    `message` text,
-    `read` boolean,
-    `created_at` real
-) engine=innodb default charset=utf8;
+-- --------------------------------------------------------
 
-create table friends (
-    `id` int(10) not null primary key auto_increment,
-    `user` int(10) not null,
-    `to` int(10) not null,
-    `group` tinyint(2),
-    `agree` boolean
-) engine=innodb default charset=utf8;
-# A json array.
-create table friend_group (
-    `user` int(10) not null primary key,
-    `content` text  
-) engine=innodb default charset=utf8;
+--
+-- 表的结构 `city`
+--
 
-create table blacklist (
-    `id` int(10) not null primary key auto_increment,
-    `user` int(10) not null,
-    `to` int(10) not null
-) engine=innodb default charset=utf8;
+CREATE TABLE `city` (
+  `id` int(9) NOT NULL,
+  `index` int(9) DEFAULT NULL,
+  `province` int(9) NOT NULL,
+  `name` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-create table notification (
-    `id` int(10) not null primary key auto_increment,
-    `title` text,
-    `content` text,
-    `read` boolean,
-    `created_at` real
-) engine=innodb default charset=utf8;
+--
+-- 转存表中的数据 `city`
+--
 
-create table abuse_report (
-    `id` int(10) not null primary key auto_increment,
-    `from` int(10) not null,
-    `content` text,
-    `photo` text,
-    `read` boolean,
-    `created_at` real
-) engine=innodb default charset=utf8;
+INSERT INTO `city` (`id`, `index`, `province`, `name`) VALUES
+(1, 1, 1, '北京市'),
+(2, 1, 2, '天津市'),
+(3, 1, 3, '上海市'),
+(4, 1, 4, '重庆市'),
+(5, 1, 5, '石家庄市'),
+(6, 2, 5, '唐山市'),
+(7, 3, 5, '秦皇岛市'),
+(8, 4, 5, '邯郸市'),
+(9, 5, 5, '邢台市'),
+(10, 6, 5, '保定市'),
+(11, 7, 5, '张家口市'),
+(12, 8, 5, '承德市'),
+(13, 9, 5, '沧州市'),
+(14, 10, 5, '廊坊市'),
+(15, 11, 5, '衡水市'),
+(16, 1, 6, '太原市'),
+(17, 2, 6, '大同市'),
+(18, 3, 6, '阳泉市'),
+(19, 4, 6, '长治市'),
+(20, 5, 6, '晋城市'),
+(21, 6, 6, '朔州市'),
+(22, 7, 6, '晋中市'),
+(23, 8, 6, '运城市'),
+(24, 9, 6, '忻州市'),
+(25, 10, 6, '临汾市'),
+(26, 11, 6, '吕梁市'),
+(27, 1, 7, '台北市'),
+(28, 2, 7, '高雄市'),
+(29, 3, 7, '基隆市'),
+(30, 4, 7, '台中市'),
+(31, 5, 7, '台南市'),
+(32, 6, 7, '新竹市'),
+(33, 7, 7, '嘉义市'),
+(34, 8, 7, '台北县'),
+(35, 9, 7, '宜兰县'),
+(36, 10, 7, '桃园县'),
+(37, 11, 7, '新竹县'),
+(38, 12, 7, '苗栗县'),
+(39, 13, 7, '台中县'),
+(40, 14, 7, '彰化县'),
+(41, 15, 7, '南投县'),
+(42, 16, 7, '云林县'),
+(43, 17, 7, '嘉义县'),
+(44, 18, 7, '台南县'),
+(45, 19, 7, '高雄县'),
+(46, 20, 7, '屏东县'),
+(47, 21, 7, '澎湖县'),
+(48, 22, 7, '台东县'),
+(49, 23, 7, '花莲县'),
+(50, 1, 8, '沈阳市'),
+(51, 2, 8, '大连市'),
+(52, 3, 8, '鞍山市'),
+(53, 4, 8, '抚顺市'),
+(54, 5, 8, '本溪市'),
+(55, 6, 8, '丹东市'),
+(56, 7, 8, '锦州市'),
+(57, 8, 8, '营口市'),
+(58, 9, 8, '阜新市'),
+(59, 10, 8, '辽阳市'),
+(60, 11, 8, '盘锦市'),
+(61, 12, 8, '铁岭市'),
+(62, 13, 8, '朝阳市'),
+(63, 14, 8, '葫芦岛市'),
+(64, 1, 9, '长春市'),
+(65, 2, 9, '吉林市'),
+(66, 3, 9, '四平市'),
+(67, 4, 9, '辽源市'),
+(68, 5, 9, '通化市'),
+(69, 6, 9, '白山市'),
+(70, 7, 9, '松原市'),
+(71, 8, 9, '白城市'),
+(72, 9, 9, '延边朝鲜族自治州'),
+(73, 1, 10, '哈尔滨市'),
+(74, 2, 10, '齐齐哈尔市'),
+(75, 3, 10, '鹤岗市'),
+(76, 4, 10, '双鸭山市'),
+(77, 5, 10, '鸡西市'),
+(78, 6, 10, '大庆市'),
+(79, 7, 10, '伊春市'),
+(80, 8, 10, '牡丹江市'),
+(81, 9, 10, '佳木斯市'),
+(82, 10, 10, '七台河市'),
+(83, 11, 10, '黑河市'),
+(84, 12, 10, '绥化市'),
+(85, 13, 10, '大兴安岭地区'),
+(86, 1, 11, '南京市'),
+(87, 2, 11, '无锡市'),
+(88, 3, 11, '徐州市'),
+(89, 4, 11, '常州市'),
+(90, 5, 11, '苏州市'),
+(91, 6, 11, '南通市'),
+(92, 7, 11, '连云港市'),
+(93, 8, 11, '淮安市'),
+(94, 9, 11, '盐城市'),
+(95, 10, 11, '扬州市'),
+(96, 11, 11, '镇江市'),
+(97, 12, 11, '泰州市'),
+(98, 13, 11, '宿迁市'),
+(99, 1, 12, '杭州市'),
+(100, 2, 12, '宁波市'),
+(101, 3, 12, '温州市'),
+(102, 4, 12, '嘉兴市'),
+(103, 5, 12, '湖州市'),
+(104, 6, 12, '绍兴市'),
+(105, 7, 12, '金华市'),
+(106, 8, 12, '衢州市'),
+(107, 9, 12, '舟山市'),
+(108, 10, 12, '台州市'),
+(109, 11, 12, '丽水市'),
+(110, 1, 13, '合肥市'),
+(111, 2, 13, '芜湖市'),
+(112, 3, 13, '蚌埠市'),
+(113, 4, 13, '淮南市'),
+(114, 5, 13, '马鞍山市'),
+(115, 6, 13, '淮北市'),
+(116, 7, 13, '铜陵市'),
+(117, 8, 13, '安庆市'),
+(118, 9, 13, '黄山市'),
+(119, 10, 13, '滁州市'),
+(120, 11, 13, '阜阳市'),
+(121, 12, 13, '宿州市'),
+(122, 13, 13, '巢湖市'),
+(123, 14, 13, '六安市'),
+(124, 15, 13, '亳州市'),
+(125, 16, 13, '池州市'),
+(126, 17, 13, '宣城市'),
+(127, 1, 14, '福州市'),
+(128, 2, 14, '厦门市'),
+(129, 3, 14, '莆田市'),
+(130, 4, 14, '三明市'),
+(131, 5, 14, '泉州市'),
+(132, 6, 14, '漳州市'),
+(133, 7, 14, '南平市'),
+(134, 8, 14, '龙岩市'),
+(135, 9, 14, '宁德市'),
+(136, 1, 15, '南昌市'),
+(137, 2, 15, '景德镇市'),
+(138, 3, 15, '萍乡市'),
+(139, 4, 15, '九江市'),
+(140, 5, 15, '新余市'),
+(141, 6, 15, '鹰潭市'),
+(142, 7, 15, '赣州市'),
+(143, 8, 15, '吉安市'),
+(144, 9, 15, '宜春市'),
+(145, 10, 15, '抚州市'),
+(146, 11, 15, '上饶市'),
+(147, 1, 16, '济南市'),
+(148, 2, 16, '青岛市'),
+(149, 3, 16, '淄博市'),
+(150, 4, 16, '枣庄市'),
+(151, 5, 16, '东营市'),
+(152, 6, 16, '烟台市'),
+(153, 7, 16, '潍坊市'),
+(154, 8, 16, '济宁市'),
+(155, 9, 16, '泰安市'),
+(156, 10, 16, '威海市'),
+(157, 11, 16, '日照市'),
+(158, 12, 16, '莱芜市'),
+(159, 13, 16, '临沂市'),
+(160, 14, 16, '德州市'),
+(161, 15, 16, '聊城市'),
+(162, 16, 16, '滨州市'),
+(163, 17, 16, '菏泽市'),
+(164, 1, 17, '郑州市'),
+(165, 2, 17, '开封市'),
+(166, 3, 17, '洛阳市'),
+(167, 4, 17, '平顶山市'),
+(168, 5, 17, '安阳市'),
+(169, 6, 17, '鹤壁市'),
+(170, 7, 17, '新乡市'),
+(171, 8, 17, '焦作市'),
+(172, 9, 17, '濮阳市'),
+(173, 10, 17, '许昌市'),
+(174, 11, 17, '漯河市'),
+(175, 12, 17, '三门峡市'),
+(176, 13, 17, '南阳市'),
+(177, 14, 17, '商丘市'),
+(178, 15, 17, '信阳市'),
+(179, 16, 17, '周口市'),
+(180, 17, 17, '驻马店市'),
+(181, 18, 17, '济源市'),
+(182, 1, 18, '武汉市'),
+(183, 2, 18, '黄石市'),
+(184, 3, 18, '十堰市'),
+(185, 4, 18, '荆州市'),
+(186, 5, 18, '宜昌市'),
+(187, 6, 18, '襄樊市'),
+(188, 7, 18, '鄂州市'),
+(189, 8, 18, '荆门市'),
+(190, 9, 18, '孝感市'),
+(191, 10, 18, '黄冈市'),
+(192, 11, 18, '咸宁市'),
+(193, 12, 18, '随州市'),
+(194, 13, 18, '仙桃市'),
+(195, 14, 18, '天门市'),
+(196, 15, 18, '潜江市'),
+(197, 16, 18, '神农架林区'),
+(198, 17, 18, '恩施土家族苗族自治州'),
+(199, 1, 19, '长沙市'),
+(200, 2, 19, '株洲市'),
+(201, 3, 19, '湘潭市'),
+(202, 4, 19, '衡阳市'),
+(203, 5, 19, '邵阳市'),
+(204, 6, 19, '岳阳市'),
+(205, 7, 19, '常德市'),
+(206, 8, 19, '张家界市'),
+(207, 9, 19, '益阳市'),
+(208, 10, 19, '郴州市'),
+(209, 11, 19, '永州市'),
+(210, 12, 19, '怀化市'),
+(211, 13, 19, '娄底市'),
+(212, 14, 19, '湘西土家族苗族自治州'),
+(213, 1, 20, '广州市'),
+(214, 2, 20, '深圳市'),
+(215, 3, 20, '珠海市'),
+(216, 4, 20, '汕头市'),
+(217, 5, 20, '韶关市'),
+(218, 6, 20, '佛山市'),
+(219, 7, 20, '江门市'),
+(220, 8, 20, '湛江市'),
+(221, 9, 20, '茂名市'),
+(222, 10, 20, '肇庆市'),
+(223, 11, 20, '惠州市'),
+(224, 12, 20, '梅州市'),
+(225, 13, 20, '汕尾市'),
+(226, 14, 20, '河源市'),
+(227, 15, 20, '阳江市'),
+(228, 16, 20, '清远市'),
+(229, 17, 20, '东莞市'),
+(230, 18, 20, '中山市'),
+(231, 19, 20, '潮州市'),
+(232, 20, 20, '揭阳市'),
+(233, 21, 20, '云浮市'),
+(234, 1, 21, '兰州市'),
+(235, 2, 21, '金昌市'),
+(236, 3, 21, '白银市'),
+(237, 4, 21, '天水市'),
+(238, 5, 21, '嘉峪关市'),
+(239, 6, 21, '武威市'),
+(240, 7, 21, '张掖市'),
+(241, 8, 21, '平凉市'),
+(242, 9, 21, '酒泉市'),
+(243, 10, 21, '庆阳市'),
+(244, 11, 21, '定西市'),
+(245, 12, 21, '陇南市'),
+(246, 13, 21, '临夏回族自治州'),
+(247, 14, 21, '甘南藏族自治州'),
+(248, 1, 22, '成都市'),
+(249, 2, 22, '自贡市'),
+(250, 3, 22, '攀枝花市'),
+(251, 4, 22, '泸州市'),
+(252, 5, 22, '德阳市'),
+(253, 6, 22, '绵阳市'),
+(254, 7, 22, '广元市'),
+(255, 8, 22, '遂宁市'),
+(256, 9, 22, '内江市'),
+(257, 10, 22, '乐山市'),
+(258, 11, 22, '南充市'),
+(259, 12, 22, '眉山市'),
+(260, 13, 22, '宜宾市'),
+(261, 14, 22, '广安市'),
+(262, 15, 22, '达州市'),
+(263, 16, 22, '雅安市'),
+(264, 17, 22, '巴中市'),
+(265, 18, 22, '资阳市'),
+(266, 19, 22, '阿坝藏族羌族自治州'),
+(267, 20, 22, '甘孜藏族自治州'),
+(268, 21, 22, '凉山彝族自治州'),
+(269, 1, 23, '贵阳市'),
+(270, 2, 23, '六盘水市'),
+(271, 3, 23, '遵义市'),
+(272, 4, 23, '安顺市'),
+(273, 5, 23, '铜仁地区'),
+(274, 6, 23, '毕节地区'),
+(275, 7, 23, '黔西南布依族苗族自治州'),
+(276, 8, 23, '黔东南苗族侗族自治州'),
+(277, 9, 23, '黔南布依族苗族自治州'),
+(278, 1, 24, '海口市'),
+(279, 2, 24, '三亚市'),
+(280, 3, 24, '五指山市'),
+(281, 4, 24, '琼海市'),
+(282, 5, 24, '儋州市'),
+(283, 6, 24, '文昌市'),
+(284, 7, 24, '万宁市'),
+(285, 8, 24, '东方市'),
+(286, 9, 24, '澄迈县'),
+(287, 10, 24, '定安县'),
+(288, 11, 24, '屯昌县'),
+(289, 12, 24, '临高县'),
+(290, 13, 24, '白沙黎族自治县'),
+(291, 14, 24, '昌江黎族自治县'),
+(292, 15, 24, '乐东黎族自治县'),
+(293, 16, 24, '陵水黎族自治县'),
+(294, 17, 24, '保亭黎族苗族自治县'),
+(295, 18, 24, '琼中黎族苗族自治县'),
+(296, 1, 25, '昆明市'),
+(297, 2, 25, '曲靖市'),
+(298, 3, 25, '玉溪市'),
+(299, 4, 25, '保山市'),
+(300, 5, 25, '昭通市'),
+(301, 6, 25, '丽江市'),
+(302, 7, 25, '思茅市'),
+(303, 8, 25, '临沧市'),
+(304, 9, 25, '文山壮族苗族自治州'),
+(305, 10, 25, '红河哈尼族彝族自治州'),
+(306, 11, 25, '西双版纳傣族自治州'),
+(307, 12, 25, '楚雄彝族自治州'),
+(308, 13, 25, '大理白族自治州'),
+(309, 14, 25, '德宏傣族景颇族自治州'),
+(310, 15, 25, '怒江傈傈族自治州'),
+(311, 16, 25, '迪庆藏族自治州'),
+(312, 1, 26, '西宁市'),
+(313, 2, 26, '海东地区'),
+(314, 3, 26, '海北藏族自治州'),
+(315, 4, 26, '黄南藏族自治州'),
+(316, 5, 26, '海南藏族自治州'),
+(317, 6, 26, '果洛藏族自治州'),
+(318, 7, 26, '玉树藏族自治州'),
+(319, 8, 26, '海西蒙古族藏族自治州'),
+(320, 1, 27, '西安市'),
+(321, 2, 27, '铜川市'),
+(322, 3, 27, '宝鸡市'),
+(323, 4, 27, '咸阳市'),
+(324, 5, 27, '渭南市'),
+(325, 6, 27, '延安市'),
+(326, 7, 27, '汉中市'),
+(327, 8, 27, '榆林市'),
+(328, 9, 27, '安康市'),
+(329, 10, 27, '商洛市'),
+(330, 1, 28, '南宁市'),
+(331, 2, 28, '柳州市'),
+(332, 3, 28, '桂林市'),
+(333, 4, 28, '梧州市'),
+(334, 5, 28, '北海市'),
+(335, 6, 28, '防城港市'),
+(336, 7, 28, '钦州市'),
+(337, 8, 28, '贵港市'),
+(338, 9, 28, '玉林市'),
+(339, 10, 28, '百色市'),
+(340, 11, 28, '贺州市'),
+(341, 12, 28, '河池市'),
+(342, 13, 28, '来宾市'),
+(343, 14, 28, '崇左市'),
+(344, 1, 29, '拉萨市'),
+(345, 2, 29, '那曲地区'),
+(346, 3, 29, '昌都地区'),
+(347, 4, 29, '山南地区'),
+(348, 5, 29, '日喀则地区'),
+(349, 6, 29, '阿里地区'),
+(350, 7, 29, '林芝地区'),
+(351, 1, 30, '银川市'),
+(352, 2, 30, '石嘴山市'),
+(353, 3, 30, '吴忠市'),
+(354, 4, 30, '固原市'),
+(355, 5, 30, '中卫市'),
+(356, 1, 31, '乌鲁木齐市'),
+(357, 2, 31, '克拉玛依市'),
+(358, 3, 31, '石河子市　'),
+(359, 4, 31, '阿拉尔市'),
+(360, 5, 31, '图木舒克市'),
+(361, 6, 31, '五家渠市'),
+(362, 7, 31, '吐鲁番市'),
+(363, 8, 31, '阿克苏市'),
+(364, 9, 31, '喀什市'),
+(365, 10, 31, '哈密市'),
+(366, 11, 31, '和田市'),
+(367, 12, 31, '阿图什市'),
+(368, 13, 31, '库尔勒市'),
+(369, 14, 31, '昌吉市　'),
+(370, 15, 31, '阜康市'),
+(371, 16, 31, '米泉市'),
+(372, 17, 31, '博乐市'),
+(373, 18, 31, '伊宁市'),
+(374, 19, 31, '奎屯市'),
+(375, 20, 31, '塔城市'),
+(376, 21, 31, '乌苏市'),
+(377, 22, 31, '阿勒泰市'),
+(378, 1, 32, '呼和浩特市'),
+(379, 2, 32, '包头市'),
+(380, 3, 32, '乌海市'),
+(381, 4, 32, '赤峰市'),
+(382, 5, 32, '通辽市'),
+(383, 6, 32, '鄂尔多斯市'),
+(384, 7, 32, '呼伦贝尔市'),
+(385, 8, 32, '巴彦淖尔市'),
+(386, 9, 32, '乌兰察布市'),
+(387, 10, 32, '锡林郭勒盟'),
+(388, 11, 32, '兴安盟'),
+(389, 12, 32, '阿拉善盟'),
+(390, 1, 33, '澳门特别行政区'),
+(391, 1, 34, '香港特别行政区');
 
-create table license (
-    `id` int(9) not null primary key auto_increment,
-    `content` text
-) engine=innodb default charset=utf8;
+-- --------------------------------------------------------
 
-create table horoscope (
-    `id` int(9) not null primary key auto_increment,
-    `name` text,
-    `desc` text
-) engine=innodb default charset=utf8;
+--
+-- 表的结构 `friends`
+--
 
-create table province (
-    `id` int(9) not null primary key auto_increment,
-    `name` text
-) engine=innodb default charset=utf8;
+CREATE TABLE `friends` (
+  `id` int(10) NOT NULL,
+  `user` int(10) NOT NULL,
+  `to` int(10) NOT NULL,
+  `group` tinyint(2) DEFAULT NULL,
+  `agree` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-create table city (
-    `id` int(9) not null primary key auto_increment,
-    `index` int(9),
-    `province` int(9) not null,
-    `name` text
-) engine=innodb default charset=utf8;
+-- --------------------------------------------------------
 
-create table school (
-    `id` int(9) not null primary key auto_increment,
-    `name` text,
-    `location` text,
-    `type` text,
-    `properties` text
-) engine=innodb default charset=utf8;
+--
+-- 表的结构 `friend_group`
+--
 
-create table major (
-    `id` int(9) not null primary key,
-    `name` text
-) engine=innodb default charset=utf8;
+CREATE TABLE `friend_group` (
+  `user` int(10) NOT NULL,
+  `content` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-create table pageview (
-    `id` int(10) not null primary key auto_increment,
-    `user` int(10),
-    `path` text,
-    `ip_addr` text,
-    `time` real
-) engine=innodb default charset=utf8;
+-- --------------------------------------------------------
 
-INSERT INTO `horoscope` VALUES (1, '白羊座', '');
-INSERT INTO `horoscope` VALUES (2, '金牛座', '');
-INSERT INTO `horoscope` VALUES (3, '双子座', '');
-INSERT INTO `horoscope` VALUES (4, '巨蟹座', '');
-INSERT INTO `horoscope` VALUES (5, '狮子座', '');
-INSERT INTO `horoscope` VALUES (6, '处女座', '');
-INSERT INTO `horoscope` VALUES (7, '天秤座', '');
-INSERT INTO `horoscope` VALUES (8, '天蝎座', '');
-INSERT INTO `horoscope` VALUES (9, '射手座', '');
-INSERT INTO `horoscope` VALUES (10, '摩羯座', '');
-INSERT INTO `horoscope` VALUES (11, '水瓶座', '');
-INSERT INTO `horoscope` VALUES (12, '双鱼座', '');
+--
+-- 表的结构 `horoscope`
+--
 
-INSERT INTO `province` VALUES ('1', '北京市');
-INSERT INTO `province` VALUES ('2', '天津市');
-INSERT INTO `province` VALUES ('3', '上海市');
-INSERT INTO `province` VALUES ('4', '重庆市');
-INSERT INTO `province` VALUES ('5', '河北省');
-INSERT INTO `province` VALUES ('6', '山西省');
-INSERT INTO `province` VALUES ('7', '台湾省');
-INSERT INTO `province` VALUES ('8', '辽宁省');
-INSERT INTO `province` VALUES ('9', '吉林省');
-INSERT INTO `province` VALUES ('10', '黑龙江省');
-INSERT INTO `province` VALUES ('11', '江苏省');
-INSERT INTO `province` VALUES ('12', '浙江省');
-INSERT INTO `province` VALUES ('13', '安徽省');
-INSERT INTO `province` VALUES ('14', '福建省');
-INSERT INTO `province` VALUES ('15', '江西省');
-INSERT INTO `province` VALUES ('16', '山东省');
-INSERT INTO `province` VALUES ('17', '河南省');
-INSERT INTO `province` VALUES ('18', '湖北省');
-INSERT INTO `province` VALUES ('19', '湖南省');
-INSERT INTO `province` VALUES ('20', '广东省');
-INSERT INTO `province` VALUES ('21', '甘肃省');
-INSERT INTO `province` VALUES ('22', '四川省');
-INSERT INTO `province` VALUES ('23', '贵州省');
-INSERT INTO `province` VALUES ('24', '海南省');
-INSERT INTO `province` VALUES ('25', '云南省');
-INSERT INTO `province` VALUES ('26', '青海省');
-INSERT INTO `province` VALUES ('27', '陕西省');
-INSERT INTO `province` VALUES ('28', '广西壮族自治区');
-INSERT INTO `province` VALUES ('29', '西藏自治区');
-INSERT INTO `province` VALUES ('30', '宁夏回族自治区');
-INSERT INTO `province` VALUES ('31', '新疆维吾尔自治区');
-INSERT INTO `province` VALUES ('32', '内蒙古自治区');
-INSERT INTO `province` VALUES ('33', '澳门特别行政区');
-INSERT INTO `province` VALUES ('34', '香港特别行政区');
+CREATE TABLE `horoscope` (
+  `id` int(9) NOT NULL,
+  `name` text,
+  `desc` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- 转存表中的数据 `horoscope`
+--
 
-INSERT INTO `city` VALUES ('1', '1', '1', '北京市');
-INSERT INTO `city` VALUES ('2', '1', '2', '天津市');
-INSERT INTO `city` VALUES ('3', '1', '3', '上海市');
-INSERT INTO `city` VALUES ('4', '1', '4', '重庆市');
-INSERT INTO `city` VALUES ('5', '1', '5', '石家庄市');
-INSERT INTO `city` VALUES ('6', '2', '5', '唐山市');
-INSERT INTO `city` VALUES ('7', '3', '5', '秦皇岛市');
-INSERT INTO `city` VALUES ('8', '4', '5', '邯郸市');
-INSERT INTO `city` VALUES ('9', '5', '5', '邢台市');
-INSERT INTO `city` VALUES ('10', '6', '5', '保定市');
-INSERT INTO `city` VALUES ('11', '7', '5', '张家口市');
-INSERT INTO `city` VALUES ('12', '8', '5', '承德市');
-INSERT INTO `city` VALUES ('13', '9', '5', '沧州市');
-INSERT INTO `city` VALUES ('14', '10', '5', '廊坊市');
-INSERT INTO `city` VALUES ('15', '11', '5', '衡水市');
-INSERT INTO `city` VALUES ('16', '1', '6', '太原市');
-INSERT INTO `city` VALUES ('17', '2', '6', '大同市');
-INSERT INTO `city` VALUES ('18', '3', '6', '阳泉市');
-INSERT INTO `city` VALUES ('19', '4', '6', '长治市');
-INSERT INTO `city` VALUES ('20', '5', '6', '晋城市');
-INSERT INTO `city` VALUES ('21', '6', '6', '朔州市');
-INSERT INTO `city` VALUES ('22', '7', '6', '晋中市');
-INSERT INTO `city` VALUES ('23', '8', '6', '运城市');
-INSERT INTO `city` VALUES ('24', '9', '6', '忻州市');
-INSERT INTO `city` VALUES ('25', '10', '6', '临汾市');
-INSERT INTO `city` VALUES ('26', '11', '6', '吕梁市');
-INSERT INTO `city` VALUES ('27', '1', '7', '台北市');
-INSERT INTO `city` VALUES ('28', '2', '7', '高雄市');
-INSERT INTO `city` VALUES ('29', '3', '7', '基隆市');
-INSERT INTO `city` VALUES ('30', '4', '7', '台中市');
-INSERT INTO `city` VALUES ('31', '5', '7', '台南市');
-INSERT INTO `city` VALUES ('32', '6', '7', '新竹市');
-INSERT INTO `city` VALUES ('33', '7', '7', '嘉义市');
-INSERT INTO `city` VALUES ('34', '8', '7', '台北县');
-INSERT INTO `city` VALUES ('35', '9', '7', '宜兰县');
-INSERT INTO `city` VALUES ('36', '10', '7', '桃园县');
-INSERT INTO `city` VALUES ('37', '11', '7', '新竹县');
-INSERT INTO `city` VALUES ('38', '12', '7', '苗栗县');
-INSERT INTO `city` VALUES ('39', '13', '7', '台中县');
-INSERT INTO `city` VALUES ('40', '14', '7', '彰化县');
-INSERT INTO `city` VALUES ('41', '15', '7', '南投县');
-INSERT INTO `city` VALUES ('42', '16', '7', '云林县');
-INSERT INTO `city` VALUES ('43', '17', '7', '嘉义县');
-INSERT INTO `city` VALUES ('44', '18', '7', '台南县');
-INSERT INTO `city` VALUES ('45', '19', '7', '高雄县');
-INSERT INTO `city` VALUES ('46', '20', '7', '屏东县');
-INSERT INTO `city` VALUES ('47', '21', '7', '澎湖县');
-INSERT INTO `city` VALUES ('48', '22', '7', '台东县');
-INSERT INTO `city` VALUES ('49', '23', '7', '花莲县');
-INSERT INTO `city` VALUES ('50', '1', '8', '沈阳市');
-INSERT INTO `city` VALUES ('51', '2', '8', '大连市');
-INSERT INTO `city` VALUES ('52', '3', '8', '鞍山市');
-INSERT INTO `city` VALUES ('53', '4', '8', '抚顺市');
-INSERT INTO `city` VALUES ('54', '5', '8', '本溪市');
-INSERT INTO `city` VALUES ('55', '6', '8', '丹东市');
-INSERT INTO `city` VALUES ('56', '7', '8', '锦州市');
-INSERT INTO `city` VALUES ('57', '8', '8', '营口市');
-INSERT INTO `city` VALUES ('58', '9', '8', '阜新市');
-INSERT INTO `city` VALUES ('59', '10', '8', '辽阳市');
-INSERT INTO `city` VALUES ('60', '11', '8', '盘锦市');
-INSERT INTO `city` VALUES ('61', '12', '8', '铁岭市');
-INSERT INTO `city` VALUES ('62', '13', '8', '朝阳市');
-INSERT INTO `city` VALUES ('63', '14', '8', '葫芦岛市');
-INSERT INTO `city` VALUES ('64', '1', '9', '长春市');
-INSERT INTO `city` VALUES ('65', '2', '9', '吉林市');
-INSERT INTO `city` VALUES ('66', '3', '9', '四平市');
-INSERT INTO `city` VALUES ('67', '4', '9', '辽源市');
-INSERT INTO `city` VALUES ('68', '5', '9', '通化市');
-INSERT INTO `city` VALUES ('69', '6', '9', '白山市');
-INSERT INTO `city` VALUES ('70', '7', '9', '松原市');
-INSERT INTO `city` VALUES ('71', '8', '9', '白城市');
-INSERT INTO `city` VALUES ('72', '9', '9', '延边朝鲜族自治州');
-INSERT INTO `city` VALUES ('73', '1', '10', '哈尔滨市');
-INSERT INTO `city` VALUES ('74', '2', '10', '齐齐哈尔市');
-INSERT INTO `city` VALUES ('75', '3', '10', '鹤岗市');
-INSERT INTO `city` VALUES ('76', '4', '10', '双鸭山市');
-INSERT INTO `city` VALUES ('77', '5', '10', '鸡西市');
-INSERT INTO `city` VALUES ('78', '6', '10', '大庆市');
-INSERT INTO `city` VALUES ('79', '7', '10', '伊春市');
-INSERT INTO `city` VALUES ('80', '8', '10', '牡丹江市');
-INSERT INTO `city` VALUES ('81', '9', '10', '佳木斯市');
-INSERT INTO `city` VALUES ('82', '10', '10', '七台河市');
-INSERT INTO `city` VALUES ('83', '11', '10', '黑河市');
-INSERT INTO `city` VALUES ('84', '12', '10', '绥化市');
-INSERT INTO `city` VALUES ('85', '13', '10', '大兴安岭地区');
-INSERT INTO `city` VALUES ('86', '1', '11', '南京市');
-INSERT INTO `city` VALUES ('87', '2', '11', '无锡市');
-INSERT INTO `city` VALUES ('88', '3', '11', '徐州市');
-INSERT INTO `city` VALUES ('89', '4', '11', '常州市');
-INSERT INTO `city` VALUES ('90', '5', '11', '苏州市');
-INSERT INTO `city` VALUES ('91', '6', '11', '南通市');
-INSERT INTO `city` VALUES ('92', '7', '11', '连云港市');
-INSERT INTO `city` VALUES ('93', '8', '11', '淮安市');
-INSERT INTO `city` VALUES ('94', '9', '11', '盐城市');
-INSERT INTO `city` VALUES ('95', '10', '11', '扬州市');
-INSERT INTO `city` VALUES ('96', '11', '11', '镇江市');
-INSERT INTO `city` VALUES ('97', '12', '11', '泰州市');
-INSERT INTO `city` VALUES ('98', '13', '11', '宿迁市');
-INSERT INTO `city` VALUES ('99', '1', '12', '杭州市');
-INSERT INTO `city` VALUES ('100', '2', '12', '宁波市');
-INSERT INTO `city` VALUES ('101', '3', '12', '温州市');
-INSERT INTO `city` VALUES ('102', '4', '12', '嘉兴市');
-INSERT INTO `city` VALUES ('103', '5', '12', '湖州市');
-INSERT INTO `city` VALUES ('104', '6', '12', '绍兴市');
-INSERT INTO `city` VALUES ('105', '7', '12', '金华市');
-INSERT INTO `city` VALUES ('106', '8', '12', '衢州市');
-INSERT INTO `city` VALUES ('107', '9', '12', '舟山市');
-INSERT INTO `city` VALUES ('108', '10', '12', '台州市');
-INSERT INTO `city` VALUES ('109', '11', '12', '丽水市');
-INSERT INTO `city` VALUES ('110', '1', '13', '合肥市');
-INSERT INTO `city` VALUES ('111', '2', '13', '芜湖市');
-INSERT INTO `city` VALUES ('112', '3', '13', '蚌埠市');
-INSERT INTO `city` VALUES ('113', '4', '13', '淮南市');
-INSERT INTO `city` VALUES ('114', '5', '13', '马鞍山市');
-INSERT INTO `city` VALUES ('115', '6', '13', '淮北市');
-INSERT INTO `city` VALUES ('116', '7', '13', '铜陵市');
-INSERT INTO `city` VALUES ('117', '8', '13', '安庆市');
-INSERT INTO `city` VALUES ('118', '9', '13', '黄山市');
-INSERT INTO `city` VALUES ('119', '10', '13', '滁州市');
-INSERT INTO `city` VALUES ('120', '11', '13', '阜阳市');
-INSERT INTO `city` VALUES ('121', '12', '13', '宿州市');
-INSERT INTO `city` VALUES ('122', '13', '13', '巢湖市');
-INSERT INTO `city` VALUES ('123', '14', '13', '六安市');
-INSERT INTO `city` VALUES ('124', '15', '13', '亳州市');
-INSERT INTO `city` VALUES ('125', '16', '13', '池州市');
-INSERT INTO `city` VALUES ('126', '17', '13', '宣城市');
-INSERT INTO `city` VALUES ('127', '1', '14', '福州市');
-INSERT INTO `city` VALUES ('128', '2', '14', '厦门市');
-INSERT INTO `city` VALUES ('129', '3', '14', '莆田市');
-INSERT INTO `city` VALUES ('130', '4', '14', '三明市');
-INSERT INTO `city` VALUES ('131', '5', '14', '泉州市');
-INSERT INTO `city` VALUES ('132', '6', '14', '漳州市');
-INSERT INTO `city` VALUES ('133', '7', '14', '南平市');
-INSERT INTO `city` VALUES ('134', '8', '14', '龙岩市');
-INSERT INTO `city` VALUES ('135', '9', '14', '宁德市');
-INSERT INTO `city` VALUES ('136', '1', '15', '南昌市');
-INSERT INTO `city` VALUES ('137', '2', '15', '景德镇市');
-INSERT INTO `city` VALUES ('138', '3', '15', '萍乡市');
-INSERT INTO `city` VALUES ('139', '4', '15', '九江市');
-INSERT INTO `city` VALUES ('140', '5', '15', '新余市');
-INSERT INTO `city` VALUES ('141', '6', '15', '鹰潭市');
-INSERT INTO `city` VALUES ('142', '7', '15', '赣州市');
-INSERT INTO `city` VALUES ('143', '8', '15', '吉安市');
-INSERT INTO `city` VALUES ('144', '9', '15', '宜春市');
-INSERT INTO `city` VALUES ('145', '10', '15', '抚州市');
-INSERT INTO `city` VALUES ('146', '11', '15', '上饶市');
-INSERT INTO `city` VALUES ('147', '1', '16', '济南市');
-INSERT INTO `city` VALUES ('148', '2', '16', '青岛市');
-INSERT INTO `city` VALUES ('149', '3', '16', '淄博市');
-INSERT INTO `city` VALUES ('150', '4', '16', '枣庄市');
-INSERT INTO `city` VALUES ('151', '5', '16', '东营市');
-INSERT INTO `city` VALUES ('152', '6', '16', '烟台市');
-INSERT INTO `city` VALUES ('153', '7', '16', '潍坊市');
-INSERT INTO `city` VALUES ('154', '8', '16', '济宁市');
-INSERT INTO `city` VALUES ('155', '9', '16', '泰安市');
-INSERT INTO `city` VALUES ('156', '10', '16', '威海市');
-INSERT INTO `city` VALUES ('157', '11', '16', '日照市');
-INSERT INTO `city` VALUES ('158', '12', '16', '莱芜市');
-INSERT INTO `city` VALUES ('159', '13', '16', '临沂市');
-INSERT INTO `city` VALUES ('160', '14', '16', '德州市');
-INSERT INTO `city` VALUES ('161', '15', '16', '聊城市');
-INSERT INTO `city` VALUES ('162', '16', '16', '滨州市');
-INSERT INTO `city` VALUES ('163', '17', '16', '菏泽市');
-INSERT INTO `city` VALUES ('164', '1', '17', '郑州市');
-INSERT INTO `city` VALUES ('165', '2', '17', '开封市');
-INSERT INTO `city` VALUES ('166', '3', '17', '洛阳市');
-INSERT INTO `city` VALUES ('167', '4', '17', '平顶山市');
-INSERT INTO `city` VALUES ('168', '5', '17', '安阳市');
-INSERT INTO `city` VALUES ('169', '6', '17', '鹤壁市');
-INSERT INTO `city` VALUES ('170', '7', '17', '新乡市');
-INSERT INTO `city` VALUES ('171', '8', '17', '焦作市');
-INSERT INTO `city` VALUES ('172', '9', '17', '濮阳市');
-INSERT INTO `city` VALUES ('173', '10', '17', '许昌市');
-INSERT INTO `city` VALUES ('174', '11', '17', '漯河市');
-INSERT INTO `city` VALUES ('175', '12', '17', '三门峡市');
-INSERT INTO `city` VALUES ('176', '13', '17', '南阳市');
-INSERT INTO `city` VALUES ('177', '14', '17', '商丘市');
-INSERT INTO `city` VALUES ('178', '15', '17', '信阳市');
-INSERT INTO `city` VALUES ('179', '16', '17', '周口市');
-INSERT INTO `city` VALUES ('180', '17', '17', '驻马店市');
-INSERT INTO `city` VALUES ('181', '18', '17', '济源市');
-INSERT INTO `city` VALUES ('182', '1', '18', '武汉市');
-INSERT INTO `city` VALUES ('183', '2', '18', '黄石市');
-INSERT INTO `city` VALUES ('184', '3', '18', '十堰市');
-INSERT INTO `city` VALUES ('185', '4', '18', '荆州市');
-INSERT INTO `city` VALUES ('186', '5', '18', '宜昌市');
-INSERT INTO `city` VALUES ('187', '6', '18', '襄樊市');
-INSERT INTO `city` VALUES ('188', '7', '18', '鄂州市');
-INSERT INTO `city` VALUES ('189', '8', '18', '荆门市');
-INSERT INTO `city` VALUES ('190', '9', '18', '孝感市');
-INSERT INTO `city` VALUES ('191', '10', '18', '黄冈市');
-INSERT INTO `city` VALUES ('192', '11', '18', '咸宁市');
-INSERT INTO `city` VALUES ('193', '12', '18', '随州市');
-INSERT INTO `city` VALUES ('194', '13', '18', '仙桃市');
-INSERT INTO `city` VALUES ('195', '14', '18', '天门市');
-INSERT INTO `city` VALUES ('196', '15', '18', '潜江市');
-INSERT INTO `city` VALUES ('197', '16', '18', '神农架林区');
-INSERT INTO `city` VALUES ('198', '17', '18', '恩施土家族苗族自治州');
-INSERT INTO `city` VALUES ('199', '1', '19', '长沙市');
-INSERT INTO `city` VALUES ('200', '2', '19', '株洲市');
-INSERT INTO `city` VALUES ('201', '3', '19', '湘潭市');
-INSERT INTO `city` VALUES ('202', '4', '19', '衡阳市');
-INSERT INTO `city` VALUES ('203', '5', '19', '邵阳市');
-INSERT INTO `city` VALUES ('204', '6', '19', '岳阳市');
-INSERT INTO `city` VALUES ('205', '7', '19', '常德市');
-INSERT INTO `city` VALUES ('206', '8', '19', '张家界市');
-INSERT INTO `city` VALUES ('207', '9', '19', '益阳市');
-INSERT INTO `city` VALUES ('208', '10', '19', '郴州市');
-INSERT INTO `city` VALUES ('209', '11', '19', '永州市');
-INSERT INTO `city` VALUES ('210', '12', '19', '怀化市');
-INSERT INTO `city` VALUES ('211', '13', '19', '娄底市');
-INSERT INTO `city` VALUES ('212', '14', '19', '湘西土家族苗族自治州');
-INSERT INTO `city` VALUES ('213', '1', '20', '广州市');
-INSERT INTO `city` VALUES ('214', '2', '20', '深圳市');
-INSERT INTO `city` VALUES ('215', '3', '20', '珠海市');
-INSERT INTO `city` VALUES ('216', '4', '20', '汕头市');
-INSERT INTO `city` VALUES ('217', '5', '20', '韶关市');
-INSERT INTO `city` VALUES ('218', '6', '20', '佛山市');
-INSERT INTO `city` VALUES ('219', '7', '20', '江门市');
-INSERT INTO `city` VALUES ('220', '8', '20', '湛江市');
-INSERT INTO `city` VALUES ('221', '9', '20', '茂名市');
-INSERT INTO `city` VALUES ('222', '10', '20', '肇庆市');
-INSERT INTO `city` VALUES ('223', '11', '20', '惠州市');
-INSERT INTO `city` VALUES ('224', '12', '20', '梅州市');
-INSERT INTO `city` VALUES ('225', '13', '20', '汕尾市');
-INSERT INTO `city` VALUES ('226', '14', '20', '河源市');
-INSERT INTO `city` VALUES ('227', '15', '20', '阳江市');
-INSERT INTO `city` VALUES ('228', '16', '20', '清远市');
-INSERT INTO `city` VALUES ('229', '17', '20', '东莞市');
-INSERT INTO `city` VALUES ('230', '18', '20', '中山市');
-INSERT INTO `city` VALUES ('231', '19', '20', '潮州市');
-INSERT INTO `city` VALUES ('232', '20', '20', '揭阳市');
-INSERT INTO `city` VALUES ('233', '21', '20', '云浮市');
-INSERT INTO `city` VALUES ('234', '1', '21', '兰州市');
-INSERT INTO `city` VALUES ('235', '2', '21', '金昌市');
-INSERT INTO `city` VALUES ('236', '3', '21', '白银市');
-INSERT INTO `city` VALUES ('237', '4', '21', '天水市');
-INSERT INTO `city` VALUES ('238', '5', '21', '嘉峪关市');
-INSERT INTO `city` VALUES ('239', '6', '21', '武威市');
-INSERT INTO `city` VALUES ('240', '7', '21', '张掖市');
-INSERT INTO `city` VALUES ('241', '8', '21', '平凉市');
-INSERT INTO `city` VALUES ('242', '9', '21', '酒泉市');
-INSERT INTO `city` VALUES ('243', '10', '21', '庆阳市');
-INSERT INTO `city` VALUES ('244', '11', '21', '定西市');
-INSERT INTO `city` VALUES ('245', '12', '21', '陇南市');
-INSERT INTO `city` VALUES ('246', '13', '21', '临夏回族自治州');
-INSERT INTO `city` VALUES ('247', '14', '21', '甘南藏族自治州');
-INSERT INTO `city` VALUES ('248', '1', '22', '成都市');
-INSERT INTO `city` VALUES ('249', '2', '22', '自贡市');
-INSERT INTO `city` VALUES ('250', '3', '22', '攀枝花市');
-INSERT INTO `city` VALUES ('251', '4', '22', '泸州市');
-INSERT INTO `city` VALUES ('252', '5', '22', '德阳市');
-INSERT INTO `city` VALUES ('253', '6', '22', '绵阳市');
-INSERT INTO `city` VALUES ('254', '7', '22', '广元市');
-INSERT INTO `city` VALUES ('255', '8', '22', '遂宁市');
-INSERT INTO `city` VALUES ('256', '9', '22', '内江市');
-INSERT INTO `city` VALUES ('257', '10', '22', '乐山市');
-INSERT INTO `city` VALUES ('258', '11', '22', '南充市');
-INSERT INTO `city` VALUES ('259', '12', '22', '眉山市');
-INSERT INTO `city` VALUES ('260', '13', '22', '宜宾市');
-INSERT INTO `city` VALUES ('261', '14', '22', '广安市');
-INSERT INTO `city` VALUES ('262', '15', '22', '达州市');
-INSERT INTO `city` VALUES ('263', '16', '22', '雅安市');
-INSERT INTO `city` VALUES ('264', '17', '22', '巴中市');
-INSERT INTO `city` VALUES ('265', '18', '22', '资阳市');
-INSERT INTO `city` VALUES ('266', '19', '22', '阿坝藏族羌族自治州');
-INSERT INTO `city` VALUES ('267', '20', '22', '甘孜藏族自治州');
-INSERT INTO `city` VALUES ('268', '21', '22', '凉山彝族自治州');
-INSERT INTO `city` VALUES ('269', '1', '23', '贵阳市');
-INSERT INTO `city` VALUES ('270', '2', '23', '六盘水市');
-INSERT INTO `city` VALUES ('271', '3', '23', '遵义市');
-INSERT INTO `city` VALUES ('272', '4', '23', '安顺市');
-INSERT INTO `city` VALUES ('273', '5', '23', '铜仁地区');
-INSERT INTO `city` VALUES ('274', '6', '23', '毕节地区');
-INSERT INTO `city` VALUES ('275', '7', '23', '黔西南布依族苗族自治州');
-INSERT INTO `city` VALUES ('276', '8', '23', '黔东南苗族侗族自治州');
-INSERT INTO `city` VALUES ('277', '9', '23', '黔南布依族苗族自治州');
-INSERT INTO `city` VALUES ('278', '1', '24', '海口市');
-INSERT INTO `city` VALUES ('279', '2', '24', '三亚市');
-INSERT INTO `city` VALUES ('280', '3', '24', '五指山市');
-INSERT INTO `city` VALUES ('281', '4', '24', '琼海市');
-INSERT INTO `city` VALUES ('282', '5', '24', '儋州市');
-INSERT INTO `city` VALUES ('283', '6', '24', '文昌市');
-INSERT INTO `city` VALUES ('284', '7', '24', '万宁市');
-INSERT INTO `city` VALUES ('285', '8', '24', '东方市');
-INSERT INTO `city` VALUES ('286', '9', '24', '澄迈县');
-INSERT INTO `city` VALUES ('287', '10', '24', '定安县');
-INSERT INTO `city` VALUES ('288', '11', '24', '屯昌县');
-INSERT INTO `city` VALUES ('289', '12', '24', '临高县');
-INSERT INTO `city` VALUES ('290', '13', '24', '白沙黎族自治县');
-INSERT INTO `city` VALUES ('291', '14', '24', '昌江黎族自治县');
-INSERT INTO `city` VALUES ('292', '15', '24', '乐东黎族自治县');
-INSERT INTO `city` VALUES ('293', '16', '24', '陵水黎族自治县');
-INSERT INTO `city` VALUES ('294', '17', '24', '保亭黎族苗族自治县');
-INSERT INTO `city` VALUES ('295', '18', '24', '琼中黎族苗族自治县');
-INSERT INTO `city` VALUES ('296', '1', '25', '昆明市');
-INSERT INTO `city` VALUES ('297', '2', '25', '曲靖市');
-INSERT INTO `city` VALUES ('298', '3', '25', '玉溪市');
-INSERT INTO `city` VALUES ('299', '4', '25', '保山市');
-INSERT INTO `city` VALUES ('300', '5', '25', '昭通市');
-INSERT INTO `city` VALUES ('301', '6', '25', '丽江市');
-INSERT INTO `city` VALUES ('302', '7', '25', '思茅市');
-INSERT INTO `city` VALUES ('303', '8', '25', '临沧市');
-INSERT INTO `city` VALUES ('304', '9', '25', '文山壮族苗族自治州');
-INSERT INTO `city` VALUES ('305', '10', '25', '红河哈尼族彝族自治州');
-INSERT INTO `city` VALUES ('306', '11', '25', '西双版纳傣族自治州');
-INSERT INTO `city` VALUES ('307', '12', '25', '楚雄彝族自治州');
-INSERT INTO `city` VALUES ('308', '13', '25', '大理白族自治州');
-INSERT INTO `city` VALUES ('309', '14', '25', '德宏傣族景颇族自治州');
-INSERT INTO `city` VALUES ('310', '15', '25', '怒江傈傈族自治州');
-INSERT INTO `city` VALUES ('311', '16', '25', '迪庆藏族自治州');
-INSERT INTO `city` VALUES ('312', '1', '26', '西宁市');
-INSERT INTO `city` VALUES ('313', '2', '26', '海东地区');
-INSERT INTO `city` VALUES ('314', '3', '26', '海北藏族自治州');
-INSERT INTO `city` VALUES ('315', '4', '26', '黄南藏族自治州');
-INSERT INTO `city` VALUES ('316', '5', '26', '海南藏族自治州');
-INSERT INTO `city` VALUES ('317', '6', '26', '果洛藏族自治州');
-INSERT INTO `city` VALUES ('318', '7', '26', '玉树藏族自治州');
-INSERT INTO `city` VALUES ('319', '8', '26', '海西蒙古族藏族自治州');
-INSERT INTO `city` VALUES ('320', '1', '27', '西安市');
-INSERT INTO `city` VALUES ('321', '2', '27', '铜川市');
-INSERT INTO `city` VALUES ('322', '3', '27', '宝鸡市');
-INSERT INTO `city` VALUES ('323', '4', '27', '咸阳市');
-INSERT INTO `city` VALUES ('324', '5', '27', '渭南市');
-INSERT INTO `city` VALUES ('325', '6', '27', '延安市');
-INSERT INTO `city` VALUES ('326', '7', '27', '汉中市');
-INSERT INTO `city` VALUES ('327', '8', '27', '榆林市');
-INSERT INTO `city` VALUES ('328', '9', '27', '安康市');
-INSERT INTO `city` VALUES ('329', '10', '27', '商洛市');
-INSERT INTO `city` VALUES ('330', '1', '28', '南宁市');
-INSERT INTO `city` VALUES ('331', '2', '28', '柳州市');
-INSERT INTO `city` VALUES ('332', '3', '28', '桂林市');
-INSERT INTO `city` VALUES ('333', '4', '28', '梧州市');
-INSERT INTO `city` VALUES ('334', '5', '28', '北海市');
-INSERT INTO `city` VALUES ('335', '6', '28', '防城港市');
-INSERT INTO `city` VALUES ('336', '7', '28', '钦州市');
-INSERT INTO `city` VALUES ('337', '8', '28', '贵港市');
-INSERT INTO `city` VALUES ('338', '9', '28', '玉林市');
-INSERT INTO `city` VALUES ('339', '10', '28', '百色市');
-INSERT INTO `city` VALUES ('340', '11', '28', '贺州市');
-INSERT INTO `city` VALUES ('341', '12', '28', '河池市');
-INSERT INTO `city` VALUES ('342', '13', '28', '来宾市');
-INSERT INTO `city` VALUES ('343', '14', '28', '崇左市');
-INSERT INTO `city` VALUES ('344', '1', '29', '拉萨市');
-INSERT INTO `city` VALUES ('345', '2', '29', '那曲地区');
-INSERT INTO `city` VALUES ('346', '3', '29', '昌都地区');
-INSERT INTO `city` VALUES ('347', '4', '29', '山南地区');
-INSERT INTO `city` VALUES ('348', '5', '29', '日喀则地区');
-INSERT INTO `city` VALUES ('349', '6', '29', '阿里地区');
-INSERT INTO `city` VALUES ('350', '7', '29', '林芝地区');
-INSERT INTO `city` VALUES ('351', '1', '30', '银川市');
-INSERT INTO `city` VALUES ('352', '2', '30', '石嘴山市');
-INSERT INTO `city` VALUES ('353', '3', '30', '吴忠市');
-INSERT INTO `city` VALUES ('354', '4', '30', '固原市');
-INSERT INTO `city` VALUES ('355', '5', '30', '中卫市');
-INSERT INTO `city` VALUES ('356', '1', '31', '乌鲁木齐市');
-INSERT INTO `city` VALUES ('357', '2', '31', '克拉玛依市');
-INSERT INTO `city` VALUES ('358', '3', '31', '石河子市　');
-INSERT INTO `city` VALUES ('359', '4', '31', '阿拉尔市');
-INSERT INTO `city` VALUES ('360', '5', '31', '图木舒克市');
-INSERT INTO `city` VALUES ('361', '6', '31', '五家渠市');
-INSERT INTO `city` VALUES ('362', '7', '31', '吐鲁番市');
-INSERT INTO `city` VALUES ('363', '8', '31', '阿克苏市');
-INSERT INTO `city` VALUES ('364', '9', '31', '喀什市');
-INSERT INTO `city` VALUES ('365', '10', '31', '哈密市');
-INSERT INTO `city` VALUES ('366', '11', '31', '和田市');
-INSERT INTO `city` VALUES ('367', '12', '31', '阿图什市');
-INSERT INTO `city` VALUES ('368', '13', '31', '库尔勒市');
-INSERT INTO `city` VALUES ('369', '14', '31', '昌吉市　');
-INSERT INTO `city` VALUES ('370', '15', '31', '阜康市');
-INSERT INTO `city` VALUES ('371', '16', '31', '米泉市');
-INSERT INTO `city` VALUES ('372', '17', '31', '博乐市');
-INSERT INTO `city` VALUES ('373', '18', '31', '伊宁市');
-INSERT INTO `city` VALUES ('374', '19', '31', '奎屯市');
-INSERT INTO `city` VALUES ('375', '20', '31', '塔城市');
-INSERT INTO `city` VALUES ('376', '21', '31', '乌苏市');
-INSERT INTO `city` VALUES ('377', '22', '31', '阿勒泰市');
-INSERT INTO `city` VALUES ('378', '1', '32', '呼和浩特市');
-INSERT INTO `city` VALUES ('379', '2', '32', '包头市');
-INSERT INTO `city` VALUES ('380', '3', '32', '乌海市');
-INSERT INTO `city` VALUES ('381', '4', '32', '赤峰市');
-INSERT INTO `city` VALUES ('382', '5', '32', '通辽市');
-INSERT INTO `city` VALUES ('383', '6', '32', '鄂尔多斯市');
-INSERT INTO `city` VALUES ('384', '7', '32', '呼伦贝尔市');
-INSERT INTO `city` VALUES ('385', '8', '32', '巴彦淖尔市');
-INSERT INTO `city` VALUES ('386', '9', '32', '乌兰察布市');
-INSERT INTO `city` VALUES ('387', '10', '32', '锡林郭勒盟');
-INSERT INTO `city` VALUES ('388', '11', '32', '兴安盟');
-INSERT INTO `city` VALUES ('389', '12', '32', '阿拉善盟');
-INSERT INTO `city` VALUES ('390', '1', '33', '澳门特别行政区');
-INSERT INTO `city` VALUES ('391', '1', '34', '香港特别行政区');
- 
-INSERT INTO `school` VALUES ('1', '北京大学', '北京', '综合', '本科');
-INSERT INTO `school` VALUES ('2', '中国人民大学', '北京', '综合', '本科');
-INSERT INTO `school` VALUES ('3', '清华大学', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('4', '北京航空航天大学', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('5', '北京理工大学', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('6', '中国农业大学', '北京', '农业', '本科');
-INSERT INTO `school` VALUES ('7', '北京师范大学', '北京', '师范', '本科');
-INSERT INTO `school` VALUES ('8', '中央民族大学', '北京', '民族', '本科');
-INSERT INTO `school` VALUES ('9', '南开大学', '天津', '综合', '本科');
-INSERT INTO `school` VALUES ('10', '天津大学', '天津', '工科', '本科');
-INSERT INTO `school` VALUES ('11', '大连理工大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('12', '东北大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('13', '吉林大学', '吉林', '综合', '本科');
-INSERT INTO `school` VALUES ('14', '哈尔滨工业大学', '黑龙江', '工科', '本科');
-INSERT INTO `school` VALUES ('15', '复旦大学', '上海', '综合', '本科');
-INSERT INTO `school` VALUES ('16', '同济大学', '上海', '工科', '本科');
-INSERT INTO `school` VALUES ('17', '上海交通大学', '上海', '综合', '本科');
-INSERT INTO `school` VALUES ('18', '华东师范大学', '上海', '师范', '本科');
-INSERT INTO `school` VALUES ('19', '南京大学', '江苏', '综合', '本科');
-INSERT INTO `school` VALUES ('20', '东南大学', '江苏', '综合', '本科');
-INSERT INTO `school` VALUES ('21', '中国矿业大学（徐州）', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('22', '浙江大学', '浙江', '综合', '本科');
-INSERT INTO `school` VALUES ('23', '中国科学技术大学', '安徽', '工科', '本科');
-INSERT INTO `school` VALUES ('24', '厦门大学', '福建', '综合', '本科');
-INSERT INTO `school` VALUES ('25', '山东大学', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('26', '中国海洋大学', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('27', '武汉大学', '湖北', '综合', '本科');
-INSERT INTO `school` VALUES ('28', '湖南大学', '湖南', '综合', '本科');
-INSERT INTO `school` VALUES ('29', '中山大学', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('30', '华南理工大学', '广东', '工科', '本科');
-INSERT INTO `school` VALUES ('31', '重庆大学', '重庆', '综合', '本科');
-INSERT INTO `school` VALUES ('32', '电子科技大学', '四川', '工科', '本科');
-INSERT INTO `school` VALUES ('33', '西安交通大学', '陕西', '综合', '本科');
-INSERT INTO `school` VALUES ('34', '西北工业大学', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('35', '兰州大学', '甘肃', '综合', '本科');
-INSERT INTO `school` VALUES ('36', '四川大学', '四川', '综合', '本科');
-INSERT INTO `school` VALUES ('37', '西北农林科技大学', '陕西', '农业', '本科');
-INSERT INTO `school` VALUES ('38', '中南大学', '湖南', '综合', '本科');
-INSERT INTO `school` VALUES ('39', '华中科技大学', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('40', '东北大学秦皇岛分校', '河北', '工科', '本科');
-INSERT INTO `school` VALUES ('41', '山东大学威海分校', '山东', '综合', '------');
-INSERT INTO `school` VALUES ('42', '哈尔滨工业大学（威海）', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('43', '北京交通大学', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('44', '北京工业大学', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('45', '北京科技大学', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('46', '北京化工大学', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('47', '北京邮电大学', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('48', '北京林业大学', '北京', '林业', '本科');
-INSERT INTO `school` VALUES ('49', '北京协和医学院', '北京', '医药', '本科');
-INSERT INTO `school` VALUES ('50', '北京中医药大学', '北京', '医药', '本科');
-INSERT INTO `school` VALUES ('51', '北京外国语大学', '北京', '语言', '本科');
-INSERT INTO `school` VALUES ('52', '中央财经大学', '北京', '财经', '本科');
-INSERT INTO `school` VALUES ('53', '对外经济贸易大学', '北京', '财经', '本科');
-INSERT INTO `school` VALUES ('54', '北京体育大学', '北京', '体育', '本科');
-INSERT INTO `school` VALUES ('55', '中央音乐学院', '北京', '艺术', '本科');
-INSERT INTO `school` VALUES ('56', '中国政法大学', '北京', '政法', '本科');
-INSERT INTO `school` VALUES ('57', '华北电力大学', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('58', '华北电力大学(保定)', '河北', '工科', '本科');
-INSERT INTO `school` VALUES ('59', '河北工业大学', '天津', '工科', '本科');
-INSERT INTO `school` VALUES ('60', '太原理工大学', '山西', '工科', '本科');
-INSERT INTO `school` VALUES ('61', '内蒙古大学', '内蒙古', '综合', '本科');
-INSERT INTO `school` VALUES ('62', '辽宁大学', '辽宁', '综合', '本科');
-INSERT INTO `school` VALUES ('63', '大连海事大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('64', '延边大学', '吉林', '综合', '本科');
-INSERT INTO `school` VALUES ('65', '东北师范大学', '吉林', '师范', '本科');
-INSERT INTO `school` VALUES ('66', '哈尔滨工程大学', '黑龙江', '工科', '本科');
-INSERT INTO `school` VALUES ('67', '东北林业大学', '黑龙江', '林业', '本科');
-INSERT INTO `school` VALUES ('68', '华东理工大学', '上海', '工科', '本科');
-INSERT INTO `school` VALUES ('69', '东华大学', '上海', '工科', '本科');
-INSERT INTO `school` VALUES ('70', '上海中医药大学', '上海', '医药', '本科');
-INSERT INTO `school` VALUES ('71', '上海外国语大学', '上海', '语言', '本科');
-INSERT INTO `school` VALUES ('72', '上海财经大学', '上海', '财经', '本科');
-INSERT INTO `school` VALUES ('73', '苏州大学', '江苏', '综合', '本科');
-INSERT INTO `school` VALUES ('74', '南京航空航天大学', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('75', '南京理工大学', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('76', '河海大学', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('77', '江南大学', '江苏', '综合', '本科');
-INSERT INTO `school` VALUES ('78', '南京农业大学', '江苏', '农业', '本科');
-INSERT INTO `school` VALUES ('79', '中国药科大学', '江苏', '医药', '本科');
-INSERT INTO `school` VALUES ('80', '南京师范大学', '江苏', '师范', '本科');
-INSERT INTO `school` VALUES ('81', '安徽大学', '安徽', '综合', '本科');
-INSERT INTO `school` VALUES ('82', '合肥工业大学', '安徽', '工科', '本科');
-INSERT INTO `school` VALUES ('83', '福州大学', '福建', '工科', '本科');
-INSERT INTO `school` VALUES ('84', '郑州大学', '河南', '综合', '本科');
-INSERT INTO `school` VALUES ('85', '华中农业大学', '湖北', '农业', '本科');
-INSERT INTO `school` VALUES ('86', '华中师范大学', '湖北', '师范', '本科');
-INSERT INTO `school` VALUES ('87', '湖南师范大学', '湖南', '师范', '本科');
-INSERT INTO `school` VALUES ('88', '暨南大学', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('89', '华南农业大学', '广东', '农业', '本科');
-INSERT INTO `school` VALUES ('90', '广州中医药大学', '广东', '医药', '本科');
-INSERT INTO `school` VALUES ('91', '华南师范大学', '广东', '师范', '本科');
-INSERT INTO `school` VALUES ('92', '海南大学', '海南', '综合', '本科');
-INSERT INTO `school` VALUES ('93', '广西大学', '广西', '综合', '本科');
-INSERT INTO `school` VALUES ('94', '西南交通大学', '四川', '工科', '本科');
-INSERT INTO `school` VALUES ('95', '四川农业大学', '四川', '农业', '本科');
-INSERT INTO `school` VALUES ('96', '西南大学', '重庆', '师范', '本科');
-INSERT INTO `school` VALUES ('97', '西南财经大学', '四川', '财经', '本科');
-INSERT INTO `school` VALUES ('98', '贵州大学', '贵州', '综合', '本科');
-INSERT INTO `school` VALUES ('99', '云南大学', '云南', '综合', '本科');
-INSERT INTO `school` VALUES ('100', '西藏大学', '西藏', '综合', '本科');
-INSERT INTO `school` VALUES ('101', '西北大学', '陕西', '综合', '本科');
-INSERT INTO `school` VALUES ('102', '西安电子科技大学', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('103', '陕西师范大学', '陕西', '师范', '本科');
-INSERT INTO `school` VALUES ('104', '青海大学', '青海', '综合', '本科');
-INSERT INTO `school` VALUES ('105', '宁夏大学', '宁夏', '综合', '本科');
-INSERT INTO `school` VALUES ('106', '新疆大学', '新疆', '综合', '本科');
-INSERT INTO `school` VALUES ('107', '石河子大学', '新疆', '综合', '本科');
-INSERT INTO `school` VALUES ('108', '中国矿业大学(北京)', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('109', '中国地质大学(北京)', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('110', '南昌大学', '江西', '综合', '本科');
-INSERT INTO `school` VALUES ('111', '上海大学', '上海', '综合', '本科');
-INSERT INTO `school` VALUES ('112', '天津医科大学', '天津', '医药', '本科');
-INSERT INTO `school` VALUES ('113', '长安大学', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('114', '中南财经政法大学', '湖北', '财经', '本科');
-INSERT INTO `school` VALUES ('115', '武汉理工大学', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('116', '东北农业大学', '黑龙江', '农业', '本科');
-INSERT INTO `school` VALUES ('117', '国防科学技术大学', '湖南', '军事', '------');
-INSERT INTO `school` VALUES ('118', '第二军医大学', '上海', '军事', '其它');
-INSERT INTO `school` VALUES ('119', '第四军医大学', '陕西', '军事', '其它');
-INSERT INTO `school` VALUES ('120', '上海交通大学医学院', '上海', '医药', '------');
-INSERT INTO `school` VALUES ('121', '中国传媒大学', '北京', '语言', '本科');
-INSERT INTO `school` VALUES ('122', '中国地质大学(武汉)', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('123', '中国石油大学(北京)', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('124', '中国石油大学(华东)', '山东', '工科', '本科');
-INSERT INTO `school` VALUES ('125', '北方工业大学', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('126', '北京服装学院', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('127', '北京印刷学院', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('128', '北京建筑大学', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('129', '北京石油化工学院', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('130', '北京电子科技学院', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('131', '北京农学院', '北京', '农业', '本科');
-INSERT INTO `school` VALUES ('132', '首都医科大学', '北京', '医药', '本科');
-INSERT INTO `school` VALUES ('133', '首都师范大学', '北京', '师范', '本科');
-INSERT INTO `school` VALUES ('134', '首都体育学院', '北京', '体育', '本科');
-INSERT INTO `school` VALUES ('135', '北京第二外国语学院', '北京', '语言', '本科');
-INSERT INTO `school` VALUES ('136', '北京语言大学', '北京', '语言', '本科');
-INSERT INTO `school` VALUES ('137', '北京物资学院', '北京', '财经', '本科');
-INSERT INTO `school` VALUES ('138', '外交学院', '北京', '语言', '本科');
-INSERT INTO `school` VALUES ('139', '中国人民公安大学', '北京', '政法', '本科');
-INSERT INTO `school` VALUES ('140', '国际关系学院', '北京', '政法', '本科');
-INSERT INTO `school` VALUES ('141', '中国音乐学院', '北京', '艺术', '本科');
-INSERT INTO `school` VALUES ('142', '中央美术学院', '北京', '艺术', '本科');
-INSERT INTO `school` VALUES ('143', '中央戏剧学院', '北京', '艺术', '本科');
-INSERT INTO `school` VALUES ('144', '中国戏曲学院', '北京', '艺术', '本科');
-INSERT INTO `school` VALUES ('145', '北京电影学院', '北京', '艺术', '本科');
-INSERT INTO `school` VALUES ('146', '北京舞蹈学院', '北京', '艺术', '本科');
-INSERT INTO `school` VALUES ('147', '天津科技大学', '天津', '工科', '本科');
-INSERT INTO `school` VALUES ('148', '天津工业大学', '天津', '工科', '本科');
-INSERT INTO `school` VALUES ('149', '中国民航大学', '天津', '工科', '本科');
-INSERT INTO `school` VALUES ('150', '天津理工大学', '天津', '工科', '本科');
-INSERT INTO `school` VALUES ('151', '天津农学院', '天津', '农业', '本科');
-INSERT INTO `school` VALUES ('152', '天津中医药大学', '天津', '医药', '本科');
-INSERT INTO `school` VALUES ('153', '天津师范大学', '天津', '师范', '本科');
-INSERT INTO `school` VALUES ('154', '天津外国语学院', '天津', '语言', '本科');
-INSERT INTO `school` VALUES ('155', '天津商业大学', '天津', '财经', '本科');
-INSERT INTO `school` VALUES ('156', '天津体育学院', '天津', '体育', '本科');
-INSERT INTO `school` VALUES ('157', '天津音乐学院', '天津', '艺术', '本科');
-INSERT INTO `school` VALUES ('158', '天津美术学院', '天津', '艺术', '本科');
-INSERT INTO `school` VALUES ('159', '河北大学', '河北', '综合', '本科');
-INSERT INTO `school` VALUES ('160', '石家庄经济学院', '河北', '财经', '本科');
-INSERT INTO `school` VALUES ('161', '河北科技大学', '河北', '工科', '本科');
-INSERT INTO `school` VALUES ('162', '河北建筑工程学院', '河北', '工科', '本科');
-INSERT INTO `school` VALUES ('163', '承德医学院', '河北', '医药', '本科');
-INSERT INTO `school` VALUES ('164', '河北师范大学', '河北', '师范', '本科');
-INSERT INTO `school` VALUES ('165', '唐山师范学院', '河北', '师范', '本科');
-INSERT INTO `school` VALUES ('166', '廊坊师范学院', '河北', '师范', '本科');
-INSERT INTO `school` VALUES ('167', '邢台学院', '河北', '师范', '本科');
-INSERT INTO `school` VALUES ('168', '石家庄铁道大学', '河北', '工科', '本科');
-INSERT INTO `school` VALUES ('169', '山西大学', '山西', '综合', '本科');
-INSERT INTO `school` VALUES ('170', '山西农业大学', '山西', '农业', '本科');
-INSERT INTO `school` VALUES ('171', '山西医科大学', '山西', '医药', '本科');
-INSERT INTO `school` VALUES ('172', '长治医学院', '山西', '医药', '本科');
-INSERT INTO `school` VALUES ('173', '山西师范大学', '山西', '师范', '本科');
-INSERT INTO `school` VALUES ('174', '太原师范学院', '山西', '师范', '本科');
-INSERT INTO `school` VALUES ('175', '晋中学院', '山西', '师范', '本科');
-INSERT INTO `school` VALUES ('176', '运城学院', '山西', '师范', '本科');
-INSERT INTO `school` VALUES ('177', '忻州师范学院', '山西', '师范', '本科');
-INSERT INTO `school` VALUES ('178', '山西财经大学', '山西', '财经', '本科');
-INSERT INTO `school` VALUES ('179', '内蒙古工业大学', '内蒙古', '工科', '本科');
-INSERT INTO `school` VALUES ('180', '内蒙古医科大学', '内蒙古', '医药', '本科');
-INSERT INTO `school` VALUES ('181', '包头医学院', '内蒙古', '医药', '其它');
-INSERT INTO `school` VALUES ('182', '内蒙古师范大学', '内蒙古', '师范', '本科');
-INSERT INTO `school` VALUES ('183', '内蒙古财经大学', '内蒙古', '财经', '本科');
-INSERT INTO `school` VALUES ('184', '沈阳工业大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('185', '沈阳航空航天大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('186', '辽宁科技大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('187', '辽宁工程技术大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('188', '辽宁石油化工大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('189', '沈阳化工大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('190', '大连工业大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('191', '辽宁工业大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('192', '沈阳农业大学', '辽宁', '农业', '本科');
-INSERT INTO `school` VALUES ('193', '大连水产学院', '辽宁', '农业', '本科');
-INSERT INTO `school` VALUES ('194', '中国医科大学', '辽宁', '医药', '本科');
-INSERT INTO `school` VALUES ('195', '辽宁医学院', '辽宁', '医药', '本科');
-INSERT INTO `school` VALUES ('196', '大连医科大学', '辽宁', '医药', '本科');
-INSERT INTO `school` VALUES ('197', '辽宁中医药大学', '辽宁', '医药', '本科');
-INSERT INTO `school` VALUES ('198', '沈阳药科大学', '辽宁', '医药', '本科');
-INSERT INTO `school` VALUES ('199', '沈阳医学院', '辽宁', '医药', '本科');
-INSERT INTO `school` VALUES ('200', '辽宁师范大学', '辽宁', '师范', '本科');
-INSERT INTO `school` VALUES ('201', '沈阳师范大学', '辽宁', '师范', '本科');
-INSERT INTO `school` VALUES ('202', '鞍山师范学院', '辽宁', '师范', '本科');
-INSERT INTO `school` VALUES ('203', '大连外国语大学', '辽宁', '语言', '本科');
-INSERT INTO `school` VALUES ('204', '东北财经大学', '辽宁', '财经', '本科');
-INSERT INTO `school` VALUES ('205', '中国刑事警察学院', '辽宁', '政法', '本科');
-INSERT INTO `school` VALUES ('206', '沈阳体育学院', '辽宁', '体育', '本科');
-INSERT INTO `school` VALUES ('207', '沈阳音乐学院', '辽宁', '艺术', '本科');
-INSERT INTO `school` VALUES ('208', '鲁迅美术学院', '辽宁', '艺术', '本科');
-INSERT INTO `school` VALUES ('209', '长春理工大学', '吉林', '工科', '本科');
-INSERT INTO `school` VALUES ('210', '东北电力大学', '吉林', '工科', '本科');
-INSERT INTO `school` VALUES ('211', '长春工业大学', '吉林', '工科', '本科');
-INSERT INTO `school` VALUES ('212', '吉林建筑大学', '吉林', '工科', '本科');
-INSERT INTO `school` VALUES ('213', '吉林化工学院', '吉林', '工科', '本科');
-INSERT INTO `school` VALUES ('214', '吉林农业大学', '吉林', '农业', '本科');
-INSERT INTO `school` VALUES ('215', '通化师范学院', '吉林', '师范', '本科');
-INSERT INTO `school` VALUES ('216', '吉林师范大学', '吉林', '师范', '本科');
-INSERT INTO `school` VALUES ('217', '吉林工程技术师范学院', '吉林', '师范', '本科');
-INSERT INTO `school` VALUES ('218', '长春师范大学', '吉林', '师范', '本科');
-INSERT INTO `school` VALUES ('219', '白城师范学院', '吉林', '师范', '本科');
-INSERT INTO `school` VALUES ('220', '长春税务学院', '吉林', '财经', '本科');
-INSERT INTO `school` VALUES ('221', '吉林体育学院', '吉林', '体育', '本科');
-INSERT INTO `school` VALUES ('222', '吉林艺术学院', '吉林', '艺术', '本科');
-INSERT INTO `school` VALUES ('223', '黑龙江大学', '黑龙江', '综合', '本科');
-INSERT INTO `school` VALUES ('224', '燕山大学', '河北', '工科', '本科');
-INSERT INTO `school` VALUES ('225', '黑龙江科技大学', '黑龙江', '工科', '本科');
-INSERT INTO `school` VALUES ('226', '东北石油大学', '黑龙江', '工科', '本科');
-INSERT INTO `school` VALUES ('227', '齐齐哈尔大学', '黑龙江', '综合', '本科');
-INSERT INTO `school` VALUES ('228', '黑龙江八一农垦大学', '黑龙江', '农业', '本科');
-INSERT INTO `school` VALUES ('229', '黑龙江中医药大学', '黑龙江', '医药', '本科');
-INSERT INTO `school` VALUES ('230', '牡丹江医学院', '黑龙江', '医药', '本科');
-INSERT INTO `school` VALUES ('231', '哈尔滨师范大学', '黑龙江', '师范', '本科');
-INSERT INTO `school` VALUES ('232', '牡丹江师范学院', '黑龙江', '师范', '本科');
-INSERT INTO `school` VALUES ('233', '绥化学院', '黑龙江', '综合', '本科');
-INSERT INTO `school` VALUES ('234', '哈尔滨商业大学', '黑龙江', '财经', '本科');
-INSERT INTO `school` VALUES ('235', '哈尔滨体育学院', '黑龙江', '体育', '本科');
-INSERT INTO `school` VALUES ('236', '上海理工大学', '上海', '工科', '本科');
-INSERT INTO `school` VALUES ('237', '上海电力学院', '上海', '工科', '本科');
-INSERT INTO `school` VALUES ('238', '上海师范大学', '上海', '师范', '本科');
-INSERT INTO `school` VALUES ('239', '上海对外经贸大学', '上海', '财经', '本科');
-INSERT INTO `school` VALUES ('240', '华东政法大学', '上海', '政法', '本科');
-INSERT INTO `school` VALUES ('241', '上海体育学院', '上海', '体育', '本科');
-INSERT INTO `school` VALUES ('242', '上海音乐学院', '上海', '艺术', '本科');
-INSERT INTO `school` VALUES ('243', '上海戏剧学院', '上海', '艺术', '本科');
-INSERT INTO `school` VALUES ('244', '南京工业大学', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('245', '江苏工业学院', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('246', '南京林业大学', '江苏', '林业', '本科');
-INSERT INTO `school` VALUES ('247', '江苏大学', '江苏', '综合', '本科');
-INSERT INTO `school` VALUES ('248', '盐城工学院', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('249', '南京医科大学', '江苏', '医药', '本科');
-INSERT INTO `school` VALUES ('250', '徐州医学院', '江苏', '医药', '本科');
-INSERT INTO `school` VALUES ('251', '南京中医药大学', '江苏', '医药', '本科');
-INSERT INTO `school` VALUES ('252', '江苏师范大学', '江苏', '师范', '本科');
-INSERT INTO `school` VALUES ('253', '淮阴师范学院', '江苏', '师范', '本科');
-INSERT INTO `school` VALUES ('254', '盐城师范学院', '江苏', '师范', '本科');
-INSERT INTO `school` VALUES ('255', '南京体育学院', '江苏', '体育', '本科');
-INSERT INTO `school` VALUES ('256', '南京艺术学院', '江苏', '艺术', '本科');
-INSERT INTO `school` VALUES ('257', '常熟理工学院', '江苏', '综合', '本科');
-INSERT INTO `school` VALUES ('258', '浙江工业大学', '浙江', '工科', '本科');
-INSERT INTO `school` VALUES ('259', '浙江理工大学', '浙江', '工科', '本科');
-INSERT INTO `school` VALUES ('260', '浙江海洋学院', '浙江', '农业', '本科');
-INSERT INTO `school` VALUES ('261', '浙江林学院', '浙江', '林业', '本科');
-INSERT INTO `school` VALUES ('262', '温州医科大学', '浙江', '医药', '本科');
-INSERT INTO `school` VALUES ('263', '浙江中医药大学', '浙江', '医药', '本科');
-INSERT INTO `school` VALUES ('264', '浙江师范大学', '浙江', '师范', '本科');
-INSERT INTO `school` VALUES ('265', '杭州师范大学', '浙江', '师范', '本科');
-INSERT INTO `school` VALUES ('266', '湖州师范学院', '浙江', '师范', '本科');
-INSERT INTO `school` VALUES ('267', '绍兴文理学院', '浙江', '师范', '本科');
-INSERT INTO `school` VALUES ('268', '台州学院', '浙江', '综合', '本科');
-INSERT INTO `school` VALUES ('269', '中国美术学院', '浙江', '艺术', '本科');
-INSERT INTO `school` VALUES ('270', '中国计量学院', '浙江', '工科', '本科');
-INSERT INTO `school` VALUES ('271', '安徽工业大学', '安徽', '工科', '本科');
-INSERT INTO `school` VALUES ('272', '安徽理工大学', '安徽', '工科', '本科');
-INSERT INTO `school` VALUES ('273', '安徽工程大学', '安徽', '工科', '本科');
-INSERT INTO `school` VALUES ('274', '安徽农业大学', '安徽', '农业', '本科');
-INSERT INTO `school` VALUES ('275', '安徽医科大学', '安徽', '医药', '本科');
-INSERT INTO `school` VALUES ('276', '蚌埠医学院', '安徽', '医药', '本科');
-INSERT INTO `school` VALUES ('277', '皖南医学院', '安徽', '医药', '本科');
-INSERT INTO `school` VALUES ('278', '安徽中医药大学', '安徽', '医药', '本科');
-INSERT INTO `school` VALUES ('279', '安徽师范大学', '安徽', '师范', '本科');
-INSERT INTO `school` VALUES ('280', '阜阳师范学院', '安徽', '师范', '本科');
-INSERT INTO `school` VALUES ('281', '安庆师范学院', '安徽', '师范', '本科');
-INSERT INTO `school` VALUES ('282', '淮北煤炭师范学院', '安徽', '师范', '本科');
-INSERT INTO `school` VALUES ('283', '黄山学院', '安徽', '师范', '本科');
-INSERT INTO `school` VALUES ('284', '巢湖学院', '安徽', '师范', '本科');
-INSERT INTO `school` VALUES ('285', '淮南师范学院', '安徽', '师范', '本科');
-INSERT INTO `school` VALUES ('286', '铜陵学院', '安徽', '财经', '本科');
-INSERT INTO `school` VALUES ('287', '华侨大学', '福建', '综合', '本科');
-INSERT INTO `school` VALUES ('288', '福建工程学院', '福建', '工科', '本科');
-INSERT INTO `school` VALUES ('289', '福建医科大学', '福建', '医药', '本科');
-INSERT INTO `school` VALUES ('290', '福建中医药大学', '福建', '医药', '本科');
-INSERT INTO `school` VALUES ('291', '福建师范大学', '福建', '师范', '本科');
-INSERT INTO `school` VALUES ('292', '闽江学院', '福建', '工科', '本科');
-INSERT INTO `school` VALUES ('293', '泉州师范学院', '福建', '师范', '本科');
-INSERT INTO `school` VALUES ('294', '闽南师范大学', '福建', '师范', '本科');
-INSERT INTO `school` VALUES ('295', '华东交通大学', '江西', '工科', '本科');
-INSERT INTO `school` VALUES ('296', '东华理工学院', '江西', '工科', '其它');
-INSERT INTO `school` VALUES ('297', '南昌航空大学', '江西', '工科', '本科');
-INSERT INTO `school` VALUES ('298', '景德镇陶瓷学院', '江西', '工科', '本科');
-INSERT INTO `school` VALUES ('299', '江西农业大学', '江西', '农业', '本科');
-INSERT INTO `school` VALUES ('300', '江西中医药大学', '江西', '医药', '本科');
-INSERT INTO `school` VALUES ('301', '赣南医学院', '江西', '医药', '本科');
-INSERT INTO `school` VALUES ('302', '江西师范大学', '江西', '师范', '本科');
-INSERT INTO `school` VALUES ('303', '上饶师范学院', '江西', '师范', '本科');
-INSERT INTO `school` VALUES ('304', '赣南师范学院', '江西', '师范', '本科');
-INSERT INTO `school` VALUES ('305', '江西财经大学', '江西', '财经', '本科');
-INSERT INTO `school` VALUES ('306', '山东科技大学', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('307', '青岛科技大学', '山东', '工科', '本科');
-INSERT INTO `school` VALUES ('308', '山东建筑大学', '山东', '工科', '本科');
-INSERT INTO `school` VALUES ('309', '齐鲁工业大学', '山东', '工科', '本科');
-INSERT INTO `school` VALUES ('310', '山东农业大学', '山东', '农业', '本科');
-INSERT INTO `school` VALUES ('311', '青岛农业大学', '山东', '农业', '本科');
-INSERT INTO `school` VALUES ('312', '潍坊医学院', '山东', '医药', '本科');
-INSERT INTO `school` VALUES ('313', '泰山医学院', '山东', '医药', '本科');
-INSERT INTO `school` VALUES ('314', '滨州医学院', '山东', '医药', '本科');
-INSERT INTO `school` VALUES ('315', '山东中医药大学', '山东', '医药', '本科');
-INSERT INTO `school` VALUES ('316', '济宁医学院', '山东', '医药', '本科');
-INSERT INTO `school` VALUES ('317', '山东师范大学', '山东', '师范', '本科');
-INSERT INTO `school` VALUES ('318', '曲阜师范大学', '山东', '师范', '本科');
-INSERT INTO `school` VALUES ('319', '聊城大学', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('320', '德州学院', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('321', '临沂大学', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('322', '泰山学院', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('323', '山东财经大学', '山东', '财经', '本科');
-INSERT INTO `school` VALUES ('324', '山东艺术学院', '山东', '艺术', '本科');
-INSERT INTO `school` VALUES ('325', '郑州轻工业学院', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('326', '河南科技大学', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('327', '中原工学院', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('328', '河南农业大学', '河南', '农业', '本科');
-INSERT INTO `school` VALUES ('329', '河南中医学院', '河南', '医药', '本科');
-INSERT INTO `school` VALUES ('330', '新乡医学院', '河南', '医药', '本科');
-INSERT INTO `school` VALUES ('331', '河南大学', '河南', '综合', '本科');
-INSERT INTO `school` VALUES ('332', '河南师范大学', '河南', '师范', '本科');
-INSERT INTO `school` VALUES ('333', '信阳师范学院', '河南', '师范', '本科');
-INSERT INTO `school` VALUES ('334', '周口师范学院', '河南', '师范', '本科');
-INSERT INTO `school` VALUES ('335', '安阳师范学院', '河南', '师范', '本科');
-INSERT INTO `school` VALUES ('336', '许昌学院', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('337', '南阳师范学院', '河南', '师范', '本科');
-INSERT INTO `school` VALUES ('338', '洛阳师范学院', '河南', '师范', '本科');
-INSERT INTO `school` VALUES ('339', '商丘师范学院', '河南', '师范', '本科');
-INSERT INTO `school` VALUES ('340', '河南财经政法大学', '河南', '财经', '本科');
-INSERT INTO `school` VALUES ('341', '郑州航空工业管理学院', '河南', '财经', '本科');
-INSERT INTO `school` VALUES ('342', '武汉工程大学', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('343', '武汉纺织大学', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('344', '武汉轻工大学', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('345', '湖北中医药大学', '湖北', '医药', '本科');
-INSERT INTO `school` VALUES ('346', '湖北大学', '湖北', '综合', '本科');
-INSERT INTO `school` VALUES ('347', '湖北师范学院', '湖北', '师范', '本科');
-INSERT INTO `school` VALUES ('348', '黄冈师范学院', '湖北', '师范', '本科');
-INSERT INTO `school` VALUES ('349', '湖北民族学院', '湖北', '民族', '本科');
-INSERT INTO `school` VALUES ('350', '湖北文理学院', '湖北', '综合', '本科');
-INSERT INTO `school` VALUES ('351', '武汉体育学院', '湖北', '体育', '本科');
-INSERT INTO `school` VALUES ('352', '湖北美术学院', '湖北', '艺术', '本科');
-INSERT INTO `school` VALUES ('353', '中南民族大学', '湖北', '民族', '本科');
-INSERT INTO `school` VALUES ('354', '湖北汽车工业学院', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('355', '湖北工程学院', '湖北', '综合', '本科');
-INSERT INTO `school` VALUES ('356', '湘潭大学', '湖南', '综合', '本科');
-INSERT INTO `school` VALUES ('357', '吉首大学', '湖南', '综合', '本科');
-INSERT INTO `school` VALUES ('358', '湖南农业大学', '湖南', '农业', '本科');
-INSERT INTO `school` VALUES ('359', '中南林业科技大学', '湖南', '林业', '本科');
-INSERT INTO `school` VALUES ('360', '湖南中医药大学', '湖南', '医药', '本科');
-INSERT INTO `school` VALUES ('361', '湖南理工学院', '湖南', '工科', '本科');
-INSERT INTO `school` VALUES ('362', '衡阳师范学院', '湖南', '师范', '本科');
-INSERT INTO `school` VALUES ('363', '怀化学院', '湖南', '综合', '本科');
-INSERT INTO `school` VALUES ('364', '湖南文理学院', '湖南', '综合', '本科');
-INSERT INTO `school` VALUES ('365', '湖南商学院', '湖南', '财经', '本科');
-INSERT INTO `school` VALUES ('366', '汕头大学', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('367', '华南热带农业大学', '海南', '农业', '其它');
-INSERT INTO `school` VALUES ('368', '广东海洋大学', '广东', '农业', '本科');
-INSERT INTO `school` VALUES ('369', '广州医科大学', '广东', '医药', '本科');
-INSERT INTO `school` VALUES ('370', '广东医学院', '广东', '医药', '本科');
-INSERT INTO `school` VALUES ('371', '广东药学院', '广东', '医药', '本科');
-INSERT INTO `school` VALUES ('372', '韶关学院', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('373', '惠州学院', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('374', '韩山师范学院', '广东', '师范', '本科');
-INSERT INTO `school` VALUES ('375', '湛江师范学院', '广东', '师范', '本科');
-INSERT INTO `school` VALUES ('376', '肇庆学院', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('377', '惠州大学', '广东', '综合', '其它');
-INSERT INTO `school` VALUES ('378', '嘉应学院', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('379', '广州体育学院', '广东', '体育', '本科');
-INSERT INTO `school` VALUES ('380', '广州美术学院', '广东', '艺术', '本科');
-INSERT INTO `school` VALUES ('381', '星海音乐学院', '广东', '艺术', '本科');
-INSERT INTO `school` VALUES ('382', '广东技术师范学院', '广东', '师范', '本科');
-INSERT INTO `school` VALUES ('383', '深圳大学', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('384', '广东商学院', '广东', '财经', '本科');
-INSERT INTO `school` VALUES ('385', '广西科技大学', '广西', '工科', '本科');
-INSERT INTO `school` VALUES ('386', '桂林电子科技大学', '广西', '工科', '本科');
-INSERT INTO `school` VALUES ('387', '桂林理工大学', '广西', '工科', '本科');
-INSERT INTO `school` VALUES ('388', '广西医科大学', '广西', '医药', '本科');
-INSERT INTO `school` VALUES ('389', '右江民族医学院', '广西', '医药', '本科');
-INSERT INTO `school` VALUES ('390', '广西中医药大学', '广西', '医药', '本科');
-INSERT INTO `school` VALUES ('391', '桂林医学院', '广西', '医药', '本科');
-INSERT INTO `school` VALUES ('392', '广西师范大学', '广西', '师范', '本科');
-INSERT INTO `school` VALUES ('393', '广西师范学院', '广西', '师范', '本科');
-INSERT INTO `school` VALUES ('394', '河池学院', '广西', '师范', '本科');
-INSERT INTO `school` VALUES ('395', '玉林师范学院', '广西', '师范', '本科');
-INSERT INTO `school` VALUES ('396', '广西艺术学院', '广西', '艺术', '本科');
-INSERT INTO `school` VALUES ('397', '广西民族大学', '广西', '民族', '本科');
-INSERT INTO `school` VALUES ('398', '百色学院', '广西', '综合', '本科');
-INSERT INTO `school` VALUES ('399', '西南石油大学', '四川', '工科', '本科');
-INSERT INTO `school` VALUES ('400', '成都理工大学', '四川', '工科', '本科');
-INSERT INTO `school` VALUES ('401', '重庆邮电大学', '重庆', '工科', '本科');
-INSERT INTO `school` VALUES ('402', '重庆交通大学', '重庆', '工科', '本科');
-INSERT INTO `school` VALUES ('403', '西南科技大学', '四川', '工科', '本科');
-INSERT INTO `school` VALUES ('404', '成都信息工程学院', '四川', '工科', '本科');
-INSERT INTO `school` VALUES ('405', '中国民用航空飞行学院', '四川', '工科', '本科');
-INSERT INTO `school` VALUES ('406', '西南农业大学', '重庆', '农业', '其它');
-INSERT INTO `school` VALUES ('407', '重庆医科大学', '重庆', '医药', '本科');
-INSERT INTO `school` VALUES ('408', '泸州医学院', '四川', '医药', '本科');
-INSERT INTO `school` VALUES ('409', '成都中医药大学', '四川', '医药', '本科');
-INSERT INTO `school` VALUES ('410', '川北医学院', '四川', '医药', '本科');
-INSERT INTO `school` VALUES ('411', '四川师范大学', '四川', '师范', '本科');
-INSERT INTO `school` VALUES ('412', '绵阳师范学院', '四川', '师范', '本科');
-INSERT INTO `school` VALUES ('413', '内江师范学院', '四川', '师范', '本科');
-INSERT INTO `school` VALUES ('414', '宜宾学院', '四川', '综合', '本科');
-INSERT INTO `school` VALUES ('415', '重庆三峡学院', '重庆', '综合', '本科');
-INSERT INTO `school` VALUES ('416', '四川文理学院', '四川', '综合', '本科');
-INSERT INTO `school` VALUES ('417', '长江师范学院', '重庆', '师范', '本科');
-INSERT INTO `school` VALUES ('418', '乐山师范学院', '四川', '师范', '本科');
-INSERT INTO `school` VALUES ('419', '四川外语学院', '重庆', '语言', '本科');
-INSERT INTO `school` VALUES ('420', '西南政法大学', '重庆', '政法', '本科');
-INSERT INTO `school` VALUES ('421', '成都体育学院', '四川', '体育', '本科');
-INSERT INTO `school` VALUES ('422', '四川音乐学院', '四川', '艺术', '本科');
-INSERT INTO `school` VALUES ('423', '四川美术学院', '重庆', '艺术', '本科');
-INSERT INTO `school` VALUES ('424', '贵阳医学院', '贵州', '医药', '本科');
-INSERT INTO `school` VALUES ('425', '遵义医学院', '贵州', '医药', '本科');
-INSERT INTO `school` VALUES ('426', '贵阳中医学院', '贵州', '医药', '本科');
-INSERT INTO `school` VALUES ('427', '贵州师范大学', '贵州', '师范', '本科');
-INSERT INTO `school` VALUES ('428', '遵义师范学院', '贵州', '师范', '本科');
-INSERT INTO `school` VALUES ('429', '黔南民族师范学院', '贵州', '师范', '本科');
-INSERT INTO `school` VALUES ('430', '贵州财经大学', '贵州', '财经', '本科');
-INSERT INTO `school` VALUES ('431', '贵州民族大学', '贵州', '民族', '本科');
-INSERT INTO `school` VALUES ('432', '昆明理工大学', '云南', '工科', '本科');
-INSERT INTO `school` VALUES ('433', '云南农业大学', '云南', '农业', '本科');
-INSERT INTO `school` VALUES ('434', '西南林学院', '云南', '林业', '本科');
-INSERT INTO `school` VALUES ('435', '昆明医科大学', '云南', '医药', '本科');
-INSERT INTO `school` VALUES ('436', '大理学院', '云南', '综合', '本科');
-INSERT INTO `school` VALUES ('437', '云南中医学院', '云南', '医药', '本科');
-INSERT INTO `school` VALUES ('438', '云南师范大学', '云南', '师范', '本科');
-INSERT INTO `school` VALUES ('439', '曲靖师范学院', '云南', '师范', '本科');
-INSERT INTO `school` VALUES ('440', '云南艺术学院', '云南', '艺术', '本科');
-INSERT INTO `school` VALUES ('441', '西藏民族学院', '西藏', '民族', '本科');
-INSERT INTO `school` VALUES ('442', '西藏藏医学院', '西藏', '医药', '本科');
-INSERT INTO `school` VALUES ('443', '西安理工大学', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('444', '西安工业大学', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('445', '西安建筑科技大学', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('446', '陕西科技大学', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('447', '西安工程大学', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('448', '陕西中医学院', '陕西', '医药', '本科');
-INSERT INTO `school` VALUES ('449', '延安大学', '陕西', '综合', '本科');
-INSERT INTO `school` VALUES ('450', '咸阳师范学院', '陕西', '师范', '本科');
-INSERT INTO `school` VALUES ('451', '渭南师范学院', '陕西', '师范', '本科');
-INSERT INTO `school` VALUES ('452', '西安外国语大学', '陕西', '语言', '本科');
-INSERT INTO `school` VALUES ('453', '西安体育学院', '陕西', '体育', '本科');
-INSERT INTO `school` VALUES ('454', '西安音乐学院', '陕西', '艺术', '本科');
-INSERT INTO `school` VALUES ('455', '西安美术学院', '陕西', '艺术', '本科');
-INSERT INTO `school` VALUES ('456', '兰州理工大学', '甘肃', '工科', '本科');
-INSERT INTO `school` VALUES ('457', '甘肃农业大学', '甘肃', '农业', '本科');
-INSERT INTO `school` VALUES ('458', '甘肃中医学院', '甘肃', '医药', '本科');
-INSERT INTO `school` VALUES ('459', '西北师范大学', '甘肃', '师范', '本科');
-INSERT INTO `school` VALUES ('460', '天水师范学院', '甘肃', '师范', '本科');
-INSERT INTO `school` VALUES ('461', '河西学院', '甘肃', '综合', '本科');
-INSERT INTO `school` VALUES ('462', '兰州商学院', '甘肃', '财经', '本科');
-INSERT INTO `school` VALUES ('463', '青海师范大学', '青海', '师范', '本科');
-INSERT INTO `school` VALUES ('464', '青海民族大学', '青海', '民族', '本科');
-INSERT INTO `school` VALUES ('465', '宁夏医科大学', '宁夏', '医药', '本科');
-INSERT INTO `school` VALUES ('466', '塔里木大学', '新疆', '综合', '本科');
-INSERT INTO `school` VALUES ('467', '新疆农业大学', '新疆', '农业', '本科');
-INSERT INTO `school` VALUES ('468', '新疆师范大学', '新疆', '师范', '本科');
-INSERT INTO `school` VALUES ('469', '喀什师范学院', '新疆', '师范', '本科');
-INSERT INTO `school` VALUES ('470', '伊犁师范学院', '新疆', '师范', '本科');
-INSERT INTO `school` VALUES ('471', '新疆财经学院', '新疆', '财经', '其它');
-INSERT INTO `school` VALUES ('472', '新疆艺术学院', '新疆', '艺术', '本科');
-INSERT INTO `school` VALUES ('473', '北京信息科技大学', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('474', '天津城建大学', '天津', '工科', '本科');
-INSERT INTO `school` VALUES ('475', '河北科技师范学院', '河北', '师范', '本科');
-INSERT INTO `school` VALUES ('476', '山西中医学院', '山西', '医药', '本科');
-INSERT INTO `school` VALUES ('477', '呼伦贝尔学院', '内蒙古', '综合', '本科');
-INSERT INTO `school` VALUES ('478', '上海工程技术大学', '上海', '工科', '本科');
-INSERT INTO `school` VALUES ('479', '浙江万里学院', '浙江', '工科', '本科');
-INSERT INTO `school` VALUES ('480', '安徽建筑大学', '安徽', '工科', '本科');
-INSERT INTO `school` VALUES ('481', '枣庄学院', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('482', '山东工艺美术学院', '山东', '艺术', '本科');
-INSERT INTO `school` VALUES ('483', '平顶山学院', '河南', '师范', '本科');
-INSERT INTO `school` VALUES ('484', '湖北科技学院', '湖北', '综合', '本科');
-INSERT INTO `school` VALUES ('485', '湖北医药学院', '湖北', '医药', '本科');
-INSERT INTO `school` VALUES ('486', '昌吉学院', '新疆', '师范', '本科');
-INSERT INTO `school` VALUES ('487', '沈阳大学', '辽宁', '综合', '本科');
-INSERT INTO `school` VALUES ('488', '淮阴工学院', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('489', '徐州工程学院', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('490', '常州工学院', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('491', '浙江科技学院', '浙江', '工科', '本科');
-INSERT INTO `school` VALUES ('492', '宁波工程学院', '浙江', '工科', '本科');
-INSERT INTO `school` VALUES ('493', '合肥学院', '安徽', '工科', '本科');
-INSERT INTO `school` VALUES ('494', '烟台大学', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('495', '中州大学', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('496', '开封大学', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('497', '洛阳理工学院', '河南', '综合', '本科');
-INSERT INTO `school` VALUES ('498', '新乡学院', '河南', '综合', '本科');
-INSERT INTO `school` VALUES ('499', '江汉大学', '湖北', '综合', '本科');
-INSERT INTO `school` VALUES ('500', '沙市大学', '湖北', '综合', '其它');
-INSERT INTO `school` VALUES ('501', '广州大学', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('502', '成都大学', '四川', '综合', '其它');
-INSERT INTO `school` VALUES ('503', '华北科技学院', '河北', '工科', '本科');
-INSERT INTO `school` VALUES ('504', '中国人民武装警察部队学院', '河北', '政法', '本科');
-INSERT INTO `school` VALUES ('505', '广东警官学院', '广东', '政法', '本科');
-INSERT INTO `school` VALUES ('506', '扬州大学', '江苏', '综合', '本科');
-INSERT INTO `school` VALUES ('507', '齐齐哈尔医学院', '黑龙江', '医药', '本科');
-INSERT INTO `school` VALUES ('508', '北京机械工业学院', '北京', '综合', '其它');
-INSERT INTO `school` VALUES ('509', '河北体育学院', '河北', '体育', '本科');
-INSERT INTO `school` VALUES ('510', '大连民族学院', '辽宁', '民族', '本科');
-INSERT INTO `school` VALUES ('511', '大连大学', '辽宁', '综合', '本科');
-INSERT INTO `school` VALUES ('512', '南京审计学院', '江苏', '财经', '本科');
-INSERT INTO `school` VALUES ('513', '温州大学', '浙江', '工科', '本科');
-INSERT INTO `school` VALUES ('514', '江西科技师范大学', '江西', '师范', '本科');
-INSERT INTO `school` VALUES ('515', '五邑大学', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('516', '攀枝花学院', '四川', '综合', '本科');
-INSERT INTO `school` VALUES ('517', '玉溪师范学院', '云南', '师范', '本科');
-INSERT INTO `school` VALUES ('518', '楚雄师范学院', '云南', '师范', '本科');
-INSERT INTO `school` VALUES ('519', '甘肃政法学院', '甘肃', '政法', '本科');
-INSERT INTO `school` VALUES ('520', '北方民族大学', '宁夏', '民族', '本科');
-INSERT INTO `school` VALUES ('521', '北京联合大学', '北京', '综合', '本科');
-INSERT INTO `school` VALUES ('522', '佳木斯大学', '黑龙江', '综合', '本科');
-INSERT INTO `school` VALUES ('523', '浙江财经大学', '浙江', '财经', '本科');
-INSERT INTO `school` VALUES ('524', '莆田学院', '福建', '综合', '本科');
-INSERT INTO `school` VALUES ('525', '山东交通学院', '山东', '工科', '本科');
-INSERT INTO `school` VALUES ('526', '焦作大学', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('527', '武汉音乐学院', '湖北', '艺术', '本科');
-INSERT INTO `school` VALUES ('528', '甘肃联合大学', '甘肃', '综合', '高职专科');
-INSERT INTO `school` VALUES ('529', '中国青年政治学院', '北京', '政法', '本科');
-INSERT INTO `school` VALUES ('530', '北京青年政治学院', '北京', '语言', '高职专科');
-INSERT INTO `school` VALUES ('531', '淮海工学院', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('532', '宁波大学', '浙江', '综合', '本科');
-INSERT INTO `school` VALUES ('533', '南阳理工学院', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('534', '广东石油化工学院', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('535', '海南师范大学', '海南', '师范', '本科');
-INSERT INTO `school` VALUES ('536', '重庆理工大学', '重庆', '工科', '本科');
-INSERT INTO `school` VALUES ('537', '西安邮电大学', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('538', '山东工商学院', '山东', '工科', '本科');
-INSERT INTO `school` VALUES ('539', '长春大学', '吉林', '综合', '本科');
-INSERT INTO `school` VALUES ('540', '平顶山工学院', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('541', '防灾科技学院', '河北', '工科', '本科');
-INSERT INTO `school` VALUES ('542', '海南医学院', '海南', '医药', '本科');
-INSERT INTO `school` VALUES ('543', '东莞理工学院', '广东', '工科', '本科');
-INSERT INTO `school` VALUES ('544', '首钢工学院', '北京', '工科', '本科');
-INSERT INTO `school` VALUES ('545', '上海政法学院', '上海', '政法', '本科');
-INSERT INTO `school` VALUES ('546', '集美大学', '福建', '综合', '本科');
-INSERT INTO `school` VALUES ('547', '宝鸡文理学院', '陕西', '师范', '本科');
-INSERT INTO `school` VALUES ('548', '青岛大学', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('549', '佛山科学技术学院', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('550', '广东外语外贸大学', '广东', '语言', '本科');
-INSERT INTO `school` VALUES ('551', '广东工业大学', '广东', '工科', '本科');
-INSERT INTO `school` VALUES ('552', '首都经济贸易大学', '北京', '财经', '本科');
-INSERT INTO `school` VALUES ('553', '哈尔滨理工大学', '黑龙江', '工科', '本科');
-INSERT INTO `school` VALUES ('554', '武汉科技大学', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('555', '重庆电力高等专科学校', '重庆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('556', '河北经贸大学', '河北', '财经', '本科');
-INSERT INTO `school` VALUES ('557', '河北医科大学', '河北', '医药', '本科');
-INSERT INTO `school` VALUES ('558', '河北农业大学', '河北', '农业', '本科');
-INSERT INTO `school` VALUES ('559', '北京工商大学', '北京', '财经', '本科');
-INSERT INTO `school` VALUES ('560', '内蒙古农业大学', '内蒙古', '农业', '本科');
-INSERT INTO `school` VALUES ('561', '北华大学', '吉林', '综合', '本科');
-INSERT INTO `school` VALUES ('562', '新疆医科大学', '新疆', '医药', '本科');
-INSERT INTO `school` VALUES ('563', '嘉兴学院', '浙江', '财经', '本科');
-INSERT INTO `school` VALUES ('564', '长春工程学院', '吉林', '工科', '本科');
-INSERT INTO `school` VALUES ('565', '哈尔滨学院', '黑龙江', '综合', '本科');
-INSERT INTO `school` VALUES ('566', '黑龙江工程学院', '黑龙江', '工科', '本科');
-INSERT INTO `school` VALUES ('567', '南京晓庄学院', '江苏', '师范', '本科');
-INSERT INTO `school` VALUES ('568', '皖西学院', '安徽', '师范', '本科');
-INSERT INTO `school` VALUES ('569', '潍坊学院', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('570', '三峡大学', '湖北', '综合', '本科');
-INSERT INTO `school` VALUES ('571', '南华大学', '湖南', '综合', '本科');
-INSERT INTO `school` VALUES ('572', '四川警察学院', '四川', '政法', '本科');
-INSERT INTO `school` VALUES ('573', '宜春学院', '江西', '综合', '本科');
-INSERT INTO `school` VALUES ('574', '济南大学', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('575', '内蒙古民族大学', '内蒙古', '综合', '本科');
-INSERT INTO `school` VALUES ('576', '福建农林大学', '福建', '农业', '本科');
-INSERT INTO `school` VALUES ('577', '湖南工程学院', '湖南', '工科', '本科');
-INSERT INTO `school` VALUES ('578', '南京工程学院', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('579', '苏州科技学院', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('580', '陕西理工学院', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('581', '西安财经学院', '陕西', '财经', '本科');
-INSERT INTO `school` VALUES ('582', '中华女子学院', '北京', '语言', '本科');
-INSERT INTO `school` VALUES ('583', '九江学院', '江西', '综合', '本科');
-INSERT INTO `school` VALUES ('584', '湖北经济学院', '湖北', '财经', '本科');
-INSERT INTO `school` VALUES ('585', '唐山学院', '河北', '工科', '本科');
-INSERT INTO `school` VALUES ('586', '邵阳学院', '湖南', '工科', '本科');
-INSERT INTO `school` VALUES ('587', '湖南城市学院', '湖南', '综合', '本科');
-INSERT INTO `school` VALUES ('588', '山东理工大学', '山东', '工科', '本科');
-INSERT INTO `school` VALUES ('589', '中央司法警官学院', '河北', '政法', '本科');
-INSERT INTO `school` VALUES ('590', '重庆师范大学涉外商贸学院', '重庆', '财经', '独立学院');
-INSERT INTO `school` VALUES ('591', '成都医学院', '四川', '医药', '本科');
-INSERT INTO `school` VALUES ('592', '吉林医药学院', '吉林', '医药', '本科');
-INSERT INTO `school` VALUES ('593', '黑河学院', '黑龙江', '综合', '本科');
-INSERT INTO `school` VALUES ('594', '山东政法学院', '山东', '政法', '本科');
-INSERT INTO `school` VALUES ('595', '内蒙古科技大学包头师范学院', '内蒙古', '综合', '其它');
-INSERT INTO `school` VALUES ('596', '四川理工学院', '四川', '工科', '本科');
-INSERT INTO `school` VALUES ('597', '辽东学院', '辽宁', '财经', '本科');
-INSERT INTO `school` VALUES ('598', '解放军信息工程大学', '河南', '军事', '其它');
-INSERT INTO `school` VALUES ('599', '解放军理工大学', '江苏', '军事', '其它');
-INSERT INTO `school` VALUES ('600', '解放军外国语学院', '河南', '军事', '其它');
-INSERT INTO `school` VALUES ('601', '解放军西安通信学院', '陕西', '工科', '其它');
-INSERT INTO `school` VALUES ('602', '郑州防空兵学院', '河南', '军事', '其它');
-INSERT INTO `school` VALUES ('603', '西安政治学院', '陕西', '军事', '其它');
-INSERT INTO `school` VALUES ('604', '海军工程大学', '湖北', '军事', '其它');
-INSERT INTO `school` VALUES ('605', '空军工程大学', '陕西', '军事', '其它');
-INSERT INTO `school` VALUES ('606', '桂林空军学院', '广西', '军事', '其它');
-INSERT INTO `school` VALUES ('607', '空军第一航空学院', '河南', '军事', '其它');
-INSERT INTO `school` VALUES ('608', '上海第二工业大学', '上海', '工科', '本科');
-INSERT INTO `school` VALUES ('609', '浙江外国语学院', '浙江', '语言', '本科');
-INSERT INTO `school` VALUES ('610', '河南教育学院', '河南', '师范', '其它');
-INSERT INTO `school` VALUES ('611', '湖北第二师范学院', '湖北', '师范', '本科');
-INSERT INTO `school` VALUES ('612', '十堰教育学院', '湖北', '师范', '其它');
-INSERT INTO `school` VALUES ('613', '上海市广播电视大学', '上海', '语言', '其它');
-INSERT INTO `school` VALUES ('614', '山东体育学院', '山东', '体育', '本科');
-INSERT INTO `school` VALUES ('615', '安徽财经大学', '安徽', '财经', '本科');
-INSERT INTO `school` VALUES ('616', '北华航天工业学院', '河北', '工科', '本科');
-INSERT INTO `school` VALUES ('617', '北京大学医学部', '北京', '综合', '------');
-INSERT INTO `school` VALUES ('618', '北京工业大学(实验学院)', '北京', '综合', '其它');
-INSERT INTO `school` VALUES ('619', '长江大学', '湖北', '综合', '本科');
-INSERT INTO `school` VALUES ('620', '长沙理工大学', '湖南', '工科', '本科');
-INSERT INTO `school` VALUES ('621', '长沙学院', '湖南', '工科', '本科');
-INSERT INTO `school` VALUES ('622', '大连交通大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('623', '广东金融学院', '广东', '财经', '本科');
-INSERT INTO `school` VALUES ('624', '广西财经学院', '广西', '财经', '本科');
-INSERT INTO `school` VALUES ('625', '杭州电子科技大学', '浙江', '工科', '本科');
-INSERT INTO `school` VALUES ('626', '河北工程大学', '河北', '工科', '本科');
-INSERT INTO `school` VALUES ('627', '河南工业大学', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('628', '河南理工大学', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('629', '红河学院', '云南', '综合', '本科');
-INSERT INTO `school` VALUES ('630', '湖南工业大学', '湖南', '工科', '本科');
-INSERT INTO `school` VALUES ('631', '湖南科技大学', '湖南', '综合', '本科');
-INSERT INTO `school` VALUES ('632', '华北水利水电大学', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('633', '黄淮学院', '河南', '师范', '本科');
-INSERT INTO `school` VALUES ('634', '吉林华侨外国语学院', '吉林', '语言', '其它');
-INSERT INTO `school` VALUES ('635', '江苏科技大学', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('636', '江西理工大学', '江西', '工科', '本科');
-INSERT INTO `school` VALUES ('637', '金陵科技学院', '江苏', '综合', '本科');
-INSERT INTO `school` VALUES ('638', '井冈山大学', '江西', '综合', '本科');
-INSERT INTO `school` VALUES ('639', '兰州交通大学', '甘肃', '工科', '本科');
-INSERT INTO `school` VALUES ('640', '内蒙古科技大学', '内蒙古', '综合', '本科');
-INSERT INTO `school` VALUES ('641', '南昌大学医学院', '江西', '医药', '其它');
-INSERT INTO `school` VALUES ('642', '南昌工程学院', '江西', '工科', '本科');
-INSERT INTO `school` VALUES ('643', '南京财经大学', '江苏', '财经', '本科');
-INSERT INTO `school` VALUES ('644', '南京信息工程大学', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('645', '南京邮电大学', '江苏', '工科', '本科');
-INSERT INTO `school` VALUES ('646', '南通大学', '江苏', '综合', '本科');
-INSERT INTO `school` VALUES ('647', '青岛理工大学', '山东', '工科', '本科');
-INSERT INTO `school` VALUES ('648', '上海海事大学', '上海', '工科', '本科');
-INSERT INTO `school` VALUES ('649', '上海商学院', '上海', '财经', '本科');
-INSERT INTO `school` VALUES ('650', '沈阳建筑大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('651', '沈阳理工大学', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('652', '首都师范大学科德学院', '北京', '语言', '独立学院');
-INSERT INTO `school` VALUES ('653', '太原科技大学', '山西', '工科', '本科');
-INSERT INTO `school` VALUES ('654', '天津财经大学', '天津', '财经', '本科');
-INSERT INTO `school` VALUES ('655', '天津工程师范学院', '天津', '师范', '本科');
-INSERT INTO `school` VALUES ('656', '西安科技大学', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('657', '西安石油大学', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('658', '西安文理学院', '陕西', '师范', '本科');
-INSERT INTO `school` VALUES ('659', '西北民族大学', '甘肃', '民族', '本科');
-INSERT INTO `school` VALUES ('660', '西华师范大学', '四川', '师范', '本科');
-INSERT INTO `school` VALUES ('661', '西南民族大学', '四川', '民族', '本科');
-INSERT INTO `school` VALUES ('662', '香港城市大学', '香港', '综合', '本科');
-INSERT INTO `school` VALUES ('663', '香港中文大学', '香港', '综合', '其它');
-INSERT INTO `school` VALUES ('664', '浙江工商大学', '浙江', '财经', '本科');
-INSERT INTO `school` VALUES ('665', '中北大学', '山西', '工科', '本科');
-INSERT INTO `school` VALUES ('666', '太原工业学院', '山西', '工科', '本科');
-INSERT INTO `school` VALUES ('667', '中国劳动关系学院', '北京', '财经', '本科');
-INSERT INTO `school` VALUES ('668', '重庆工商大学', '重庆', '综合', '本科');
-INSERT INTO `school` VALUES ('669', '重庆科技学院', '重庆', '工科', '本科');
-INSERT INTO `school` VALUES ('670', '重庆师范大学', '重庆', '师范', '本科');
-INSERT INTO `school` VALUES ('671', '重庆文理学院', '重庆', '综合', '本科');
-INSERT INTO `school` VALUES ('672', '云南民族大学', '云南', '民族', '本科');
-INSERT INTO `school` VALUES ('673', '湖北工业大学', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('674', '西华大学', '四川', '综合', '本科');
-INSERT INTO `school` VALUES ('675', '厦门理工学院', '福建', '工科', '本科');
-INSERT INTO `school` VALUES ('676', '长春中医药大学', '吉林', '医药', '本科');
-INSERT INTO `school` VALUES ('677', '云南财经大学', '云南', '财经', '本科');
-INSERT INTO `school` VALUES ('678', '新疆财经大学', '新疆', '财经', '本科');
-INSERT INTO `school` VALUES ('679', '宁波诺丁汉大学', '浙江', '综合', '本科');
-INSERT INTO `school` VALUES ('680', '香港科技大学', '香港', '综合', '其它');
-INSERT INTO `school` VALUES ('681', '香港大学', '香港', '综合', '其它');
-INSERT INTO `school` VALUES ('682', '香港理工大学', '香港', '综合', '其它');
-INSERT INTO `school` VALUES ('683', '香港浸会大学', '香港', '综合', '其它');
-INSERT INTO `school` VALUES ('684', '香港岭南大学', '香港', '综合', '其它');
-INSERT INTO `school` VALUES ('685', '香港教育学院', '香港', '综合', '本科');
-INSERT INTO `school` VALUES ('686', '西交利物浦大学', '江苏', '------', '本科');
-INSERT INTO `school` VALUES ('687', '梧州学院', '广西', '综合', '本科');
-INSERT INTO `school` VALUES ('688', '山西大同大学', '山西', '综合', '本科');
-INSERT INTO `school` VALUES ('689', '河北北方学院', '河北', '医药', '本科');
-INSERT INTO `school` VALUES ('690', '衡水学院', '河北', '师范', '本科');
-INSERT INTO `school` VALUES ('691', '河南科技学院', '河南', '师范', '本科');
-INSERT INTO `school` VALUES ('692', '吉林农业科技学院', '吉林', '农业', '本科');
-INSERT INTO `school` VALUES ('693', '鲁东大学', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('694', '滨州学院', '山东', '师范', '本科');
-INSERT INTO `school` VALUES ('695', '安徽科技学院', '安徽', '师范', '本科');
-INSERT INTO `school` VALUES ('696', '安阳工学院', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('697', '湖北理工学院', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('698', '渤海大学', '辽宁', '综合', '本科');
-INSERT INTO `school` VALUES ('699', '解放军军事经济学院', '湖北', '综合', '其它');
-INSERT INTO `school` VALUES ('700', '解放军南京政治学院', '江苏', '综合', '其它');
-INSERT INTO `school` VALUES ('701', '南方医科大学', '广东', '医药', '本科');
-INSERT INTO `school` VALUES ('702', '中国人民解放军工程兵指挥学院', '江苏', '工科', '其它');
-INSERT INTO `school` VALUES ('703', '中国人民解放军军事交通学院', '天津', '军事', '其它');
-INSERT INTO `school` VALUES ('704', '上海金融学院', '上海', '财经', '本科');
-INSERT INTO `school` VALUES ('705', '石家庄学院', '河北', '师范', '本科');
-INSERT INTO `school` VALUES ('706', '邯郸学院', '河北', '师范', '本科');
-INSERT INTO `school` VALUES ('707', '河北金融学院', '河北', '财经', '本科');
-INSERT INTO `school` VALUES ('708', '菏泽学院', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('709', '山东警察学院', '山东', '政法', '本科');
-INSERT INTO `school` VALUES ('710', '济宁学院', '山东', '------', '本科');
-INSERT INTO `school` VALUES ('711', '长治学院', '山西', '师范', '本科');
-INSERT INTO `school` VALUES ('712', '滁州学院', '安徽', '师范', '本科');
-INSERT INTO `school` VALUES ('713', '宿州学院', '安徽', '师范', '本科');
-INSERT INTO `school` VALUES ('714', '东华理工大学', '江西', '工科', '本科');
-INSERT INTO `school` VALUES ('715', '丽水学院', '浙江', '师范', '本科');
-INSERT INTO `school` VALUES ('716', '湘南学院', '湖南', '工科', '本科');
-INSERT INTO `school` VALUES ('717', '贺州学院', '广西', '综合', '本科');
-INSERT INTO `school` VALUES ('718', '钦州学院', '广西', '综合', '本科');
-INSERT INTO `school` VALUES ('719', '西昌学院', '四川', '综合', '本科');
-INSERT INTO `school` VALUES ('720', '榆林学院', '陕西', '师范', '本科');
-INSERT INTO `school` VALUES ('721', '西安医学院', '陕西', '医药', '本科');
-INSERT INTO `school` VALUES ('722', '西北政法大学', '陕西', '政法', '本科');
-INSERT INTO `school` VALUES ('723', '安康学院', '陕西', '综合', '本科');
-INSERT INTO `school` VALUES ('724', '宁夏师范学院', '宁夏', '师范', '本科');
-INSERT INTO `school` VALUES ('725', '吉林工商学院', '吉林', '财经', '本科');
-INSERT INTO `school` VALUES ('726', '琼州学院', '海南', '综合', '本科');
-INSERT INTO `school` VALUES ('727', '三明学院', '福建', '综合', '本科');
-INSERT INTO `school` VALUES ('728', '龙岩学院', '福建', '师范', '本科');
-INSERT INTO `school` VALUES ('729', '陇东学院', '甘肃', '师范', '本科');
-INSERT INTO `school` VALUES ('730', '澳门科技大学', '澳门', '综合', '其它');
-INSERT INTO `school` VALUES ('731', '澳门旅游学院', '澳门', '------', '------');
-INSERT INTO `school` VALUES ('732', '河北工程技术高等专科学校', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('733', '承德民族师范高等专科学校', '河北', '师范', '高职专科');
-INSERT INTO `school` VALUES ('734', '澳门科技大学', '澳门', '师范', '高职专科');
-INSERT INTO `school` VALUES ('735', '澳门旅游学院', '辽宁', '师范', '高职专科');
-INSERT INTO `school` VALUES ('736', '抚顺师范高等专科学校', '辽宁', '师范', '高职专科');
-INSERT INTO `school` VALUES ('737', '锦州师范高等专科学校', '辽宁', '师范', '高职专科');
-INSERT INTO `school` VALUES ('738', '铁岭师范高等专科学校', '辽宁', '师范', '高职专科');
-INSERT INTO `school` VALUES ('739', '哈尔滨医科大学', '黑龙江', '医药', '本科');
-INSERT INTO `school` VALUES ('740', '大庆师范学院', '黑龙江', '综合', '本科');
-INSERT INTO `school` VALUES ('741', '哈尔滨金融学院', '黑龙江', '财经', '本科');
-INSERT INTO `school` VALUES ('742', '上海医疗器械高等专科学校', '上海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('743', '上海公安高等专科学校', '上海', '政法', '高职专科');
-INSERT INTO `school` VALUES ('744', '江苏警官学院', '江苏', '政法', '本科');
-INSERT INTO `school` VALUES ('745', '宁德师范高等专科学校', '福建', '师范', '高职专科');
-INSERT INTO `school` VALUES ('746', '菏泽医学专科学校', '山东', '医药', '高职专科');
-INSERT INTO `school` VALUES ('747', '河南牧业经济学院', '河南', '农业', '本科');
-INSERT INTO `school` VALUES ('748', '郧阳师范高等专科学校', '湖北', '师范', '高职专科');
-INSERT INTO `school` VALUES ('749', '广东培正学院', '广东', '财经', '本科');
-INSERT INTO `school` VALUES ('750', '广西民族师范学院', '广西', '师范', '本科');
-INSERT INTO `school` VALUES ('751', '阿坝师范高等专科学校', '四川', '师范', '高职专科');
-INSERT INTO `school` VALUES ('752', '兴义民族师范学院', '贵州', '师范', '本科');
-INSERT INTO `school` VALUES ('753', '昭通师范高等专科学校', '云南', '师范', '高职专科');
-INSERT INTO `school` VALUES ('754', '普洱学院', '云南', '师范', '本科');
-INSERT INTO `school` VALUES ('755', '保山学院', '云南', '师范', '本科');
-INSERT INTO `school` VALUES ('756', '兰州城市学院', '甘肃', '综合', '本科');
-INSERT INTO `school` VALUES ('757', '和田师范专科学校', '新疆', '师范', '高职专科');
-INSERT INTO `school` VALUES ('758', '吕梁高等专科学校', '山西', '师范', '高职专科');
-INSERT INTO `school` VALUES ('759', '广东白云学院', '广东', '工科', '本科');
-INSERT INTO `school` VALUES ('760', '公安海警高等专科学校', '浙江', '政法', '高职专科');
-INSERT INTO `school` VALUES ('761', '青岛滨海学院', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('762', '江西医学院上饶分院', '江西', '医药', '其它');
-INSERT INTO `school` VALUES ('763', '景德镇学院', '江西', '综合', '本科');
-INSERT INTO `school` VALUES ('764', '萍乡学院', '江西', '综合', '本科');
-INSERT INTO `school` VALUES ('765', '六盘水师范学院', '贵州', '师范', '本科');
-INSERT INTO `school` VALUES ('766', '新疆工程学院', '新疆', '工科', '本科');
-INSERT INTO `school` VALUES ('767', '新疆警察学院', '新疆', '政法', '本科');
-INSERT INTO `school` VALUES ('768', '天津职业大学', '天津', '工科', '高职专科');
-INSERT INTO `school` VALUES ('769', '抚顺职业技术学院', '辽宁', '综合', '高职专科');
-INSERT INTO `school` VALUES ('770', '牡丹江大学', '黑龙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('771', '镇江市高等专科学校', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('772', '南通职业大学', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('773', '铁道警察学院', '河南', '政法', '本科');
-INSERT INTO `school` VALUES ('774', '三亚学院', '海南', '综合', '本科');
-INSERT INTO `school` VALUES ('775', '广州航海学院', '广东', '工科', '本科');
-INSERT INTO `school` VALUES ('776', '成都工业学院', '四川', '工科', '本科');
-INSERT INTO `school` VALUES ('777', '私立华联学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('778', '太原学院', '山西', '工科', '本科');
-INSERT INTO `school` VALUES ('779', '辽宁农业职业技术学院', '辽宁', '农业', '高职专科');
-INSERT INTO `school` VALUES ('780', '阜新高等专科学校', '辽宁', '综合', '高职专科');
-INSERT INTO `school` VALUES ('781', '沙洲职业工学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('782', '淮南联合大学', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('783', '福建商业高等专科学校', '福建', '财经', '高职专科');
-INSERT INTO `school` VALUES ('784', '黎明职业大学', '福建', '综合', '高职专科');
-INSERT INTO `school` VALUES ('785', '信阳农林学院', '河南', '农业', '本科');
-INSERT INTO `school` VALUES ('786', '湖南科技学院', '湖南', '综合', '本科');
-INSERT INTO `school` VALUES ('787', '河南机电高等专科学校', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('788', '湖北警官学院', '湖北', '政法', '本科');
-INSERT INTO `school` VALUES ('789', '鄂州职业大学', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('790', '广西体育高等专科学校', '广西', '体育', '高职专科');
-INSERT INTO `school` VALUES ('791', '北京城市学院', '北京', '综合', '本科');
-INSERT INTO `school` VALUES ('792', '集宁师范学院', '内蒙古', '师范', '本科');
-INSERT INTO `school` VALUES ('793', '辽宁警官高等专科学校', '辽宁', '政法', '高职专科');
-INSERT INTO `school` VALUES ('794', '长春汽车工业高等专科学校', '吉林', '工科', '高职专科');
-INSERT INTO `school` VALUES ('795', '长春金融高等专科学校', '吉林', '财经', '高职专科');
-INSERT INTO `school` VALUES ('796', '吉林警察学院', '吉林', '政法', '本科');
-INSERT INTO `school` VALUES ('797', '黑龙江工业学院', '黑龙江', '工科', '本科');
-INSERT INTO `school` VALUES ('798', '扬州市职业大学', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('799', '江苏理工学院', '江苏', '师范', '本科');
-INSERT INTO `school` VALUES ('800', '南京森林公安高等专科学校', '江苏', '政法', '高职专科');
-INSERT INTO `school` VALUES ('801', '浙江水利水电学院', '浙江', '工科', '本科');
-INSERT INTO `school` VALUES ('802', '福建华南女子职业学院', '福建', '综合', '高职专科');
-INSERT INTO `school` VALUES ('803', '辽宁交通高等专科学校', '辽宁', '工科', '高职专科');
-INSERT INTO `school` VALUES ('804', '江西公安专科学校', '江西', '政法', '高职专科');
-INSERT INTO `school` VALUES ('805', '九江职业大学', '江西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('806', '新余高等专科学校', '江西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('807', '湖南财政经济学院', '湖南', '财经', '本科');
-INSERT INTO `school` VALUES ('808', '湖南警察学院', '湖南', '政法', '本科');
-INSERT INTO `school` VALUES ('809', '湖南女子职业大学', '湖南', '语言', '高职专科');
-INSERT INTO `school` VALUES ('810', '柳州师范高等专科学校', '广西', '师范', '高职专科');
-INSERT INTO `school` VALUES ('811', '南宁学院', '广西', '工科', '本科');
-INSERT INTO `school` VALUES ('812', '四川旅游学院', '四川', '综合', '本科');
-INSERT INTO `school` VALUES ('813', '成都纺织高等专科学校', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('814', '文山学院', '云南', '师范', '本科');
-INSERT INTO `school` VALUES ('815', '昆明冶金高等专科学校', '云南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('816', '合作民族师范高等专科学校', '甘肃', '师范', '高职专科');
-INSERT INTO `school` VALUES ('817', '乌鲁木齐职业大学', '新疆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('818', '河套学院', '内蒙古', '师范', '本科');
-INSERT INTO `school` VALUES ('819', '河南财政税务高等专科学校', '河南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('820', '武汉商学院', '湖北', '财经', '本科');
-INSERT INTO `school` VALUES ('821', '四川民族学院', '四川', '师范', '本科');
-INSERT INTO `school` VALUES ('822', '黔南民族医学高等专科学校', '贵州', '医药', '高职专科');
-INSERT INTO `school` VALUES ('823', '呼和浩特民族学院', '内蒙古', '语言', '本科');
-INSERT INTO `school` VALUES ('824', '贵州商业高等专科学校', '贵州', '财经', '高职专科');
-INSERT INTO `school` VALUES ('825', '上海出版印刷高等专科学校', '上海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('826', '西安航空学院', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('827', '承德石油高等专科学校', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('828', '仰恩大学', '福建', '综合', '本科');
-INSERT INTO `school` VALUES ('829', '河南公安高等专科学校', '河南', '政法', '高职专科');
-INSERT INTO `school` VALUES ('830', '湖北财经高等专科学校', '湖北', '财经', '高职专科');
-INSERT INTO `school` VALUES ('831', '兰州工业学院', '甘肃', '工科', '本科');
-INSERT INTO `school` VALUES ('832', '新疆维吾尔医学专科学校', '新疆', '医药', '高职专科');
-INSERT INTO `school` VALUES ('833', '邢台职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('834', '长春医学高等专科学校', '吉林', '医药', '高职专科');
-INSERT INTO `school` VALUES ('835', '桂林师范高等专科学校', '广西', '师范', '高职专科');
-INSERT INTO `school` VALUES ('836', '桂林航天工业学院', '广西', '工科', '本科');
-INSERT INTO `school` VALUES ('837', '西安电力高等专科学校', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('838', '郑州电力高等专科学校', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('839', '上海杉达学院', '上海', '财经', '本科');
-INSERT INTO `school` VALUES ('840', '黄河科技学院', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('841', '桂林旅游高等专科学校', '广西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('842', '民办四川天一学院', '四川', '财经', '高职专科');
-INSERT INTO `school` VALUES ('843', '浙江树人学院', '浙江', '工科', '本科');
-INSERT INTO `school` VALUES ('844', '长沙航空职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('845', '郑州澍青医学高等专科学校', '河南', '医药', '高职专科');
-INSERT INTO `school` VALUES ('846', '天津医学高等专科学校', '天津', '医药', '高职专科');
-INSERT INTO `school` VALUES ('847', '三江学院', '江苏', '综合', '本科');
-INSERT INTO `school` VALUES ('848', '黑龙江东方学院', '黑龙江', '综合', '本科');
-INSERT INTO `school` VALUES ('849', '山西警官高等专科学校', '山西', '政法', '高职专科');
-INSERT INTO `school` VALUES ('850', '连云港师范高等专科学校', '江苏', '师范', '高职专科');
-INSERT INTO `school` VALUES ('851', '上海应用技术学院', '上海', '工科', '本科');
-INSERT INTO `school` VALUES ('852', '浙江医药高等专科学校', '浙江', '医药', '高职专科');
-INSERT INTO `school` VALUES ('853', '泰州学院', '江苏', '师范', '本科');
-INSERT INTO `school` VALUES ('854', '鹤岗师范高等专科学校', '黑龙江', '师范', '高职专科');
-INSERT INTO `school` VALUES ('855', '安徽医学高等专科学校', '安徽', '医药', '高职专科');
-INSERT INTO `school` VALUES ('856', '亳州师范高等专科学校', '安徽', '师范', '高职专科');
-INSERT INTO `school` VALUES ('857', '邢台医学高等专科学校', '河北', '医药', '高职专科');
-INSERT INTO `school` VALUES ('858', '湖北中医药高等专科学校', '湖北', '医药', '高职专科');
-INSERT INTO `school` VALUES ('859', '焦作师范高等专科学校', '河南', '师范', '高职专科');
-INSERT INTO `school` VALUES ('860', '安徽中医药高等专科学校', '安徽', '医药', '高职专科');
-INSERT INTO `school` VALUES ('861', '郑州师范高等专科学校', '河南', '师范', '高职专科');
-INSERT INTO `school` VALUES ('862', '安徽新华学院', '安徽', '工科', '本科');
-INSERT INTO `school` VALUES ('863', '烟台南山学院', '山东', '工科', '本科');
-INSERT INTO `school` VALUES ('864', '湘潭大学兴湘学院', '湖南', '综合', '独立学院');
-INSERT INTO `school` VALUES ('865', '重庆大学城市科技学院', '重庆', '综合', '独立学院');
-INSERT INTO `school` VALUES ('866', '华南理工大学广州学院', '广东', '工科', '本科');
-INSERT INTO `school` VALUES ('867', '广州大学华软软件学院', '广东', '工科', '独立学院');
-INSERT INTO `school` VALUES ('868', '中山大学南方学院', '广东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('869', '广东外语外贸大学南国商学院', '广东', '财经', '独立学院');
-INSERT INTO `school` VALUES ('870', '广东商学院华商学院', '广东', '财经', '独立学院');
-INSERT INTO `school` VALUES ('871', '广东海洋大学寸金学院', '广东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('872', '华南农业大学珠江学院', '广东', '农业', '独立学院');
-INSERT INTO `school` VALUES ('873', '湖南师范大学树达学院', '湖南', '师范', '独立学院');
-INSERT INTO `school` VALUES ('874', '湖南文理学院芙蓉学院', '湖南', '综合', '独立学院');
-INSERT INTO `school` VALUES ('875', '湖南理工学院南湖学院', '湖南', '工科', '独立学院');
-INSERT INTO `school` VALUES ('876', '衡阳师范学院南岳学院', '湖南', '师范', '独立学院');
-INSERT INTO `school` VALUES ('877', '湖南中医药大学湘杏学院', '湖南', '医药', '独立学院');
-INSERT INTO `school` VALUES ('878', '广东技术师范学院天河学院', '广东', '工科', '独立学院');
-INSERT INTO `school` VALUES ('879', '东南大学成贤学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('880', '西安欧亚学院', '陕西', '财经', '本科');
-INSERT INTO `school` VALUES ('881', '上海建桥学院', '上海', '综合', '本科');
-INSERT INTO `school` VALUES ('882', '福建师范大学闽南科技学院', '福建', '工科', '独立学院');
-INSERT INTO `school` VALUES ('883', '福建农林大学东方学院', '福建', '工科', '独立学院');
-INSERT INTO `school` VALUES ('884', '武汉大学珞珈学院', '湖北', '综合', '独立学院');
-INSERT INTO `school` VALUES ('885', '沈阳城市建设学院', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('886', '大连医科大学中山学院', '辽宁', '医药', '独立学院');
-INSERT INTO `school` VALUES ('887', '辽宁师范大学海华学院', '辽宁', '师范', '独立学院');
-INSERT INTO `school` VALUES ('888', '湖北工业大学工程技术学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('889', '武汉科技学院外经贸学院', '湖北', '财经', '独立学院');
-INSERT INTO `school` VALUES ('890', '湖北民族学院科技学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('891', '湖北经济学院法商学院', '湖北', '财经', '独立学院');
-INSERT INTO `school` VALUES ('892', '武汉体育学院体育科技学院', '湖北', '体育', '独立学院');
-INSERT INTO `school` VALUES ('893', '襄樊学院理工学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('894', '孝感学院新技术学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('895', '浙江工业大学之江学院', '浙江', '工科', '独立学院');
-INSERT INTO `school` VALUES ('896', '浙江师范大学行知学院', '浙江', '综合', '独立学院');
-INSERT INTO `school` VALUES ('897', '宁波大学科学技术学院', '浙江', '综合', '独立学院');
-INSERT INTO `school` VALUES ('898', '杭州电子科技大学信息工程学院', '浙江', '工科', '独立学院');
-INSERT INTO `school` VALUES ('899', '浙江理工大学科技与艺术学院', '浙江', '工科', '独立学院');
-INSERT INTO `school` VALUES ('900', '浙江海洋学院东海科学技术学院', '浙江', '农业', '独立学院');
-INSERT INTO `school` VALUES ('901', '浙江林学院天目学院', '浙江', '林业', '独立学院');
-INSERT INTO `school` VALUES ('902', '温州医学院仁济学院', '浙江', '医药', '独立学院');
-INSERT INTO `school` VALUES ('903', '浙江中医药大学滨江学院', '浙江', '医药', '独立学院');
-INSERT INTO `school` VALUES ('904', '湖州师范学院求真学院', '浙江', '师范', '独立学院');
-INSERT INTO `school` VALUES ('905', '绍兴文理学院元培学院', '浙江', '师范', '独立学院');
-INSERT INTO `school` VALUES ('906', '温州大学瓯江学院', '浙江', '师范', '独立学院');
-INSERT INTO `school` VALUES ('907', '浙江工商大学杭州商学院', '浙江', '财经', '独立学院');
-INSERT INTO `school` VALUES ('908', '嘉兴学院南湖学院', '浙江', '财经', '独立学院');
-INSERT INTO `school` VALUES ('909', '浙江财经学院东方学院', '浙江', '财经', '独立学院');
-INSERT INTO `school` VALUES ('910', '大庆石油学院华瑞学院', '黑龙江', '工科', '独立学院');
-INSERT INTO `school` VALUES ('911', '哈尔滨剑桥学院', '黑龙江', '综合', '本科');
-INSERT INTO `school` VALUES ('912', '青岛理工大学琴岛学院', '山东', '工科', '独立学院');
-INSERT INTO `school` VALUES ('913', '中国石油大学胜利学院', '山东', '工科', '独立学院');
-INSERT INTO `school` VALUES ('914', '赣南师范学院科技学院', '江西', '师范', '独立学院');
-INSERT INTO `school` VALUES ('915', '福州大学阳光学院', '福建', '工科', '独立学院');
-INSERT INTO `school` VALUES ('916', '福州大学至诚学院', '福建', '综合', '独立学院');
-INSERT INTO `school` VALUES ('917', '河南师范大学新联学院', '河南', '师范', '独立学院');
-INSERT INTO `school` VALUES ('918', '信阳师范学院华锐学院', '河南', '师范', '独立学院');
-INSERT INTO `school` VALUES ('919', '安阳师范学院人文管理学院', '河南', '师范', '独立学院');
-INSERT INTO `school` VALUES ('920', '河南理工大学万方科技学院', '河南', '工科', '独立学院');
-INSERT INTO `school` VALUES ('921', '兰州交通大学博文学院', '甘肃', '工科', '独立学院');
-INSERT INTO `school` VALUES ('922', '兰州理工大学技术工程学院', '甘肃', '工科', '独立学院');
-INSERT INTO `school` VALUES ('923', '山西大学商务学院', '山西', '财经', '独立学院');
-INSERT INTO `school` VALUES ('924', '山西农业大学信息学院', '山西', '农业', '独立学院');
-INSERT INTO `school` VALUES ('925', '新疆大学科学技术学院', '新疆', '综合', '独立学院');
-INSERT INTO `school` VALUES ('926', '新疆农业大学科学技术学院', '新疆', '农业', '独立学院');
-INSERT INTO `school` VALUES ('927', '江南大学太湖学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('928', '大连艺术学院', '辽宁', '艺术', '本科');
-INSERT INTO `school` VALUES ('929', '吉林动画学院', '吉林', '艺术', '本科');
-INSERT INTO `school` VALUES ('930', '安徽工程大学机电学院', '安徽', '工科', '独立学院');
-INSERT INTO `school` VALUES ('931', '安徽工业大学工商学院', '安徽', '工科', '独立学院');
-INSERT INTO `school` VALUES ('932', '安徽师范大学皖江学院', '安徽', '师范', '独立学院');
-INSERT INTO `school` VALUES ('933', '安徽医科大学临床医学院', '安徽', '医药', '独立学院');
-INSERT INTO `school` VALUES ('934', '阜阳师范学院信息工程学院', '安徽', '综合', '独立学院');
-INSERT INTO `school` VALUES ('935', '吉林师范大学博达学院', '吉林', '师范', '独立学院');
-INSERT INTO `school` VALUES ('936', '长春大学旅游学院', '吉林', '综合', '独立学院');
-INSERT INTO `school` VALUES ('937', '山东科技大学泰山科技学院', '山东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('938', '上海外国语大学贤达经济人文学院', '上海', '财经', '独立学院');
-INSERT INTO `school` VALUES ('939', '温州大学城市学院', '浙江', '综合', '独立学院');
-INSERT INTO `school` VALUES ('940', '广西师范大学漓江学院', '广西', '综合', '独立学院');
-INSERT INTO `school` VALUES ('941', '广西师范学院师园学院', '广西', '综合', '独立学院');
-INSERT INTO `school` VALUES ('942', '桂林工学院博文管理学院', '广西', '综合', '独立学院');
-INSERT INTO `school` VALUES ('943', '南京大学金陵学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('944', '贵州民族学院人文科技学院', '贵州', '民族', '独立学院');
-INSERT INTO `school` VALUES ('945', '遵义医学院医学与科技学院', '贵州', '医药', '独立学院');
-INSERT INTO `school` VALUES ('946', '南京理工大学紫金学院', '江苏', '工科', '独立学院');
-INSERT INTO `school` VALUES ('947', '广东工业大学华立学院', '广东', '工科', '独立学院');
-INSERT INTO `school` VALUES ('948', '广州大学松田学院', '广东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('949', '成都理工大学工程技术学院', '四川', '工科', '独立学院');
-INSERT INTO `school` VALUES ('950', '四川师范大学成都学院', '四川', '工科', '独立学院');
-INSERT INTO `school` VALUES ('951', '西安交通大学城市学院', '陕西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('952', '西北大学现代学院', '陕西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('953', '南京理工大学泰州科技学院', '江苏', '工科', '独立学院');
-INSERT INTO `school` VALUES ('954', '东莞理工学院城市学院', '广东', '工科', '独立学院');
-INSERT INTO `school` VALUES ('955', '北京航空航天大学北海学院', '广西', '综合', '独立学院');
-INSERT INTO `school` VALUES ('956', '上海师范大学天华学院', '上海', '综合', '独立学院');
-INSERT INTO `school` VALUES ('957', '中山大学新华学院', '广东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('958', '四川大学锦城学院', '四川', '综合', '独立学院');
-INSERT INTO `school` VALUES ('959', '南京师范大学中北学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('960', '南京医科大学康达学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('961', '南京中医药大学翰林学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('962', '苏州大学文正学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('963', '苏州大学应用技术学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('964', '苏州科技学院天平学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('965', '扬州大学广陵学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('966', '徐州师范大学科文学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('967', '南京财经大学红山学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('968', '江苏工业学院怀德学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('969', '南通大学杏林学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('970', '青岛工学院', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('971', '曲阜师范大学杏坛学院', '山东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('972', '山东师范大学历山学院', '山东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('973', '聊城大学东昌学院', '山东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('974', '商丘学院', '河南', '综合', '本科');
-INSERT INTO `school` VALUES ('975', '长安大学兴华学院', '陕西', '综合', '独立学院');
-INSERT INTO `school` VALUES ('976', '华中农业大学楚天学院', '湖北', '农业', '独立学院');
-INSERT INTO `school` VALUES ('977', '同济大学同科学院', '上海', '综合', '独立学院');
-INSERT INTO `school` VALUES ('978', '西南财经大学天府学院', '四川', '财经', '独立学院');
-INSERT INTO `school` VALUES ('979', '四川大学锦江学院', '四川', '综合', '独立学院');
-INSERT INTO `school` VALUES ('980', '河南财经学院成功学院', '河南', '财经', '独立学院');
-INSERT INTO `school` VALUES ('981', '西安理工大学高科学院', '陕西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('982', '西安科技大学高新学院', '陕西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('983', '四川音乐学院绵阳艺术学院', '四川', '艺术', '独立学院');
-INSERT INTO `school` VALUES ('984', '西南科技大学城市学院', '安徽', '工科', '独立学院');
-INSERT INTO `school` VALUES ('985', '福建农林大学金山学院', '福建', '农业', '独立学院');
-INSERT INTO `school` VALUES ('986', '天津财经大学珠江学院', '天津', '综合', '独立学院');
-INSERT INTO `school` VALUES ('987', '北京师范大学-香港浸会大学联合国', '广东', '------', '本科');
-INSERT INTO `school` VALUES ('988', '浙江大学宁波理工学院', '浙江', '工科', '独立学院');
-INSERT INTO `school` VALUES ('989', '北京师范大学珠海分校', '广东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('990', '大连理工大学城市学院', '辽宁', '工科', '独立学院');
-INSERT INTO `school` VALUES ('991', '浙江大学城市学院', '浙江', '工科', '独立学院');
-INSERT INTO `school` VALUES ('992', '武汉东湖学院', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('993', '汉口学院', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('994', '电子科技大学中山学院', '广东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('995', '武昌理工学院', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('996', '华中科技大学武昌分校', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('997', '北京工业职业技术学院', '北京', '工科', '高职专科');
-INSERT INTO `school` VALUES ('998', '北京信息职业技术学院', '北京', '工科', '高职专科');
-INSERT INTO `school` VALUES ('999', '北京电子科技职业学院', '北京', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1000', '北京科技经营管理学院', '北京', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1001', '北京吉利大学', '北京', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1002', '北京农业职业学院', '北京', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1003', '北京戏曲艺术职业学院', '北京', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1004', '北京京北职业技术学院', '北京', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1005', '北京经贸职业学院', '北京', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1006', '北京经济技术职业学院', '河北', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1007', '北京北大方正软件职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1008', '北京财贸职业学院', '北京', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1009', '天津滨海职业学院', '天津', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1010', '天津工程职业技术学院', '天津', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1011', '天津现代职业技术学院', '天津', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1012', '天津轻工职业技术学院', '天津', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1013', '天津电子信息职业技术学院', '天津', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1014', '天津公安警官职业学院', '天津', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1015', '天津机电职业技术学院', '天津', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1016', '天津渤海职业技术学院', '天津', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1017', '天津中德职业技术学院', '天津', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1018', '天津青年职业学院', '天津', '语言', '高职专科');
-INSERT INTO `school` VALUES ('1019', '天津对外经济贸易职业学院', '天津', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1020', '天津交通职业学院', '天津', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1021', '天津开发区职业技术学院', '天津', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1022', '河北工业职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1023', '邯郸职业技术学院', '河北', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1024', '石家庄职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1025', '张家口职业技术学院', '河北', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1026', '沧州职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1027', '石家庄铁路职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1028', '河北能源职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1029', '保定职业技术学院', '河北', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1030', '河北建材职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1031', '河北政法职业学院', '河北', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1032', '河北石油职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1033', '衡水职业技术学院', '河北', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1034', '秦皇岛职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1035', '唐山职业技术学院', '河北', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1036', '唐山工业职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1037', '石家庄工程职业学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1038', '石家庄法商职业学院', '河北', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1039', '河北省艺术职业学院', '河北', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1040', '河北交通职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1041', '河北化工医药职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1042', '秦皇岛外国语职业学院', '河北', '语言', '高职专科');
-INSERT INTO `school` VALUES ('1043', '石家庄信息工程职业学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1044', '石家庄外经贸职业学院', '河北', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1045', '河北美术学院', '河北', '艺术', '本科');
-INSERT INTO `school` VALUES ('1046', '河北京都高尔夫职业学院', '河北', '综合', '其它');
-INSERT INTO `school` VALUES ('1047', '山西建筑职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1048', '山西工程职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1049', '晋城职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1050', '北岳职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1051', '山西药科职业学院', '山西', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1052', '山西交通职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1053', '山西兴华职业学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1054', '长治职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1055', '山西艺术职业学院', '山西', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1056', '阳泉职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1057', '山西水利职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1058', '山西林业职业技术学院', '山西', '林业', '高职专科');
-INSERT INTO `school` VALUES ('1059', '山西财贸职业技术学院', '山西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1060', '山西戏剧职业学院', '山西', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1061', '山西机电职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1062', '临汾职业技术学院', '山西', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1063', '山西综合职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1064', '太原城市职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1065', '山西煤炭职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1066', '包头职业技术学院', '内蒙古', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1067', '内蒙古建筑职业技术学院', '内蒙古', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1068', '兴安职业技术学院', '内蒙古', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1069', '内蒙古警察职业学院', '内蒙古', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1070', '内蒙古体育职业学院', '内蒙古', '体育', '高职专科');
-INSERT INTO `school` VALUES ('1071', '包头轻工职业技术学院', '内蒙古', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1072', '呼和浩特职业学院', '内蒙古', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1073', '渤海船舶职业学院', '辽宁', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1074', '盘锦职业技术学院', '辽宁', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1075', '辽宁金融职业学院', '辽宁', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1076', '大连职业技术学院', '辽宁', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1077', '大连商务职业学院', '辽宁', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1078', '辽阳职业技术学院', '辽宁', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1079', '营口职业技术学院', '辽宁', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1080', '郑州幼儿师范高等专科学校', '河南', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1081', '福建幼儿师范高等专科学校', '福建', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1082', '辽宁石化职业技术学院', '辽宁', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1083', '辽宁经济职业技术学院', '辽宁', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1084', '辽宁机电职业技术学院', '辽宁', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1085', '辽宁广告职业学院', '辽宁', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1086', '辽宁信息职业技术学院', '辽宁', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1087', '辽宁体育运动职业技术学院', '辽宁', '体育', '高职专科');
-INSERT INTO `school` VALUES ('1088', '辽宁林业职业技术学院', '辽宁', '林业', '高职专科');
-INSERT INTO `school` VALUES ('1089', '沈阳航空职业技术学院', '辽宁', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1090', '沈阳职业技术学院', '辽宁', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1091', '吉林交通职业技术学院', '吉林', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1092', '辽源职业技术学院', '吉林', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1093', '吉林对外经贸职业学院', '吉林', '财经', '其它');
-INSERT INTO `school` VALUES ('1094', '长春东方职业学院', '吉林', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1095', '吉林电子信息职业技术学院', '吉林', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1096', '吉林工业职业技术学院', '吉林', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1097', '吉林司法警官职业学院', '吉林', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1098', '吉林农业工程职业技术学院', '吉林', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1099', '长春职业技术学院', '吉林', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1100', '黑龙江建筑职业技术学院', '黑龙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1101', '伊春职业学院', '黑龙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1102', '黑龙江司法警官职业学院', '黑龙江', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1103', '齐齐哈尔工程学院', '黑龙江', '综合', '本科');
-INSERT INTO `school` VALUES ('1104', '黑龙江林业职业技术学院', '黑龙江', '林业', '高职专科');
-INSERT INTO `school` VALUES ('1105', '黑龙江农业职业技术学院', '黑龙江', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1106', '黑龙江农业工程职业学院', '黑龙江', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1107', '大庆职业学院', '黑龙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1108', '黑龙江农垦职业学院', '黑龙江', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1109', '哈尔滨职业技术学院', '黑龙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1110', '哈尔滨电力职业技术学院', '黑龙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1111', '哈尔滨铁道职业技术学院', '黑龙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1112', '大兴安岭职业学院', '黑龙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1113', '黑龙江畜牧兽医职业学院', '黑龙江', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1114', '黑龙江农业经济职业学院', '黑龙江', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1115', '黑龙江艺术职业学院', '黑龙江', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1116', '哈尔滨华夏计算机职业技术学院', '黑龙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1117', '黑龙江职业学院', '黑龙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1118', '上海建峰职业技术学院', '上海', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1119', '上海科学技术职业学院', '上海', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1120', '上海海事职业技术学院', '上海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1121', '上海电子信息职业技术学院', '上海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1122', '上海交通职业技术学院', '上海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1123', '上海城市管理职业技术学院', '上海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1124', '上海行健职业学院', '上海', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1125', '上海农林职业技术学院', '上海', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1126', '民办明达职业技术学院', '江苏', '语言', '高职专科');
-INSERT INTO `school` VALUES ('1127', '连云港职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1128', '南京工业职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1129', '徐州建筑职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1130', '泰州职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1131', '无锡职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1132', '南通纺织职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1133', '苏州工艺美术职业技术学院', '江苏', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1134', '常州信息职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1135', '南通航运职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1136', '无锡商业职业技术学院', '江苏', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1137', '南京交通职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1138', '淮安信息职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1139', '江苏畜牧兽医职业技术学院', '江苏', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1140', '常州纺织服装职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1141', '苏州农业职业技术学院', '江苏', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1142', '苏州工业园区职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1143', '南京化工职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1144', '正德职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1145', '无锡南洋职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1146', '钟山职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1147', '炎黄职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1148', '金肯职业技术学院', '江苏', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1149', '紫琅职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1150', '九州职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1151', '硅湖职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1152', '江阴职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1153', '宿迁职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1154', '南京信息职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1155', '常州工程职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1156', '常州轻工职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1157', '常州机电职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1158', '徐州工业职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1159', '江苏食品职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1160', '江苏农林职业技术学院', '江苏', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1161', '江苏信息职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1162', '南京特殊教育职业技术学院', '江苏', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1163', '浙江艺术职业学院', '浙江', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1164', '浙江交通职业技术学院', '浙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1165', '杭州职业技术学院', '浙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1166', '义乌工商职业技术学院', '浙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1167', '宁波职业技术学院', '浙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1168', '温州职业技术学院', '浙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1169', '浙江工商职业技术学院', '浙江', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1170', '浙江工贸职业技术学院', '浙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1171', '台州职业技术学院', '浙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1172', '浙江机电职业技术学院', '浙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1173', '浙江商业职业技术学院', '浙江', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1174', '浙江警官职业学院', '浙江', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1175', '浙江工业职业技术学院', '浙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1176', '浙江旅游职业学院', '浙江', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1177', '浙江金融职业学院', '浙江', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1178', '浙江经济职业技术学院', '浙江', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1179', '浙江建设职业技术学院', '浙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1180', '浙江经贸职业技术学院', '浙江', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1181', '浙江育英职业技术学院', '浙江', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1182', '绍兴托普信息职业技术学院', '浙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1183', '嘉兴职业技术学院', '浙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1184', '湖州职业技术学院', '浙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1185', '衢州职业技术学院', '浙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1186', '丽水职业技术学院', '浙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1187', '浙江东方职业技术学院', '浙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1188', '安徽职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1189', '民办三联职业技术学院', '安徽', '综合', '其它');
-INSERT INTO `school` VALUES ('1190', '淮北职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1191', '芜湖职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1192', '民办万博科技职业学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1193', '铜陵职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1194', '安徽商贸职业技术学院', '安徽', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1195', '安徽警官职业学院', '安徽', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1196', '安徽水利水电职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1197', '淮南职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1198', '安徽电子信息职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1199', '安徽工贸职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1200', '安徽工业经济职业技术学院', '安徽', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1201', '安徽交通职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1202', '安徽体育运动职业技术学院', '安徽', '体育', '高职专科');
-INSERT INTO `school` VALUES ('1203', '阜阳职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1204', '合肥通用职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1205', '六安职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1206', '安徽文达信息工程学院', '安徽', '工科', '本科');
-INSERT INTO `school` VALUES ('1207', '民办合肥经济技术职业学院', '安徽', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1208', '宿州职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1209', '安徽广播影视职业技术学院', '安徽', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1210', '民办安徽明星科技职业学院', '安徽', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1211', '池州职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1212', '滁州职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1213', '宣城职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1214', '安徽外国语学院', '安徽', '语言', '本科');
-INSERT INTO `school` VALUES ('1215', '合肥职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1216', '福建船政交通职业学院', '福建', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1217', '福州职业技术学院', '福建', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1218', '福州英华职业学院', '福建', '语言', '高职专科');
-INSERT INTO `school` VALUES ('1219', '厦门华夏职业学院', '福建', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1220', '闽南理工学院', '福建', '工科', '本科');
-INSERT INTO `school` VALUES ('1221', '漳州职业技术学院', '福建', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1222', '泉州华光摄影艺术职业学院', '福建', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1223', '福建信息职业技术学院', '福建', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1224', '福建水利电力职业技术学院', '福建', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1225', '福建电力职业技术学院', '福建', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1226', '福建林业职业技术学院', '福建', '林业', '高职专科');
-INSERT INTO `school` VALUES ('1227', '福建农业职业技术学院', '福建', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1228', '厦门海洋职业技术学院', '福建', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1229', '九江职业技术学院', '江西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1230', '江西工业职业技术学院', '江西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1231', '江西科技学院', '江西', '综合', '本科');
-INSERT INTO `school` VALUES ('1232', '江西司法警官职业学院', '江西', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1233', '江西电力职业技术学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1234', '江西旅游商贸职业学院', '江西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1235', '江西机电职业技术学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1236', '江西陶瓷工艺美术职业技术学院', '江西', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1237', '江西环境工程职业学院', '江西', '林业', '高职专科');
-INSERT INTO `school` VALUES ('1238', '江西信息应用职业技术学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1239', '江西工业工程职业技术学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1240', '江西交通职业技术学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1241', '江西艺术职业学院', '江西', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1242', '江西财经职业学院', '河南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1243', '江西应用技术职业学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1244', '鹰潭职业技术学院', '江西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1245', '江西现代职业技术学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1246', '山东商业职业技术学院', '山东', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1247', '民办山东万杰医学高等专科学校', '山东', '医药', '本科');
-INSERT INTO `school` VALUES ('1248', '日照职业技术学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1249', '山东水利职业学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1250', '济南铁道职业技术学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1251', '莱芜职业技术学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1252', '威海职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1253', '青岛职业技术学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1254', '聊城职业技术学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1255', '济宁职业技术学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1256', '山东劳动职业技术学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1257', '曲阜远东职业技术学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1258', '烟台职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1259', '滨州职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1260', '潍坊职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1261', '东营职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1262', '山东服装职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1263', '德州科技职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1264', '山东力明科技职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1265', '山东畜牧兽医职业学院', '山东', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1266', '山东圣翰财贸职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1267', '淄博职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1268', '山东交通职业学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1269', '山东信息职业技术学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1270', '山东外贸职业学院', '山东', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1271', '青岛酒店管理职业技术学院', '山东', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1272', '山东大王职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1273', '青岛飞洋职业技术学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1274', '河南职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1275', '漯河职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1276', '黄河水利职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1277', '三门峡职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1278', '郑州铁路职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1279', '濮阳职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1280', '许昌职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1281', '鹤壁职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1282', '商丘职业技术学院', '河南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1283', '河南工业职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1284', '河南司法警官职业学院', '河南', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1285', '平顶山工业职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1286', '济源职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1287', '周口职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1288', '武汉职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1289', '武汉船舶职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1290', '长江职业学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1291', '黄冈职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1292', '十堰职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1293', '襄阳职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1294', '恩施职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1295', '湖北交通职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1296', '湖北轻工职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1297', '仙桃职业学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1298', '荆州职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1299', '武汉工程职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1300', '武汉航海职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1301', '武汉电力职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1302', '湖北城市建设职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1303', '湖北水利水电职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1304', '武汉外语外事职业学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1305', '武汉商贸职业学院', '湖北', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1306', '武汉科技职业学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1307', '武汉信息传播职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1308', '湖北开放职业学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1309', '武汉警官职业学院', '湖北', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1310', '随州职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1311', '长沙民政职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1312', '湖南工业职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1313', '湖南交通职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1314', '怀化医学高等专科学校', '湖南', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1315', '湖南科技职业学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1316', '湖南环境生物职业技术学院', '湖南', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1317', '湖南铁道职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1318', '永州职业技术学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1319', '湖南大众传媒职业技术学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1320', '长沙通信职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1321', '湘潭职业技术学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1322', '湖南商务职业技术学院', '湖南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1323', '郴州职业技术学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1324', '娄底职业技术学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1325', '张家界航空工业职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1326', '湖南工程职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1327', '长沙环境保护职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1328', '湖南艺术职业学院', '湖南', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1329', '湖南体育职业学院', '湖南', '体育', '高职专科');
-INSERT INTO `school` VALUES ('1330', '湖南机电职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1331', '广州民航职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1332', '广东轻工职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1333', '顺德职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1334', '广东交通职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1335', '番禺职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1336', '广东水利电力职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1337', '深圳信息职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1338', '深圳职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1339', '潮汕职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1340', '广东松山职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1341', '广东农工商职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1342', '佛山职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1343', '广东新安职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1344', '广东省外语艺术职业学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1345', '广东机电职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1346', '广东建设职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1347', '广东职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1348', '广东女子职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1349', '广东岭南职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1350', '汕尾职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1351', '河源职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1352', '罗定职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1353', '阳江职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1354', '广东财经职业学院', '广东', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1355', '揭阳职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1356', '广东邮电职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1357', '汕头职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1358', '清远职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1359', '广东亚视演艺职业学院', '广东', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1360', '广东司法警官职业学院', '广东', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1361', '广东建华职业学院', '广东', '综合', '其它');
-INSERT INTO `school` VALUES ('1362', '广东工贸职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1363', '广州康大职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1364', '南海东软信息技术职业学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1365', '珠海艺术职业学院', '广东', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1366', '广西职业技术学院', '广西', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1367', '广西机电职业技术学院', '广西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1368', '柳州职业技术学院', '广西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1369', '南宁职业技术学院', '广西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1370', '广西建设职业技术学院', '广西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1371', '广西水利电力职业技术学院', '广西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1372', '广西交通职业技术学院', '广西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1373', '广西农业职业技术学院', '广西', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1374', '广西生态工程职业技术学院', '广西', '林业', '高职专科');
-INSERT INTO `school` VALUES ('1375', '广西国际商务职业技术学院', '广西', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1376', '海南职业技术学院', '海南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1377', '重庆电子职业技术学院', '重庆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1378', '重庆工业职业技术学院', '重庆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1379', '重庆工程职业技术学院', '重庆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1380', '重庆警察学院', '重庆', '政法', '本科');
-INSERT INTO `school` VALUES ('1381', '重庆信息技术职业学院', '重庆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1382', '重庆海联职业技术学院', '重庆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1383', '重庆光彩职业技术学院', '重庆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1384', '重庆巴渝职业技术学院', '重庆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1385', '重庆三峡职业学院', '重庆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1386', '成都航空职业技术学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1387', '四川交通职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1388', '达州职业技术学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1389', '四川机电职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1390', '四川工程职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1391', '四川电力职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1392', '绵阳职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1393', '四川工商职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1394', '四川建筑职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1395', '四川国际标榜职业学院', '四川', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1396', '成都农业科技职业学院', '四川', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1397', '宜宾职业技术学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1398', '成都艺术职业学院', '四川', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1399', '四川托普信息技术职业学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1400', '四川职业技术学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1401', '眉山职业技术学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1402', '泸州职业技术学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1403', '乐山职业技术学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1404', '雅安职业技术学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1405', '贵州航天职业技术学院', '贵州', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1406', '贵州交通职业技术学院', '贵州', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1407', '贵州电子信息职业技术学院', '贵州', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1408', '贵州警官职业学院', '贵州', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1409', '安顺职业技术学院', '贵州', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1410', '黔东南民族职业技术学院', '贵州', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1411', '黔南民族职业技术学院', '贵州', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1412', '遵义职业技术学院', '贵州', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1413', '贵州工业职业技术学院', '贵州', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1414', '贵州电力职业技术学院', '贵州', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1415', '六盘水职业技术学院', '贵州', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1416', '铜仁职业技术学院', '贵州', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1417', '云南国土资源职业学院', '云南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1418', '云南交通职业技术学院', '云南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1419', '昆明艺术职业学院', '云南', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1420', '西双版纳职业技术学院', '云南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1421', '玉溪农业职业技术学院', '云南', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1422', '昆明工业职业技术学院', '云南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1423', '云南能源职业技术学院', '云南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1424', '云南农业职业技术学院', '云南', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1425', '云南司法警官职业学院', '云南', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1426', '陕西工业职业技术学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1427', '杨凌职业技术学院', '陕西', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1428', '西安外事学院', '陕西', '财经', '本科');
-INSERT INTO `school` VALUES ('1429', '陕西财经职业技术学院', '陕西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1430', '陕西国防工业职业技术学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1431', '陕西交通职业技术学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1432', '陕西能源职业技术学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1433', '陕西职业技术学院', '陕西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1434', '西安航空职业技术学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1435', '西安高新科技职业学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1436', '陕西服装工程学院', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('1437', '西安城市建设职业学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1438', '兰州石化职业技术学院', '甘肃', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1439', '甘肃工业职业技术学院', '甘肃', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1440', '甘肃建筑职业技术学院', '甘肃', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1441', '甘肃警察职业学院', '甘肃', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1442', '甘肃林业职业技术学院', '甘肃', '林业', '高职专科');
-INSERT INTO `school` VALUES ('1443', '酒泉职业技术学院', '甘肃', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1444', '兰州外语职业学院', '甘肃', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1445', '兰州职业技术学院', '甘肃', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1446', '青海警官职业学院', '青海', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1447', '青海畜牧兽医职业技术学院', '青海', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1448', '青海交通职业技术学院', '青海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1449', '青海建筑职业技术学院', '青海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1450', '宁夏理工学院', '宁夏', '综合', '本科');
-INSERT INTO `school` VALUES ('1451', '宁夏工业职业学院', '青海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1452', '宁夏职业技术学院', '青海', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1453', '宁夏财经职业技术学院', '青海', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1454', '宁夏司法警官职业学院', '青海', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1455', '宁夏建设职业技术学院', '青海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1456', '新疆农业职业技术学院', '新疆', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1457', '新疆机电职业技术学院', '新疆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1458', '新疆轻工职业技术学院', '新疆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1459', '克拉玛依职业技术学院', '新疆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1460', '昌吉职业技术学院', '新疆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1461', '伊犁职业技术学院', '新疆', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1462', '巴音郭楞职业技术学院', '新疆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1463', '阿克苏职业技术学院', '新疆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1464', '新疆建设职业技术学院', '新疆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1465', '山西传媒学院', '山西', '艺术', '本科');
-INSERT INTO `school` VALUES ('1466', '陕西航天职工大学', '陕西', '工科', '其它');
-INSERT INTO `school` VALUES ('1467', '河北地质职工大学', '河北', '工科', '其它');
-INSERT INTO `school` VALUES ('1468', '江西行政管理干部学院', '江西', '综合', '其它');
-INSERT INTO `school` VALUES ('1469', '山西职工医学院', '山西', '医药', '其它');
-INSERT INTO `school` VALUES ('1470', '山西煤炭职工联合大学', '山西', '综合', '其它');
-INSERT INTO `school` VALUES ('1471', '吉林省教育学院', '吉林', '师范', '其它');
-INSERT INTO `school` VALUES ('1472', '鹤岗矿务局职工大学', '黑龙江', '综合', '其它');
-INSERT INTO `school` VALUES ('1473', '黑龙江省农垦管理干部学院', '黑龙江', '------', '其它');
-INSERT INTO `school` VALUES ('1474', '黑龙江省政法管理干部学院', '黑龙江', '政法', '其它');
-INSERT INTO `school` VALUES ('1475', '黑龙江省教育学院', '黑龙江', '师范', '其它');
-INSERT INTO `school` VALUES ('1476', '佳木斯市教育学院', '黑龙江', '综合', '其它');
-INSERT INTO `school` VALUES ('1477', '江苏第二师范学院', '江苏', '师范', '本科');
-INSERT INTO `school` VALUES ('1478', '宁波教育学院', '浙江', '师范', '其它');
-INSERT INTO `school` VALUES ('1479', '福建教育学院', '福建', '师范', '其它');
-INSERT INTO `school` VALUES ('1480', '福建经济管理干部学院', '福建', '财经', '其它');
-INSERT INTO `school` VALUES ('1481', '南昌师范学院', '江西', '师范', '本科');
-INSERT INTO `school` VALUES ('1482', '山东省水利职工大学', '山东', '综合', '其它');
-INSERT INTO `school` VALUES ('1483', '青岛远洋船员学院', '山东', '工科', '其它');
-INSERT INTO `school` VALUES ('1484', '山东省贸易职工大学', '山东', '综合', '其它');
-INSERT INTO `school` VALUES ('1485', '山东省经济管理干部学院', '山东', '财经', '其它');
-INSERT INTO `school` VALUES ('1486', '山东农业工程学院', '山东', '农业', '本科');
-INSERT INTO `school` VALUES ('1487', '山东省教育学院', '山东', '综合', '其它');
-INSERT INTO `school` VALUES ('1488', '潍坊教育学院', '山东', '师范', '其它');
-INSERT INTO `school` VALUES ('1489', '第一拖拉机制造厂拖拉机学院', '河南', '工科', '其它');
-INSERT INTO `school` VALUES ('1490', '开封教育学院', '河南', '师范', '其它');
-INSERT INTO `school` VALUES ('1491', '平顶山教育学院', '河南', '师范', '其它');
-INSERT INTO `school` VALUES ('1492', '丹江口工程管理局职工大学', '湖北', '工科', '其它');
-INSERT INTO `school` VALUES ('1493', '荆州教育学院', '湖北', '师范', '其它');
-INSERT INTO `school` VALUES ('1494', '株洲市职工大学', '湖南', '综合', '其它');
-INSERT INTO `school` VALUES ('1495', '南方动力机械公司职工工学院', '湖南', '工科', '其它');
-INSERT INTO `school` VALUES ('1496', '广东教育学院', '广东', '师范', '其它');
-INSERT INTO `school` VALUES ('1497', '广西教育学院', '广西', '师范', '其它');
-INSERT INTO `school` VALUES ('1498', '成都师范学院', '四川', '师范', '本科');
-INSERT INTO `school` VALUES ('1499', '重庆第二师范学院', '重庆', '师范', '本科');
-INSERT INTO `school` VALUES ('1500', '贵州师范学院', '贵州', '师范', '本科');
-INSERT INTO `school` VALUES ('1501', '西安航空职工大学', '陕西', '工科', '其它');
-INSERT INTO `school` VALUES ('1502', '西安飞机工业公司职工工学院', '陕西', '工科', '其它');
-INSERT INTO `school` VALUES ('1503', '西安铁路工程职工大学', '陕西', '工科', '其它');
-INSERT INTO `school` VALUES ('1504', '西安电力机械制造公司机电学院', '陕西', '工科', '其它');
-INSERT INTO `school` VALUES ('1505', '陕西省建筑工程总公司职工大学', '陕西', '工科', '其它');
-INSERT INTO `school` VALUES ('1506', '西安外贸职工大学', '陕西', '综合', '其它');
-INSERT INTO `school` VALUES ('1507', '陕西教育学院', '陕西', '师范', '其它');
-INSERT INTO `school` VALUES ('1508', '甘肃机械电子职工大学', '甘肃', '工科', '其它');
-INSERT INTO `school` VALUES ('1509', '兰州航空工业职工大学', '甘肃', '工科', '其它');
-INSERT INTO `school` VALUES ('1510', '兰州铁路工程职工大学', '甘肃', '综合', '其它');
-INSERT INTO `school` VALUES ('1511', '湖北省经济管理干部学院', '湖北', '财经', '其它');
-INSERT INTO `school` VALUES ('1512', '天津市广播电视大学', '天津', '语言', '其它');
-INSERT INTO `school` VALUES ('1513', '天津市工会管理干部学院', '天津', '综合', '其它');
-INSERT INTO `school` VALUES ('1514', '石家庄职工大学', '河北', '综合', '其它');
-INSERT INTO `school` VALUES ('1515', '山西煤炭管理干部学院', '山西', '综合', '其它');
-INSERT INTO `school` VALUES ('1516', '山西青年管理干部学院', '山西', '综合', '其它');
-INSERT INTO `school` VALUES ('1517', '广东科学技术职业学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1518', '吉林省经济管理干部学院', '吉林', '财经', '其它');
-INSERT INTO `school` VALUES ('1519', '大庆医学高等专科学校', '黑龙江', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1520', '江苏省广播电视大学', '江苏', '语言', '其它');
-INSERT INTO `school` VALUES ('1521', '南京人口管理干部学院', '江苏', '综合', '其它');
-INSERT INTO `school` VALUES ('1522', '江苏省省级机关管理干部学院', '江苏', '综合', '其它');
-INSERT INTO `school` VALUES ('1523', '安徽城市管理职业学院', '安徽', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1524', '闽北职业技术学院', '福建', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1525', '福州教育学院', '福建', '------', '其它');
-INSERT INTO `school` VALUES ('1526', '福建财会管理干部学院', '福建', '综合', '其它');
-INSERT INTO `school` VALUES ('1527', '南昌教育学院', '江西', '师范', '其它');
-INSERT INTO `school` VALUES ('1528', '河南卫生职工学院', '河南', '综合', '其它');
-INSERT INTO `school` VALUES ('1529', '河南政法管理干部学院', '河南', '政法', '其它');
-INSERT INTO `school` VALUES ('1530', '广东文艺职业学院', '广东', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1531', '广东工程职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1532', '广西警官高等专科学校', '广西', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1533', '广西政法管理干部学院', '广西', '政法', '其它');
-INSERT INTO `school` VALUES ('1534', '陕西工运学院', '陕西', '工科', '其它');
-INSERT INTO `school` VALUES ('1535', '白银有色金属公司职工大学', '甘肃', '------', '其它');
-INSERT INTO `school` VALUES ('1536', '新疆教育学院', '新疆', '师范', '其它');
-INSERT INTO `school` VALUES ('1537', '北京经济管理职业学院', '北京', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1538', '北京政法职业学院', '北京', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1539', '南宁地区教育学院', '广西', '师范', '其它');
-INSERT INTO `school` VALUES ('1540', '辽宁商贸职业学院', '辽宁', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1541', '辽宁文化艺术职工大学', '辽宁', '艺术', '其它');
-INSERT INTO `school` VALUES ('1542', '兰州教育学院', '甘肃', '师范', '其它');
-INSERT INTO `school` VALUES ('1543', '赣南教育学院', '江西', '师范', '其它');
-INSERT INTO `school` VALUES ('1544', '河北管理干部学院', '河北', '综合', '其它');
-INSERT INTO `school` VALUES ('1545', '哈尔滨市职工医学院', '黑龙江', '医药', '其它');
-INSERT INTO `school` VALUES ('1546', '黑龙江生态工程职业学院', '黑龙江', '林业', '高职专科');
-INSERT INTO `school` VALUES ('1547', '武汉冶金管理干部学院', '湖北', '综合', '其它');
-INSERT INTO `school` VALUES ('1548', '山东电力高等专科学校', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1549', '山西政法管理干部学院', '山西', '综合', '其它');
-INSERT INTO `school` VALUES ('1550', '河北青年管理干部学院', '河北', '综合', '其它');
-INSERT INTO `school` VALUES ('1551', '江苏省青年管理干部学院', '江苏', '综合', '其它');
-INSERT INTO `school` VALUES ('1552', '广东行政职业学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1553', '辽宁公安司法管理干部学院', '辽宁', '政法', '其它');
-INSERT INTO `school` VALUES ('1554', '山东管理学院', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('1555', '山东省青年管理干部学院', '山东', '综合', '其它');
-INSERT INTO `school` VALUES ('1556', '重庆民生职业技术学院', '重庆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1557', '北京锡华国际经贸职业学院', '北京', '------', '高职专科');
-INSERT INTO `school` VALUES ('1558', '石家庄联合技术职业学院', '河北', '------', '高职专科');
-INSERT INTO `school` VALUES ('1559', '河北科技学院', '河北', '工科', '本科');
-INSERT INTO `school` VALUES ('1560', '石家庄经济职业学院', '河北', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1561', '石家庄工商职业学院', '河北', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1562', '山西华澳商贸职业学院', '山西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1563', '山西同文外语职业学院', '山西', '语言', '高职专科');
-INSERT INTO `school` VALUES ('1564', '山西老区职业技术学院', '山西', '------', '高职专科');
-INSERT INTO `school` VALUES ('1565', '山西信息职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1566', '山西工商学院', '山西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1567', '内蒙古丰州职业学院', '内蒙古', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1568', '内蒙古经贸外语职业学院', '内蒙古', '语言', '高职专科');
-INSERT INTO `school` VALUES ('1569', '赤峰职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1570', '内蒙古北方职业技术学院', '内蒙古', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1571', '内蒙古科技职业学院', '内蒙古', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1572', '大连翻译职业学院', '------', '语言', '高职专科');
-INSERT INTO `school` VALUES ('1573', '辽宁美术职业学院', '辽宁', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1574', '锦州商务职业学院', '------', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1575', '吉林华桥外国语学院', '吉林', '语言', '本科');
-INSERT INTO `school` VALUES ('1576', '长春信息技术职业学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1577', '哈尔滨现代公共关系职业学院', '黑龙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1578', '哈尔滨应用职业技术学院', '黑龙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1579', '上海新侨职业技术学院', '上海', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1580', '上海东海职业技术学院', '上海', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1581', '上海立达职业技术学院', '上海', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1582', '上海民远职业技术学院', '上海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1583', '上海欧华职业技术学院', '上海', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1584', '上海邦德职业技术学院', '上海', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1585', '上海震旦职业学院', '上海', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1586', '上海中侨职业技术学院', '上海', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1587', '上海中华职业技术学院', '上海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1588', '苏州港大思培科技职业学院', '江苏', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1589', '应天职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1590', '南京视觉艺术职业学院', '------', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1591', '建东职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1592', '江海职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1593', '昆山登云科技职业学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1594', '江南影视艺术职业学院', '------', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1595', '苏州托普信息职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1596', '太湖创意职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1597', '金山职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1598', '杭州万向职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1599', '浙江长征职业技术学院', '浙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1600', '嘉兴南洋职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1601', '浙江广厦建设职业技术学院', '浙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1602', '安徽绿海商务职业学院', '安徽', '------', '高职专科');
-INSERT INTO `school` VALUES ('1603', '合肥共达职业技术学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1604', '蚌埠经济技术职业学院', '------', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1605', '民办合肥财经职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1606', '安徽涉外经济职业学院', '安徽', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1607', '武夷山职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1608', '泉州信息职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1609', '福州黎明职业技术学院', '福建', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1610', '厦门兴才职业技术学院', '福建', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1611', '福州软件职业技术学院', '福建', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1612', '泉州理工职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1613', '福州外语外贸学院', '福建', '财经', '本科');
-INSERT INTO `school` VALUES ('1614', '漳州吉马印刷职业技术学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1615', '漳州科技职业学院', '福建', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1616', '厦门东海职业技术学院', '福建', '------', '高职专科');
-INSERT INTO `school` VALUES ('1617', '厦门南洋职业学院', '福建', '------', '高职专科');
-INSERT INTO `school` VALUES ('1618', '厦门软件职业技术学院', '福建', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1619', '福州科技职业技术学院', '福建', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1620', '福州海峡职业技术学院', '福建', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1621', '江西渝州科技职业学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1622', '江西科技职业学院', '江西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1623', '赣西科技职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1624', '江西城市职业学院', '江西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1625', '山东外国语职业学院', '山东', '语言', '高职专科');
-INSERT INTO `school` VALUES ('1626', '潍坊工商职业学院', '------', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1627', '枣庄科技职业学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1628', '山东凯文科技职业学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1629', '山东现代职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1630', '青岛黄海学院', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('1631', '山东华宇职业技术学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1632', '山东协和学院', '山东', '医药', '本科');
-INSERT INTO `school` VALUES ('1633', '山东外事翻译职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1634', '山东杏林科技职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1635', '郑州交通职业学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1636', '郑州电子信息职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1637', '嵩山少林武术职业学院', '------', '体育', '高职专科');
-INSERT INTO `school` VALUES ('1638', '郑州电力职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1639', '商丘工学院', '', '工科', '本科');
-INSERT INTO `school` VALUES ('1640', '武汉工贸职业学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1641', '黄冈科技职业学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1642', '武昌职业学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1643', '湖北科技职业学院', '湖北', '------', '高职专科');
-INSERT INTO `school` VALUES ('1644', '湖南科技经贸职业学院', '湖南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1645', '湖南九嶷职业技术学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1646', '湖南都市职业学院', '湖南', '------', '高职专科');
-INSERT INTO `school` VALUES ('1647', '湖南软件职业学院', '湖南', '------', '高职专科');
-INSERT INTO `school` VALUES ('1648', '长沙南方职业学院', '湖南', '------', '高职专科');
-INSERT INTO `school` VALUES ('1649', '潇湘职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1650', '湖南外国语职业学院', '湖南', '语言', '高职专科');
-INSERT INTO `school` VALUES ('1651', '湖南同德职业学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1652', '石家庄幼儿师范高等专科学校', '河北', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1653', '湖南电子科技职业学院', '湖南', '------', '高职专科');
-INSERT INTO `school` VALUES ('1654', '湖南信息科学职业学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1655', '民办南华工商学院', '------', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1656', '肇庆科技职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1657', '广东科技学院', '广东', '综合', '本科');
-INSERT INTO `school` VALUES ('1658', '惠州经济职业技术学院', '------', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1659', '广州科技职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1660', '广州工商职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1661', '广州珠江职业技术学院', '广东', '------', '高职专科');
-INSERT INTO `school` VALUES ('1662', '广州松田职业学院', '广东', '------', '高职专科');
-INSERT INTO `school` VALUES ('1663', '广东文理职业学院', '', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1664', '广州涉外经济职业技术学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1665', '广州城建职业学院', '广东', '------', '高职专科');
-INSERT INTO `school` VALUES ('1666', '肇庆工商职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1667', '广州华南商贸职业学院', '广东', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1668', '广州现代信息工程职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1669', '广州华立科技职业学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1670', '广西英华国际职业学院', '广西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1671', '广西城市职业学院', '广西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1672', '广西工程职业学院', '广西', '------', '高职专科');
-INSERT INTO `school` VALUES ('1673', '广西外国语学院', '广西', '综合', '本科');
-INSERT INTO `school` VALUES ('1674', '广西演艺职业学院', '广西', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1675', '北海艺术设计职业学院', '------', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1676', '桂林山水职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1677', '三亚城市职业学院', '------', '语言', '高职专科');
-INSERT INTO `school` VALUES ('1678', '重庆正大软件职业技术学院', '重庆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1679', '四川科技职业学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1680', '四川华新现代职业学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1681', '四川文化传媒职业学院', '四川', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1682', '贵州亚泰职业学院', '贵州', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1683', '云南新兴职业学院', '云南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1684', '云南经济管理职业学院', '云南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1685', '昆明扬帆职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1686', '云南北美职业学院', '云南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1687', '云南工商学院', '云南', '综合', '本科');
-INSERT INTO `school` VALUES ('1688', '西安东方亚太职业技术学院', '陕西', '------', '高职专科');
-INSERT INTO `school` VALUES ('1689', '西安汽车科技职业学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1690', '西安科技商贸职业学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1691', '陕西电子科技职业学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1692', '陕西旅游烹饪职业学院', '陕西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1693', '银川能源学院', '', '工科', '本科');
-INSERT INTO `school` VALUES ('1694', '新疆能源职业技术学院', '新疆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1695', '新疆天山职业技术学院', '新疆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1696', '新疆现代职业技术学院', '新疆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1697', '漳州城市职业学院', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1698', '福建卫生职业技术学院', '福建', '------', '高职专科');
-INSERT INTO `school` VALUES ('1699', '南昌师范高等专科学校', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1700', '江西中医药高等专科学校', '江西', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1701', '江西泰豪动漫职业学院', '江西', '------', '高职专科');
-INSERT INTO `school` VALUES ('1702', '江西枫林涉外经贸职业学院', '江西', '------', '高职专科');
-INSERT INTO `school` VALUES ('1703', '江西太阳能科技职业学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1704', '江西生物科技职业学院', '江西', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1705', '江西航空职业技术学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1706', '江西工程职业学院', '江西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1707', '江西青年职业学院', '江西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1708', '宜春职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1709', '江西应用工程职业学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1710', '江西经济管理职业学院', '江西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1711', '上饶职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1712', '江西农业工程职业学院', '江西', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1713', '江西护理职业技术学院', '江西', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1714', '山东中医药高等专科学校', '山东', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1715', '淄博师范高等专科学校', '山东', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1716', '山东科技职业学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1717', '山东城市建设职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1718', '烟台汽车工程职业学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1719', '山东司法警官职业学院', '山东', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1720', '泰山职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1721', '山东工业职业学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1722', '德州职业技术学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1723', '烟台工程职业技术学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1724', '枣庄职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1725', '临沂职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1726', '山东传媒职业学院', '山东', '------', '高职专科');
-INSERT INTO `school` VALUES ('1727', '山东化工职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1728', '山东商务职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1729', '山东经贸职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1730', '济南职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1731', '山东电子职业技术学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1732', '山东丝绸纺织职业学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1733', '山东铝业职业学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1734', '菏泽家政职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1735', '山东胜利职业学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1736', '河南工业贸易职业学院', '河南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1737', '河南交通职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1738', '河南经贸职业学院', '河南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1739', '河南农业职业学院', '河南', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1740', '河南质量工程职业学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1741', '漯河医学高等专科学校', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1742', '南阳医学高等专科学校', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1743', '商丘医学高等专科学校', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1744', '信阳职业技术学院', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1745', '郑州工业安全职业学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1746', '郑州信息科技职业学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1747', '郑州旅游职业学院', '河南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1748', '河南建筑职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1749', '周口科技职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1750', '沙市职业大学', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1751', '江汉艺术职业学院', '------', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1752', '湖北艺术职业学院', '湖北', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1753', '湖北生物科技职业学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1754', '咸宁职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1755', '武汉工业职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1756', '湖北生态工程职业技术学院', '湖北', '林业', '高职专科');
-INSERT INTO `school` VALUES ('1757', '三峡电力职业学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1758', '湖北财税职业学院', '湖北', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1759', '武汉软件工程职业学院', '湖北', '------', '高职专科');
-INSERT INTO `school` VALUES ('1760', '湖北青年职业学院', '湖北', '------', '高职专科');
-INSERT INTO `school` VALUES ('1761', '黄石职业技术学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1762', '益阳医学高等专科学校', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1763', '湖南中医药高等专科学校', '湖南', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1764', '邵阳医学高等专科学校', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1765', '湖南信息职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1766', '长沙电力职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1767', '湖南水利水电职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1768', '湖南现代物流职业技术学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1769', '湖南交通工程职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1770', '湖南铁路科技职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1771', '湖南工艺美术职业学院', '湖南', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1772', '湖南民族职业学院', '湖南', '民族', '高职专科');
-INSERT INTO `school` VALUES ('1773', '衡阳财经工业职业技术学院', '------', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1774', '湖南石油化工职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1775', '湖南化工职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1776', '怀化职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1777', '湖南理工职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1778', '湖南安全技术职业学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1779', '长沙师范学院', '湖南', '师范', '本科');
-INSERT INTO `school` VALUES ('1780', '湘西民族职业技术学院', '------', '民族', '高职专科');
-INSERT INTO `school` VALUES ('1781', '益阳职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1782', '湖南电气职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1783', '株洲职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1784', '湖南城建职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1785', '湖南网络工程职业学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1786', '长沙职业技术学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1787', '长沙商贸旅游职业技术学院', '湖南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1788', '邵阳职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1789', '湖南对外经济贸易职业学院', '湖南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1790', '湖南生物与机电工程职业技术学院', '湖南', '------', '高职专科');
-INSERT INTO `school` VALUES ('1791', '湖南科技工业职业技术学院', '湖南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1792', '肇庆医学高等专科学校', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1793', '广州工程技术职业学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1794', '珠海城市职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1795', '广州铁路职业技术学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1796', '广州体育职业技术学院', '广东', '体育', '高职专科');
-INSERT INTO `school` VALUES ('1797', '江门职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1798', '广东科贸职业学院', '广东', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1799', '茂名职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1800', '中山职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1801', '广州科技贸易职业学院', '广东', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1802', '中山火炬职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1803', '广东理工职业学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1804', '广州城市职业学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1805', '广东体育职业技术学院', '广东', '体育', '高职专科');
-INSERT INTO `school` VALUES ('1806', '广东食品药品职业学院', '广东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1807', '河池职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1808', '北海职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1809', '广西电力职业技术学院', '广西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1810', '广西工业职业技术学院', '广西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1811', '贵港职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1812', '柳州运输职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1813', '广西工商职业技术学院', '广西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1814', '百色职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1815', '柳州城市职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1816', '广西理工职业技术学院', '广西', '------', '高职专科');
-INSERT INTO `school` VALUES ('1817', '梧州职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1818', '海南软件职业技术学院', '海南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1819', '海南科技职业学院', '海南', '------', '高职专科');
-INSERT INTO `school` VALUES ('1820', '重庆三峡医药高等专科学校', '重庆', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1821', '重庆医药高等专科学校', '重庆', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1822', '重庆城市管理职业学院', '重庆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1823', '重庆城市职业学院', '重庆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1824', '重庆青年职业技术学院', '重庆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1825', '重庆机电职业技术学院', '重庆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1826', '重庆工商职业学院', '重庆', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1827', '重庆水利电力职业技术学院', '重庆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1828', '重庆工贸职业技术学院', '重庆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1829', '重庆电子工程职业学院', '重庆', '------', '高职专科');
-INSERT INTO `school` VALUES ('1830', '重庆财经职业学院', '重庆', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1831', '重庆科创职业学院', '重庆', '------', '高职专科');
-INSERT INTO `school` VALUES ('1832', '重庆建筑工程职业学院', '重庆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1833', '四川中医药高等专科学校', '四川', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1834', '内江职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1835', '成都职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1836', '四川管理职业学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1837', '四川邮电职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1838', '四川化工职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1839', '四川水利职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1840', '四川文化产业职业学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1841', '四川司法警官职业学院', '四川', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1842', '四川信息职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1843', '广安职业技术学院', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1844', '四川商务职业学院', '四川', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1845', '四川财经职业学院', '四川', '------', '高职专科');
-INSERT INTO `school` VALUES ('1846', '四川艺术职业学院', '四川', '------', '高职专科');
-INSERT INTO `school` VALUES ('1847', '四川城市职业学院', '四川', '------', '高职专科');
-INSERT INTO `school` VALUES ('1848', '四川现代职业学院', '四川', '------', '高职专科');
-INSERT INTO `school` VALUES ('1849', '遵义医药高等专科学校', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1850', '贵阳护理职业学院', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1851', '黔西南民族职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1852', '贵州轻工职业技术学院', '贵州', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1853', '贵阳职业技术学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1854', '毕节职业技术学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1855', '云南医学高等专科学校', '云南', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1856', '保山中医药高等专科学校', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1857', '曲靖医学高等专科学校', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1858', '楚雄医药高等专科学校', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1859', '临沧师范高等专科学校', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1860', '德宏师范高等专科学校', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1861', '丽江师范高等专科学校', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1862', '云南林业职业技术学院', '云南', '林业', '高职专科');
-INSERT INTO `school` VALUES ('1863', '云南体育运动职业技术学院', '云南', '体育', '高职专科');
-INSERT INTO `school` VALUES ('1864', '云南文化艺术职业学院', '云南', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1865', '云南热带作物职业学院', '云南', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1866', '云南机电职业技术学院', '云南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1867', '云南国防工业职业技术学院', '云南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1868', '云南锡业职业技术学院', '云南', '------', '高职专科');
-INSERT INTO `school` VALUES ('1869', '拉萨师范高等专科学校', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1870', '西藏警官高等专科学校', '西藏', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1871', '西藏职业技术学院', '西藏', '------', '高职专科');
-INSERT INTO `school` VALUES ('1872', '延安职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1873', '汉中职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1874', '商洛职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1875', '西安职业技术学院', '陕西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1876', '咸阳职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1877', '陕西经济管理职业技术学院', '陕西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1878', '宝鸡职业技术学院', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1879', '陕西航空职业技术学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1880', '陕西铁路工程职业技术学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1881', '陕西纺织服装职业技术学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1882', '铜川职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1883', '安康职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1884', '渭南职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1885', '张掖医学高等专科学校', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1886', '平凉医学高等专科学校', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1887', '陇南师范高等专科学校', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1888', '定西师范高等专科学校', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1889', '甘肃农业职业技术学院', '甘肃', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1890', '甘肃畜牧工程职业技术学院', '甘肃', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1891', '兰州资源环境职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1892', '甘肃交通职业技术学院', '甘肃', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1893', '武威职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1894', '甘肃钢铁职业技术学院', '甘肃', '------', '高职专科');
-INSERT INTO `school` VALUES ('1895', '青海卫生职业技术学院', '青海', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1896', '宁夏民族职业技术学院', '宁夏', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1897', '宁夏工商职业技术学院', '宁夏', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1898', '新疆兵团警官高等专科学校', '新疆', '------', '高职专科');
-INSERT INTO `school` VALUES ('1899', '新疆石河子职业技术学院', '新疆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1900', '新疆交通职业技术学院', '新疆', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1901', '新疆职业大学', '新疆', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1902', '天津商业大学宝德学院', '天津', '财经', '独立学院');
-INSERT INTO `school` VALUES ('1903', '大连工业大学艺术与信息工程学院', '------', '工科', '独立学院');
-INSERT INTO `school` VALUES ('1904', '辽宁科技大学信息技术学院', '辽宁', '工科', '独立学院');
-INSERT INTO `school` VALUES ('1905', '辽宁医学院医疗学院', '辽宁', '医药', '独立学院');
-INSERT INTO `school` VALUES ('1906', '黑龙江工程学院昆仑旅游学院', '黑龙江', '工科', '独立学院');
-INSERT INTO `school` VALUES ('1907', '上海视觉艺术学院', '', '艺术', '本科');
-INSERT INTO `school` VALUES ('1908', '杭州师范大学钱江学院', '------', '师范', '独立学院');
-INSERT INTO `school` VALUES ('1909', '东华理工大学长江学院', '------', '工科', '独立学院');
-INSERT INTO `school` VALUES ('1910', '青岛农业大学海都学院', '山东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('1911', '华中师范大学武汉传媒学院', '------', '艺术', '独立学院');
-INSERT INTO `school` VALUES ('1912', '重庆人文科技学院', '', '综合', '本科');
-INSERT INTO `school` VALUES ('1913', '云南艺术学院文华学院', '云南', '艺术', '独立学院');
-INSERT INTO `school` VALUES ('1914', '新疆财经大学商务学院', '新疆', '财经', '独立学院');
-INSERT INTO `school` VALUES ('1915', '北京科技大学延庆分校', '北京', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1916', '张家口学院', '', '师范', '本科');
-INSERT INTO `school` VALUES ('1917', '江苏职工医科大学', '江苏', '------', '高职专科');
-INSERT INTO `school` VALUES ('1918', '浙江工业大学浙西分校', '浙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1919', '安徽经济管理干部学院', '安徽', '------', '高职专科');
-INSERT INTO `school` VALUES ('1920', '福建政法管理干部学院', '福建', '------', '高职专科');
-INSERT INTO `school` VALUES ('1921', '新余钢铁有限责任公司职工大学', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1922', '南昌钢铁有限责任公司职工大学', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1923', '山东省聊城教育学院', '山东', '------', '高职专科');
-INSERT INTO `school` VALUES ('1924', '长沙教育学院', '湖南', '------', '高职专科');
-INSERT INTO `school` VALUES ('1925', '湘潭教育学院', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1926', '广西壮族自治区经济管理干部学院', '广西', '------', '高职专科');
-INSERT INTO `school` VALUES ('1927', '广西壮族自治区卫生管理干部学院', '广西', '------', '高职专科');
-INSERT INTO `school` VALUES ('1928', '中国工程物理研究院职工工学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1929', '北京劳动保障职业学院', '北京', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1930', '北京社会管理职业学院', '北京', '------', '高职专科');
-INSERT INTO `school` VALUES ('1931', '天津工艺美术职业学院', '天津', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1932', '天津艺术职业学院', '天津', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1933', '天津国土资源和房屋职业学院', '天津', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1934', '河北机电职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1935', '河北司法警官职业学院', '河北', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1936', '廊坊职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1937', '河北公安警察职业学院', '河北', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1938', '河北通信职业技术学院', '河北', '------', '高职专科');
-INSERT INTO `school` VALUES ('1939', '河北女子职业技术学院', '河北', '语言', '高职专科');
-INSERT INTO `school` VALUES ('1940', '河北旅游职业学院', '河北', '------', '高职专科');
-INSERT INTO `school` VALUES ('1941', '冀中职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1942', '石家庄科技工程职业学院', '河北', '------', '高职专科');
-INSERT INTO `school` VALUES ('1943', '太原电力高等专科学校', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1944', '运城幼儿师范高等专科学校', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1945', '山西省财政税务专科学校', '山西', '------', '高职专科');
-INSERT INTO `school` VALUES ('1946', '晋中职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1947', '山西运城农业职业技术学院', '山西', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1948', '太原旅游职业学院', '------', '语言', '高职专科');
-INSERT INTO `school` VALUES ('1949', '山西管理职业学院', '山西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1950', '潞安职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1951', '山西金融职业学院', '山西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1952', '山西体育职业学院', '山西', '体育', '高职专科');
-INSERT INTO `school` VALUES ('1953', '山西警官职业学院', '山西', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1954', '山西国际商务职业学院', '山西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1955', '忻州职业技术学院', '------', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1956', '山西经贸职业学院', '山西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1957', '朔州职业技术学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1958', '包头钢铁职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1959', '锡林郭勒职业学院', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1960', '内蒙古交通职业技术学院', '内蒙古', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1961', '科尔沁艺术职业学院', '------', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1962', '通辽职业学院', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1963', '内蒙古电子信息职业技术学院', '内蒙古', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1964', '乌兰察布职业学院', '------', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1965', '乌海职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1966', '内蒙古机电职业技术学院', '内蒙古', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1967', '内蒙古化工职业学院', '内蒙古', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1968', '内蒙古商贸职业学院', '内蒙古', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1969', '包头铁道职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1970', '辽宁装备制造职业技术学院', '辽宁', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1971', '辽河石油职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1972', '辽宁职业学院', '辽宁', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1973', '辽宁地质工程职业学院', '辽宁', '------', '高职专科');
-INSERT INTO `school` VALUES ('1974', '辽宁铁道职业技术学院', '辽宁', '------', '高职专科');
-INSERT INTO `school` VALUES ('1975', '辽宁建筑职业技术学院', '辽宁', '------', '高职专科');
-INSERT INTO `school` VALUES ('1976', '松原职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1977', '吉林铁道职业技术学院', '吉林', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1978', '白城职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1979', '长白山职业技术学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('1980', '齐齐哈尔高等师范专科学校', '------', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1981', '黑龙江幼儿师范高等专科学校', '黑龙江', '师范', '高职专科');
-INSERT INTO `school` VALUES ('1982', '黑龙江生物科技职业学院', '黑龙江', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1983', '黑龙江民族职业学院', '黑龙江', '民族', '高职专科');
-INSERT INTO `school` VALUES ('1984', '七台河职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1985', '黑龙江信息技术职业学院', '黑龙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1986', '黑龙江农垦林业职业技术学院', '黑龙江', '------', '高职专科');
-INSERT INTO `school` VALUES ('1987', '黑龙江公安警官职业学院', '黑龙江', '政法', '高职专科');
-INSERT INTO `school` VALUES ('1988', '黑龙江农垦农业职业技术学院', '黑龙江', '农业', '高职专科');
-INSERT INTO `school` VALUES ('1989', '黑龙江商业职业学院', '黑龙江', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1990', '黑龙江旅游职业技术学院', '黑龙江', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1991', '黑龙江煤炭职业技术学院', '黑龙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1992', '黑龙江交通职业技术学院', '黑龙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('1993', '哈尔滨科学技术职业学院', '黑龙江', '体育', '高职专科');
-INSERT INTO `school` VALUES ('1994', '黑龙江粮食职业学院', '黑龙江', '------', '高职专科');
-INSERT INTO `school` VALUES ('1995', '佳木斯职业学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('1996', '上海医药高等专科学校', '上海', '医药', '高职专科');
-INSERT INTO `school` VALUES ('1997', '上海旅游高等专科学校', '上海', '财经', '高职专科');
-INSERT INTO `school` VALUES ('1998', '上海工艺美术职业学院', '上海', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('1999', '上海工会管理职业学院', '上海', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2000', '上海体育职业学院', '上海', '体育', '高职专科');
-INSERT INTO `school` VALUES ('2001', '苏州职业大学', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2002', '南通农业职业技术学院', '------', '农业', '高职专科');
-INSERT INTO `school` VALUES ('2003', '无锡科技职业学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2004', '南京铁道职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2005', '江苏联合职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2006', '无锡工艺职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2007', '南京机电职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2008', '无锡城市职业技术学院', '------', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2009', '扬州环境资源职业技术学院', '------', '农业', '高职专科');
-INSERT INTO `school` VALUES ('2010', '健雄职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2011', '江苏财经职业技术学院', '江苏', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2012', '苏州工业职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2013', '盐城纺织职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2014', '扬州工业职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2015', '江苏城市职业学院', '江苏', '------', '高职专科');
-INSERT INTO `school` VALUES ('2016', '苏州卫生职业技术学院', '江苏', '------', '高职专科');
-INSERT INTO `school` VALUES ('2017', '盐城卫生职业技术学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('2018', '苏州高博软件技术职业学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2019', '南京旅游职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('2020', '浙江医学高等专科学校', '浙江', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2021', '金华职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2022', '浙江国际海运职业技术学院', '浙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2023', '宁波城市职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2024', '浙江纺织服装职业技术学院', '浙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2025', '宁波卫生职业技术学院', '', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2026', '浙江同济科技职业学院', '浙江', '------', '高职专科');
-INSERT INTO `school` VALUES ('2027', '浙江邮电职业技术学院', '浙江', '------', '高职专科');
-INSERT INTO `school` VALUES ('2028', '浙江体育职业技术学院', '浙江', '------', '高职专科');
-INSERT INTO `school` VALUES ('2029', '浙江电力职业技术学院', '浙江', '------', '高职专科');
-INSERT INTO `school` VALUES ('2030', '台州科技职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('2031', '温州科技职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('2032', '安庆医药高等专科学校', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('2033', '安徽工业职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2034', '安徽工商职业学院', '安徽', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2035', '安徽邮电职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2036', '安徽艺术职业学院', '安徽', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('2037', '安徽国防科技职业学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2038', '安徽林业职业技术学院', '安徽', '林业', '高职专科');
-INSERT INTO `school` VALUES ('2039', '安徽新闻出版职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2040', '安徽财贸职业学院', '安徽', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2041', '安徽电气工程职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2042', '安庆职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2043', '安徽公安职业学院', '安徽', '政法', '高职专科');
-INSERT INTO `school` VALUES ('2044', '芜湖信息技术职业学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2045', '安徽国际商务职业学院', '安徽', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2046', '马鞍山职业技术学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('2047', '徽商职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('2048', '民办安徽旅游职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('2049', '安徽冶金科技职业学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2050', '安徽机电职业技术学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2051', '安徽审计职业学院', '安徽', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2052', '亳州职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2053', '安徽中澳科技职业学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2054', '泉州医学高等专科学校', '------', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2055', '厦门医学高等专科学校', '福建', '------', '高职专科');
-INSERT INTO `school` VALUES ('2056', '德化陶瓷职业技术学院', '------', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('2057', '厦门城市职业学院', '福建', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2058', '福建警官职业学院', '福建', '政法', '高职专科');
-INSERT INTO `school` VALUES ('2059', '福建生物工程职业技术学院', '福建', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2060', '福建艺术职业学院', '福建', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('2061', '福建体育职业技术学院', '福建', '体育', '高职专科');
-INSERT INTO `school` VALUES ('2062', '宁德职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2063', '泉州经贸职业技术学院', '------', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2064', '闽西职业技术学院', '------', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2065', '三明职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2066', '湄洲湾职业技术学院', '------', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2067', '漳州卫生职业学院', '------', '------', '高职专科');
-INSERT INTO `school` VALUES ('2068', '天津天狮学院', '天津', '综合', '本科');
-INSERT INTO `school` VALUES ('2069', '保定学院', '------', '师范', '本科');
-INSERT INTO `school` VALUES ('2070', '上海海洋大学', '上海', '农业', '本科');
-INSERT INTO `school` VALUES ('2071', '上海海关学院', '上海', '综合', '本科');
-INSERT INTO `school` VALUES ('2072', '浙江警察学院', '浙江', '政法', '本科');
-INSERT INTO `school` VALUES ('2073', '宁波大红鹰学院', '浙江', '工科', '本科');
-INSERT INTO `school` VALUES ('2074', '浙江越秀外国语学院', '浙江', '语言', '本科');
-INSERT INTO `school` VALUES ('2075', '合肥师范学院', '------', '师范', '本科');
-INSERT INTO `school` VALUES ('2076', '池州学院', '------', '师范', '本科');
-INSERT INTO `school` VALUES ('2077', '蚌埠学院', '------', '工科', '本科');
-INSERT INTO `school` VALUES ('2078', '安徽三联学院', '安徽', '工科', '本科');
-INSERT INTO `school` VALUES ('2079', '福建警察学院', '福建', '政法', '本科');
-INSERT INTO `school` VALUES ('2080', '武夷学院', '------', '师范', '本科');
-INSERT INTO `school` VALUES ('2081', '山东万杰医学院', '山东', '医药', '本科');
-INSERT INTO `school` VALUES ('2082', '潍坊科技学院', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('2083', '山东英才学院', '山东', '综合', '本科');
-INSERT INTO `school` VALUES ('2084', '河南工程学院', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('2085', '郑州华信学院', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('2086', '郑州科技学院', '河南', '工科', '本科');
-INSERT INTO `school` VALUES ('2087', '荆楚理工学院', '------', '工科', '本科');
-INSERT INTO `school` VALUES ('2088', '湖南第一师范学院', '湖南', '师范', '本科');
-INSERT INTO `school` VALUES ('2089', '仲恺农业工程学院', '北京', '农业', '本科');
-INSERT INTO `school` VALUES ('2090', '海口经济学院', '海南', '财经', '本科');
-INSERT INTO `school` VALUES ('2091', '成都学院', '------', '综合', '本科');
-INSERT INTO `school` VALUES ('2092', '昆明学院', '------', '综合', '本科');
-INSERT INTO `school` VALUES ('2093', '西安思源学院', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('2094', '陕西国际商贸学院', '陕西', '财经', '本科');
-INSERT INTO `school` VALUES ('2095', '保定电力职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2096', '保险职业学院', '湖南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2097', '北海宏源足球职业学院', '广西', '体育', '高职专科');
-INSERT INTO `school` VALUES ('2098', '北京工商大学嘉华学院', '北京', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2099', '北京工业大学耿丹学院', '北京', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2100', '燕京理工学院', '河北', '综合', '本科');
-INSERT INTO `school` VALUES ('2101', '北京汇佳职业学院', '北京', '语言', '高职专科');
-INSERT INTO `school` VALUES ('2102', '北京交通职业技术学院', '北京', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2103', '北京科技大学天津学院', '天津', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2104', '北京科技职业学院', '北京', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2105', '北京理工大学珠海学院', '广东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2106', '北京培黎职业学院', '北京', '语言', '高职专科');
-INSERT INTO `school` VALUES ('2107', '北京现代职业技术学院', '北京', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2108', '北京邮电大学世纪学院', '北京', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2109', '北京中医药大学东方学院', '河北', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2110', '长春理工大学光电信息学院', '吉林', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2111', '长春税务学院信息经济学院', '吉林', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2112', '长江大学工程技术学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2113', '长江工程职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2114', '长沙理工大学城南学院', '湖南', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2115', '长沙医学院', '湖南', '医药', '本科');
-INSERT INTO `school` VALUES ('2116', '成都东软学院', '四川', '工科', '本科');
-INSERT INTO `school` VALUES ('2117', '四川传媒学院', '四川', '艺术', '本科');
-INSERT INTO `school` VALUES ('2118', '大连科技学院', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('2119', '电子科技大学成都学院', '四川', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2120', '大连财经学院', '辽宁', '财经', '本科');
-INSERT INTO `school` VALUES ('2121', '大连东软信息学院', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('2122', '东北农业大学成栋学院', '黑龙江', '农业', '独立学院');
-INSERT INTO `school` VALUES ('2123', '鄂东职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2124', '广西经贸职业技术学院', '广西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2125', '广州南洋理工职业学院', '广东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2126', '桂林电子科技大学信息科技学院', '广西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2127', '黑龙江外国语学院', '黑龙江', '师范', '本科');
-INSERT INTO `school` VALUES ('2128', '河北大学工商学院', '河北', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2129', '河北理工大学轻工学院', '河北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2130', '河北传媒学院', '河北', '艺术', '本科');
-INSERT INTO `school` VALUES ('2131', '河南大学民生学院', '河南', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2132', '河南科技学院新科学院', '河南', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2133', '黑龙江北开职业技术学院', '黑龙江', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2134', '黑龙江三江美术职业学院', '黑龙江', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('2135', '湖北国土资源职业学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2136', '湖北三峡职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2137', '湖北职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2138', '湖南工业大学科技学院', '湖南', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2139', '湖南科技大学潇湘学院', '湖南', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2140', '湖南涉外经济学院', '湖南', '综合', '本科');
-INSERT INTO `school` VALUES ('2141', '华北电力大学科技学院', '河北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2142', '华北煤炭医学院冀唐学院', '河北', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2143', '华南师范大学增城学院', '广东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2144', '华中科技大学文华学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2145', '吉林大学珠海学院', '广东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2146', '长春建筑学院', '吉林', '工科', '本科');
-INSERT INTO `school` VALUES ('2147', '长春科技学院', '吉林', '农业', '本科');
-INSERT INTO `school` VALUES ('2148', '集美大学诚毅学院', '福建', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2149', '江苏大学京江学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2150', '江苏科技大学南徐学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2151', '江西财经大学现代经济管理学院', '江西', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2152', '江西大宇职业技术学院', '江西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2153', '江西服装学院', '江西', '艺术', '本科');
-INSERT INTO `school` VALUES ('2154', '南昌工学院', '江西', '民族', '本科');
-INSERT INTO `school` VALUES ('2155', '江西工业贸易职业技术学院', '江西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2156', '江西建设职业技术学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2157', '江西理工大学应用科学学院', '江西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2158', '江西外语外贸职业学院', '江西', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2159', '江西中医学院科技学院', '江西', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2160', '景德镇陶瓷学院科技艺术学院', '江西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2161', '昆明医学院海源学院', '云南', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2162', '辽宁对外经贸学院', '辽宁', '财经', '本科');
-INSERT INTO `school` VALUES ('2163', '辽宁科技学院', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('2164', '辽宁石油化工大学顺华能源学院', '辽宁', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2165', '南昌大学共青学院', '江西', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2166', '南昌大学科学技术学院', '江西', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2167', '南昌航空大学科技学院', '江西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2168', '南昌理工学院', '江西', '综合', '本科');
-INSERT INTO `school` VALUES ('2169', '南充职业技术学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2170', '南华大学船山学院', '湖南', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2171', '南京工业大学浦江学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2172', '南京航空航天大学金城学院', '江苏', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2173', '南京审计学院金审学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2174', '南京师范大学泰州学院', '江苏', '师范', '独立学院');
-INSERT INTO `school` VALUES ('2175', '南京信息工程大学滨江学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2176', '南京邮电大学通达学院', '江苏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2177', '南开大学滨海学院', '天津', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2178', '青岛港湾职业技术学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2179', '青岛恒星职业技术学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2180', '三亚航空旅游职业学院', '海南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2181', '山西财经大学华商学院', '山西', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2182', '山西旅游职业学院', '山西', '语言', '高职专科');
-INSERT INTO `school` VALUES ('2183', '陕西电子信息职业技术学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2184', '上海电影艺术职业学院', '上海', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('2185', '上海工商外国语职业学院', '上海', '语言', '高职专科');
-INSERT INTO `school` VALUES ('2186', '上海托普信息技术职业学院', '上海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2187', '沈阳城市学院', '辽宁', '综合', '本科');
-INSERT INTO `school` VALUES ('2188', '沈阳工程学院', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('2189', '石家庄经济学院华信学院', '河北', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2190', '石家庄铁道学院四方学院', '河北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2191', '河北外国语学院', '河北', '综合', '本科');
-INSERT INTO `school` VALUES ('2192', '石家庄医学高等专科学校', '河北', '------', '高职专科');
-INSERT INTO `school` VALUES ('2193', '石家庄邮电职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2194', '四川航天职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2195', '四川外语学院重庆南方翻译学院', '重庆', '语言', '独立学院');
-INSERT INTO `school` VALUES ('2196', '苏州经贸职业技术学院', '江苏', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2197', '太原理工大学现代科技学院', '山西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2198', '天津石油职业技术学院', '天津', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2199', '天津医科大学临床医学院', '天津', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2200', '武汉交通职业学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2201', '武汉理工大学华夏学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2202', '武汉民政职业学院', '湖北', '政法', '高职专科');
-INSERT INTO `school` VALUES ('2203', '武汉铁路职业技术学院', '湖北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2204', '西安财经学院行知学院', '陕西', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2205', '西安海棠职业学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2206', '西安培华学院', '陕西', '综合', '本科');
-INSERT INTO `school` VALUES ('2207', '西北工业大学明德学院', '陕西', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2208', '厦门大学嘉庚学院', '福建', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2209', '厦门演艺职业学院', '福建', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('2210', '云南大学旅游文化学院', '云南', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2211', '云南科技信息职业学院', '云南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2212', '云南师范大学商学院', '云南', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2213', '云南师范大学文理学院', '云南', '------', '独立学院');
-INSERT INTO `school` VALUES ('2214', '浙江传媒学院', '浙江', '语言', '本科');
-INSERT INTO `school` VALUES ('2215', '郑州经贸职业学院', '河南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2216', '中北大学信息商务学院', '山西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2217', '中国传媒大学南广学院', '江苏', '艺术', '独立学院');
-INSERT INTO `school` VALUES ('2218', '中国地质大学长城学院', '河北', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2219', '中国地质大学江城学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2220', '中国环境管理干部学院', '河北', '综合', '其它');
-INSERT INTO `school` VALUES ('2221', '中国矿业大学徐海学院', '江苏', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2222', '中国医科大学临床医药学院', '辽宁', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2223', '武汉长江工商学院', '湖北', '财经', '本科');
-INSERT INTO `school` VALUES ('2224', '重庆工商大学派斯学院', '重庆', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2225', '重庆工商大学融智学院', '重庆', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2226', '云南警官学院', '云南', '政法', '本科');
-INSERT INTO `school` VALUES ('2227', '湖南人文科技学院', '湖南', '师范', '本科');
-INSERT INTO `school` VALUES ('2228', '安徽农业大学经济技术学院', '安徽', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2229', '上海济光职业技术学院', '上海', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2230', '延安大学西安创新学院', '陕西', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2231', '江苏海事职业技术学院', '江苏', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2232', '河北农业大学现代科技学院', '河北', '农业', '独立学院');
-INSERT INTO `school` VALUES ('2233', '哈尔滨德强商务学院', '黑龙江', '综合', '本科');
-INSERT INTO `school` VALUES ('2234', '海南经贸职业技术学院', '海南', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2235', '大连软件职业学院', '辽宁', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2236', '天津海运职业学院', '天津', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2237', '山东经济学院燕山学院', '山东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2238', '济南工程职业技术学院', '山东', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2239', '江西科技师范学院理工学院', '江西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2240', '贵州大学科技学院', '贵州', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2241', '安徽建筑工业学院城市建设学院', '安徽', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2242', '贵阳医学院神奇民族医药学院', '贵州', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2243', '琼台师范高等专科学校', '海南', '师范', '高职专科');
-INSERT INTO `school` VALUES ('2244', '昆明理工大学津桥学院', '云南', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2245', '西北师范大学知行学院', '甘肃', '师范', '独立学院');
-INSERT INTO `school` VALUES ('2246', '河北科技大学理工学院', '河北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2247', '天津大学仁爱学院', '天津', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2248', '中南林业科技大学涉外学院', '湖南', '农业', '独立学院');
-INSERT INTO `school` VALUES ('2249', '武汉生物工程学院', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('2250', '吉林建筑工程学院城建学院', '吉林', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2251', '四川外语学院成都学院', '四川', '语言', '独立学院');
-INSERT INTO `school` VALUES ('2252', '阜阳科技职业学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2253', '泉州纺织服装职业学院', '福建', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2254', '广西民族大学相思湖学院', '广西', '民族', '独立学院');
-INSERT INTO `school` VALUES ('2255', '河北工业大学城市学院', '天津', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2256', '天津铁道职业技术学院', '天津', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2257', '渤海大学文理学院', '辽宁', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2258', '中国计量学院现代科技学院', '浙江', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2259', '山东财政学院东方学院', '山东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2260', '四川师范大学文理学院', '四川', '师范', '独立学院');
-INSERT INTO `school` VALUES ('2261', '江西先锋软件职业技术学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2262', '常德职业技术学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2263', '湖北汽车工业学院科技学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2264', '沈阳航空工业学院北方科技学院', '辽宁', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2265', '天津城市建设管理职业技术学院', '天津', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2266', '马鞍山师范高等专科学校', '安徽', '师范', '高职专科');
-INSERT INTO `school` VALUES ('2267', '西安翻译学院', '陕西', '语言', '本科');
-INSERT INTO `school` VALUES ('2268', '陕西青年职业学院', '陕西', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2269', '沈阳工学院', '辽宁', '工科', '本科');
-INSERT INTO `school` VALUES ('2270', '云南大学滇池学院', '云南', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2271', '天津师范大学津沽学院', '天津', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2272', '大连枫叶职业技术学院', '辽宁', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2273', '河北软件职业技术学院', '河北', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2274', '湖南农业大学东方科技学院', '湖南', '农业', '独立学院');
-INSERT INTO `school` VALUES ('2275', '沈阳化工大学科亚学院', '辽宁', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2276', '永城职业学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2277', '海南政法职业学院', '海南', '政法', '高职专科');
-INSERT INTO `school` VALUES ('2278', '西京学院', '陕西', '工科', '本科');
-INSERT INTO `school` VALUES ('2279', '安徽财经大学商学院', '安徽', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2280', '河北医科大学临床学院', '河北', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2281', '广西大学行健文理学院', '广西', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2282', '重庆邮电大学移通学院', '重庆', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2283', '辽宁财贸学院', '辽宁', '综合', '本科');
-INSERT INTO `school` VALUES ('2284', '唐山科技职业技术学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2285', '中南财经政法大学武汉学院', '湖北', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2286', '福建师范大学协和学院', '福建', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2287', '武汉工程大学邮电与信息工程学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2288', '成都信息工程学院银杏酒店管理学院', '四川', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2289', '哈尔滨广厦学院', '黑龙江', '综合', '本科');
-INSERT INTO `school` VALUES ('2290', '太原科技大学华科学院', '山西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2291', '厦门华天涉外职业技术学院', '福建', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2292', '石家庄科技信息职业学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2293', '天津冶金职业技术学院', '天津', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2294', '白城医学高等专科学校', '吉林', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2295', '天津体育学院运动与文化艺术学院', '天津', '体育', '独立学院');
-INSERT INTO `school` VALUES ('2296', '武昌工学院', '湖北', '工科', '本科');
-INSERT INTO `school` VALUES ('2297', '福建对外经济贸易职业技术学院', '福建', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2298', '长春光华学院', '吉林', '综合', '本科');
-INSERT INTO `school` VALUES ('2299', '淮北煤炭师范学院信息学院', '安徽', '师范', '独立学院');
-INSERT INTO `school` VALUES ('2300', '长春工业大学人文信息学院', '吉林', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2301', '河北工程大学科信学院', '河北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2302', '宁夏大学新华学院', '宁夏', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2303', '燕山大学里仁学院', '河北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2304', '西安建筑科技大学华清学院', '陕西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2305', '山西电力职业技术学院', '山西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2306', '哈尔滨远东理工学院', '黑龙江', '工科', '本科');
-INSERT INTO `school` VALUES ('2307', '中原工学院信息商务学院', '河南', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2308', '沧州医学高等专科学校', '河北', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2309', '湖南商学院北津学院', '湖南', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2310', '江西农业大学南昌商学院', '江西', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2311', '兰州商学院陇桥学院', '甘肃', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2312', '武汉科技大学城市学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2313', '辽宁中医药大学杏林学院', '辽宁', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2314', '江西师范大学科学技术学院', '江西', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2315', '湖南司法警官职业学院', '湖南', '政法', '高职专科');
-INSERT INTO `school` VALUES ('2316', '商洛学院', '陕西', '综合', '本科');
-INSERT INTO `school` VALUES ('2317', '天津城市职业学院', '天津', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2318', '抚州职业技术学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2319', '湖南工程学院应用技术学院', '湖南', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2320', '烟台大学文经学院', '山东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2321', '岳阳职业技术学院', '湖南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2322', '长江大学文理学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2323', '山东医学高等专科学校', '山东', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2324', '河南检察职业学院', '河南', '政法', '高职专科');
-INSERT INTO `school` VALUES ('2325', '广西中医学院赛恩斯新医药学院', '广西', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2326', '湖北大学知行学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2327', '贵州大学明德学院', '贵州', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2328', '湖北工业大学商贸学院', '湖北', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2329', '华东交通大学理工学院', '江西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2330', '贵阳中医学院时珍学院', '贵州', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2331', '青岛求实职业技术学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2332', '西安工业大学北方信息工程学院', '陕西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2333', '新疆医科大学厚博学院', '新疆', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2334', '河北师范大学汇华学院', '河北', '师范', '独立学院');
-INSERT INTO `school` VALUES ('2335', '江苏经贸职业技术学院', '江苏', '财经', '高职专科');
-INSERT INTO `school` VALUES ('2336', '郑州职业技术学院', '河南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2337', '山东药品食品职业学院', '山东', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2338', '天津外国语学院滨海外事学院', '天津', '语言', '独立学院');
-INSERT INTO `school` VALUES ('2339', '贵州师范大学求是学院', '贵州', '师范', '独立学院');
-INSERT INTO `school` VALUES ('2340', '天津生物工程职业技术学院', '天津', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2341', '河北经贸大学经济管理学院', '河北', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2342', '山西师范大学现代文理学院', '山西', '师范', '独立学院');
-INSERT INTO `school` VALUES ('2343', '三峡大学科技学院', '湖北', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2344', '安徽大学江淮学院', '安徽', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2345', '吉首大学张家界学院', '湖南', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2346', '安顺学院', '贵州', '综合', '本科');
-INSERT INTO `school` VALUES ('2347', '辽宁何氏医学院', '辽宁', '医药', '本科');
-INSERT INTO `school` VALUES ('2348', '天津理工大学中环信息学院', '天津', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2349', '贵州财经学院商务学院', '贵州', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2350', '西安电子科技大学长安学院', '陕西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2351', '上海思博职业技术学院', '上海', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2352', '陕西邮电职业技术学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2353', '哈尔滨华德学院', '黑龙江', '工科', '本科');
-INSERT INTO `school` VALUES ('2354', '济南大学泉城学院', '山东', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2355', '凯里学院', '贵州', '综合', '本科');
-INSERT INTO `school` VALUES ('2356', '海南万和信息职业技术学院', '海南', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2357', '新乡医学院三全学院', '河南', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2358', '石家庄外国语职业学院', '河北', '语言', '高职专科');
-INSERT INTO `school` VALUES ('2359', '海南外国语职业学院', '海南', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2360', '陕西警官职业学院', '陕西', '政法', '高职专科');
-INSERT INTO `school` VALUES ('2361', '江汉大学文理学院', '湖北', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2362', '渤海石油职业学院', '河北', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2363', '山东旅游职业学院', '山东', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2364', '广西工学院鹿山学院', '广西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2365', '陕西科技大学镐京学院', '陕西', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2366', '东北师范大学人文学院', '吉林', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2367', '江西制造职业技术学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2368', '沈阳工业大学工程学院', '辽宁', '工科', '独立学院');
-INSERT INTO `school` VALUES ('2369', '郧阳医学院药护学院', '湖北', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2370', '山西医科大学晋祠学院', '山西', '医药', '独立学院');
-INSERT INTO `school` VALUES ('2371', '四川警安职业学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2372', '青海大学昆仑学院', '青海', '综合', '独立学院');
-INSERT INTO `school` VALUES ('2373', '兰州商学院长青学院', '甘肃', '财经', '独立学院');
-INSERT INTO `school` VALUES ('2374', '湖北师范学院文理学院', '湖北', '师范', '独立学院');
-INSERT INTO `school` VALUES ('2375', '西安铁路职业技术学院', '陕西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2376', '上海立信会计学院', '上海', '财经', '本科');
-INSERT INTO `school` VALUES ('2377', '上海电机学院', '上海', '工科', '本科');
-INSERT INTO `school` VALUES ('2378', '湖南工学院', '湖南', '工科', '本科');
-INSERT INTO `school` VALUES ('2379', '毕节学院', '贵州', '师范', '本科');
-INSERT INTO `school` VALUES ('2380', '贵阳学院', '贵州', '综合', '本科');
-INSERT INTO `school` VALUES ('2381', '铜仁学院', '贵州', '综合', '本科');
-INSERT INTO `school` VALUES ('2382', '赤峰学院', '内蒙古', '综合', '本科');
-INSERT INTO `school` VALUES ('2383', '天津外国语大学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2384', '河北民族师范学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2385', '沧州师范学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2386', '红河卫生职业学院', '云南', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2387', '四川电影电视职业学院', '四川', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('2388', '大连海洋大学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2389', '朝阳师范高等专科学校', '------', '------', '------');
-INSERT INTO `school` VALUES ('2390', '吉林财经大学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2391', '云南外事外语职业学院', '云南', '语言', '高职专科');
-INSERT INTO `school` VALUES ('2392', '常州大学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2393', '浙江农林大学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2394', '四川三河职业学院', '四川', '综合', '高职专科');
-INSERT INTO `school` VALUES ('2395', '淮北师范大学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2396', '宁德师范学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2397', '济南幼儿师范高等专科学校', '山东', '师范', '高职专科');
-INSERT INTO `school` VALUES ('2398', '西南林业大学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2399', '吕梁学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2400', '公安海警学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2401', '南华工商学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2402', '四川汽车职业技术学院', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2403', '南京森林警察学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2404', '江西警察学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2405', '新余学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2406', '湖南女子学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2407', '甘肃民族师范学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2408', '河南城建学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2409', '河南警察学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2410', '郑州师范学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2411', '浙江农林大学天目学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2412', '哈尔滨石油学院', '', '工科', '本科');
-INSERT INTO `school` VALUES ('2413', '无锡太湖学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2414', '齐齐哈尔理工职业学院', '黑龙江', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2415', '郑州成功财经学院', '', '财经', '本科');
-INSERT INTO `school` VALUES ('2416', '北京卫生职业学院', '北京', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2417', '中国人民解放军炮兵学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2418', '中国人民解放军第二军医大学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2419', '中国人民解放军海军飞行学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2420', '河北外国语职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2421', '运城护理职业学院', '山西', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2422', '大同煤炭职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2423', '山西职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2424', '绍兴职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2425', '广东舞蹈戏剧职业学院', '广东', '艺术', '高职专科');
-INSERT INTO `school` VALUES ('2426', '山东职业学院（原济南铁道职业技术', '------', '------', '------');
-INSERT INTO `school` VALUES ('2427', '湖南冶金职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2428', '惠州卫生职业技术学院', '广东', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2429', '北京人民警察学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2430', '江西管理职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2431', '齐鲁师范学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2432', '潍坊工程职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2433', '开封文化艺术职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2434', '广东第二师范学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2435', '陕西学前师范学院', '陕西', '师范', '本科');
-INSERT INTO `school` VALUES ('2436', '甘肃机电职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2437', '山西青年职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2438', '福建江夏学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2439', '白银矿冶职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2440', '上海健康职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2441', '山东青年政治学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2442', '沈阳北软信息职业技术学院', '辽宁', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2443', '川北幼儿师范高等专科学校', '四川', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2444', '上海民航职业技术学院', '上海', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2445', '安阳幼儿师范高等专科学校', '河南', '师范', '高职专科');
-INSERT INTO `school` VALUES ('2446', '泉州幼儿师范高等专科学校', '福建', '师范', '高职专科');
-INSERT INTO `school` VALUES ('2447', '四川卫生康复职业学院', '四川', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2448', '广西现代职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2449', '柳州铁道职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2450', '江苏建康职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2451', '衢州学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2452', '共青科技职业学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2453', '哈尔滨工业大学(威海)', '------', '------', '------');
-INSERT INTO `school` VALUES ('2454', '合肥科技职业学院', '安徽', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2455', '河北联合大学轻工学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2456', '哈尔滨江南职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2457', '河北联合大学冀唐学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2458', '景德镇陶瓷职业技术学院', '江西', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2459', '石家庄铁道大学四方学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2460', '天津职业技术师范大学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2461', '郑州升达经贸管理学院', '河南', '财经', '本科');
-INSERT INTO `school` VALUES ('2462', '辽宁政法职业学院', '辽宁', '政法', '高职专科');
-INSERT INTO `school` VALUES ('2463', '武警福州指挥学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2464', '河北联合大学', '河北', '综合', '本科');
-INSERT INTO `school` VALUES ('2465', '淮北师范大学信息学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2466', '天津外国语大学滨海外事学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2467', '合肥幼儿师范高等专科学校', '安徽', '师范', '高职专科');
-INSERT INTO `school` VALUES ('2468', '湖北医药学院药护学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2469', '中国人民解放军第三军医大学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2470', '澳门大学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2471', '天津广播影视职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2472', '河北劳动关系职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2473', '泊头职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2474', '宣化科技职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2475', '山西轻工职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2476', '乌兰察布医学高等专科学校', '内蒙古', '林业', '高职专科');
-INSERT INTO `school` VALUES ('2477', '鄂尔多斯职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2478', '辽宁现代服务职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2479', '四平职业大学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2480', '杭州科技职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2481', '江西冶金职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2482', '江西新闻出版职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2483', '郑州理工职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2484', '山东理工职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2485', '山东文化产业职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2486', '安阳职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2487', '新乡职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2488', '驻马店职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2489', '三峡旅游职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2490', '湖南生物机电职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2491', '广州番禺职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2492', '广西幼儿师范高等专科学校', '广西', '师范', '高职专科');
-INSERT INTO `school` VALUES ('2493', '重庆航天职业技术学院', '', '------', '------');
-INSERT INTO `school` VALUES ('2494', '重庆商务职业学院', '', '------', '------');
-INSERT INTO `school` VALUES ('2495', '四川幼儿师范高等专科学校', '四川', '师范', '高职专科');
-INSERT INTO `school` VALUES ('2496', '廊坊东方职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2497', '石家庄人民医学高等专科学校', '河北', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2498', '石家庄科技职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2499', '石家庄理工职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2500', '运城职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2501', '大连航运职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2502', '大连装备制造职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2503', '大连汽车职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2504', '苏州信息职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2505', '浙江横店影视职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2506', '浙江汽车职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2507', '安徽矿业职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2508', '合肥信息技术职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2509', '民办合肥滨湖职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2510', '安徽现代信息工程职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2511', '泉州泰山航海职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2512', '泉州轻工职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2513', '厦门安防科技职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2514', '漯河食品职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2515', '郑州城市职业学院（原郑州布瑞达理', '------', '------', '------');
-INSERT INTO `school` VALUES ('2516', '广西经济职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2517', '三亚理工职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2518', '重庆传媒职业学院', '', '------', '------');
-INSERT INTO `school` VALUES ('2519', '重庆能源职业学院', '', '------', '------');
-INSERT INTO `school` VALUES ('2520', '西安医学高等专科学校', '陕西', '医药', '高职专科');
-INSERT INTO `school` VALUES ('2521', '北京第二外国语学院中瑞酒店管理学', '------', '------', '------');
-INSERT INTO `school` VALUES ('2522', '常州大学怀德学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2523', '上海财经大学浙江学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2524', '西南交通大学希望学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2525', '东莞职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2526', '山东女子学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2527', '北京交通运输职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2528', '北京新圆明职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2529', '北京体育职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2530', '承德护理职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2531', '廊坊燕京职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2532', '阳泉师范高等专科学校', '山西', '师范', '高职专科');
-INSERT INTO `school` VALUES ('2533', '辽宁卫生职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2534', '吉林科技职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2535', '宿迁泽达职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2536', '桐城师范高等专科学校', '------', '------', '------');
-INSERT INTO `school` VALUES ('2537', '安徽汽车职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2538', '皖西卫生职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2539', '滁州城市职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2540', '青岛远洋船员职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2541', '焦作工贸职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2542', '河南化工职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2543', '河南艺术职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2544', '许昌陶瓷职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2545', '辽宁理工职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2546', '晋中师范高等专科学校', '山西', '师范', '高职专科');
-INSERT INTO `school` VALUES ('2547', '内蒙古工业职业学院', '内蒙古', '工科', '高职专科');
-INSERT INTO `school` VALUES ('2548', '呼伦贝尔职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2549', '满洲里俄语职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2550', '辽宁冶金职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2551', '辽宁工程职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2552', '辽宁城市建设职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2553', '铁岭卫生职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2554', '黑龙江护理高等专科学校', '------', '------', '------');
-INSERT INTO `school` VALUES ('2555', '黑龙江农垦科技职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2556', '苏州工业园区服务外包职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2557', '郑州信息工程职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2558', '长垣烹饪职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2559', '武汉城市职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2560', '湖南高尔夫旅游职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2561', '湖南工商职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2562', '广州华商职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2563', '广东南方职业学院', '', '------', '------');
-INSERT INTO `school` VALUES ('2564', '广州华夏职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2565', '广东环境保护工程职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2566', '广西科技职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2567', '广西卫生职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2568', '海南工商职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2569', '重庆房地产职业学院', '', '------', '------');
-INSERT INTO `school` VALUES ('2570', '重庆电讯职业学院', '', '------', '------');
-INSERT INTO `school` VALUES ('2571', '重庆化工职业学院', '', '------', '------');
-INSERT INTO `school` VALUES ('2572', '重庆交通职业学院', '', '------', '------');
-INSERT INTO `school` VALUES ('2573', '重庆旅游职业学院', '', '------', '------');
-INSERT INTO `school` VALUES ('2574', '陕西工商职业学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2575', '榆林职业技术学院', '------', '------', '------');
-INSERT INTO `school` VALUES ('2576', '', '', '------', '------');
+INSERT INTO `horoscope` (`id`, `name`, `desc`) VALUES
+(1, '白羊座', ''),
+(2, '金牛座', ''),
+(3, '双子座', ''),
+(4, '巨蟹座', ''),
+(5, '狮子座', ''),
+(6, '处女座', ''),
+(7, '天秤座', ''),
+(8, '天蝎座', ''),
+(9, '射手座', ''),
+(10, '摩羯座', ''),
+(11, '水瓶座', ''),
+(12, '双鱼座', '');
 
-INSERT INTO `major` VALUES ('1', '哲学类');
-INSERT INTO `major` VALUES ('2', '哲学');
-INSERT INTO `major` VALUES ('3', '逻辑学');
-INSERT INTO `major` VALUES ('4', '宗教学');
-INSERT INTO `major` VALUES ('5', '伦理学');
-INSERT INTO `major` VALUES ('6', '经济学类');
-INSERT INTO `major` VALUES ('7', '经济学');
-INSERT INTO `major` VALUES ('8', '国际经济与贸易');
-INSERT INTO `major` VALUES ('9', '财政学');
-INSERT INTO `major` VALUES ('10', '金融学');
-INSERT INTO `major` VALUES ('11', '国民经济管理');
-INSERT INTO `major` VALUES ('12', '贸易经济');
-INSERT INTO `major` VALUES ('13', '保险');
-INSERT INTO `major` VALUES ('14', '金融工程');
-INSERT INTO `major` VALUES ('15', '税务');
-INSERT INTO `major` VALUES ('16', '信用管理');
-INSERT INTO `major` VALUES ('17', '网络经济学');
-INSERT INTO `major` VALUES ('18', '体育经济');
-INSERT INTO `major` VALUES ('19', '投资学');
-INSERT INTO `major` VALUES ('20', '环境资源与发展经济学');
-INSERT INTO `major` VALUES ('21', '海洋经济学');
-INSERT INTO `major` VALUES ('22', '法学类');
-INSERT INTO `major` VALUES ('23', '法学');
-INSERT INTO `major` VALUES ('24', '知识产权');
-INSERT INTO `major` VALUES ('25', '监狱学');
-INSERT INTO `major` VALUES ('26', '马克思主义理论类');
-INSERT INTO `major` VALUES ('27', '科学社会主义与国际共产主义运动');
-INSERT INTO `major` VALUES ('28', '中国革命史与中国共产党党史');
-INSERT INTO `major` VALUES ('29', '社会学类');
-INSERT INTO `major` VALUES ('30', '社会学');
-INSERT INTO `major` VALUES ('31', '社会工作');
-INSERT INTO `major` VALUES ('32', '家政学');
-INSERT INTO `major` VALUES ('33', '人类学');
-INSERT INTO `major` VALUES ('34', '政治学类');
-INSERT INTO `major` VALUES ('35', '政治学与行政学');
-INSERT INTO `major` VALUES ('36', '国际政治');
-INSERT INTO `major` VALUES ('37', '外交学');
-INSERT INTO `major` VALUES ('38', '思想政治教育');
-INSERT INTO `major` VALUES ('39', '国际政治经济学');
-INSERT INTO `major` VALUES ('40', '国际事务');
-INSERT INTO `major` VALUES ('41', '公安学类');
-INSERT INTO `major` VALUES ('42', '治安学');
-INSERT INTO `major` VALUES ('43', '侦察学');
-INSERT INTO `major` VALUES ('44', '边防管理');
-INSERT INTO `major` VALUES ('45', '火灾勘测');
-INSERT INTO `major` VALUES ('46', '禁毒学');
-INSERT INTO `major` VALUES ('47', '警犬技术');
-INSERT INTO `major` VALUES ('48', '经济犯罪侦察');
-INSERT INTO `major` VALUES ('49', '边防指挥');
-INSERT INTO `major` VALUES ('50', '消防指挥');
-INSERT INTO `major` VALUES ('51', '警卫学');
-INSERT INTO `major` VALUES ('52', '教育学类');
-INSERT INTO `major` VALUES ('53', '教育学');
-INSERT INTO `major` VALUES ('54', '学前教育');
-INSERT INTO `major` VALUES ('55', '特殊教育');
-INSERT INTO `major` VALUES ('56', '教育技术学');
-INSERT INTO `major` VALUES ('57', '小学教育');
-INSERT INTO `major` VALUES ('58', '艺术教育');
-INSERT INTO `major` VALUES ('59', '人文教育');
-INSERT INTO `major` VALUES ('60', '科学教育');
-INSERT INTO `major` VALUES ('61', '言语听觉科学');
-INSERT INTO `major` VALUES ('62', '体育学类');
-INSERT INTO `major` VALUES ('63', '体育教育');
-INSERT INTO `major` VALUES ('64', '运动训练');
-INSERT INTO `major` VALUES ('65', '社会体育');
-INSERT INTO `major` VALUES ('66', '运动人体科学');
-INSERT INTO `major` VALUES ('67', '民族传统体育');
-INSERT INTO `major` VALUES ('68', '职业技术教育类');
-INSERT INTO `major` VALUES ('69', '农艺教育');
-INSERT INTO `major` VALUES ('70', '园艺教育');
-INSERT INTO `major` VALUES ('71', '特用作物教育');
-INSERT INTO `major` VALUES ('72', '林木生产教育');
-INSERT INTO `major` VALUES ('73', '特用动物教育');
-INSERT INTO `major` VALUES ('74', '畜禽生产教育');
-INSERT INTO `major` VALUES ('75', '水产养殖教育');
-INSERT INTO `major` VALUES ('76', '应用生物教育');
-INSERT INTO `major` VALUES ('77', '农业机械教育');
-INSERT INTO `major` VALUES ('78', '农业建筑与环境控制教育');
-INSERT INTO `major` VALUES ('79', '农产品储运与加工教育');
-INSERT INTO `major` VALUES ('80', '农业经营管理教育');
-INSERT INTO `major` VALUES ('81', '机械制造工艺教育');
-INSERT INTO `major` VALUES ('82', '机械维修及检测技术教育');
-INSERT INTO `major` VALUES ('83', '机电技术教育');
-INSERT INTO `major` VALUES ('84', '电气技术教育');
-INSERT INTO `major` VALUES ('85', '汽车维修工程教育');
-INSERT INTO `major` VALUES ('86', '应用电子技术教育');
-INSERT INTO `major` VALUES ('87', '制浆造纸工艺教育');
-INSERT INTO `major` VALUES ('88', '印刷工艺教育');
-INSERT INTO `major` VALUES ('89', '橡塑制品成型工艺教育');
-INSERT INTO `major` VALUES ('90', '食品工艺教育');
-INSERT INTO `major` VALUES ('91', '纺织工艺教育');
-INSERT INTO `major` VALUES ('92', '染整工艺教育');
-INSERT INTO `major` VALUES ('93', '化工工艺教育');
-INSERT INTO `major` VALUES ('94', '化工分析与检测技术教育');
-INSERT INTO `major` VALUES ('95', '建筑材料工程教育');
-INSERT INTO `major` VALUES ('96', '建筑工程教育');
-INSERT INTO `major` VALUES ('97', '服装设计与工艺教育');
-INSERT INTO `major` VALUES ('98', '装潢设计与工艺教育');
-INSERT INTO `major` VALUES ('99', '旅游管理与服务教育');
-INSERT INTO `major` VALUES ('100', '食品营养与检验教育');
-INSERT INTO `major` VALUES ('101', '烹饪与营养教育');
-INSERT INTO `major` VALUES ('102', '财务会计教育');
-INSERT INTO `major` VALUES ('103', '文秘教育');
-INSERT INTO `major` VALUES ('104', '市场营销教育');
-INSERT INTO `major` VALUES ('105', '职业技术教育管理');
-INSERT INTO `major` VALUES ('106', '中国语言文学类');
-INSERT INTO `major` VALUES ('107', '汉语言文学');
-INSERT INTO `major` VALUES ('108', '汉语言');
-INSERT INTO `major` VALUES ('109', '对外汉语');
-INSERT INTO `major` VALUES ('110', '中国少数民族语言文学');
-INSERT INTO `major` VALUES ('111', '古典文献');
-INSERT INTO `major` VALUES ('112', '中国语言文化');
-INSERT INTO `major` VALUES ('113', '应用语言学');
-INSERT INTO `major` VALUES ('114', '外国语言文学类');
-INSERT INTO `major` VALUES ('115', '英语');
-INSERT INTO `major` VALUES ('116', '俄语');
-INSERT INTO `major` VALUES ('117', '德语');
-INSERT INTO `major` VALUES ('118', '法语');
-INSERT INTO `major` VALUES ('119', '西班牙语');
-INSERT INTO `major` VALUES ('120', '阿拉伯语');
-INSERT INTO `major` VALUES ('121', '日语');
-INSERT INTO `major` VALUES ('122', '波斯语');
-INSERT INTO `major` VALUES ('123', '朝鲜语');
-INSERT INTO `major` VALUES ('124', '菲律宾语');
-INSERT INTO `major` VALUES ('125', '梵语巴利语');
-INSERT INTO `major` VALUES ('126', '印度尼西亚语');
-INSERT INTO `major` VALUES ('127', '印地语');
-INSERT INTO `major` VALUES ('128', '柬埔寨语');
-INSERT INTO `major` VALUES ('129', '老挝语');
-INSERT INTO `major` VALUES ('130', '缅甸语');
-INSERT INTO `major` VALUES ('131', '马来语');
-INSERT INTO `major` VALUES ('132', '蒙古语');
-INSERT INTO `major` VALUES ('133', '僧加罗语');
-INSERT INTO `major` VALUES ('134', '泰语');
-INSERT INTO `major` VALUES ('135', '乌尔都语');
-INSERT INTO `major` VALUES ('136', '希伯莱语');
-INSERT INTO `major` VALUES ('137', '越南语');
-INSERT INTO `major` VALUES ('138', '豪萨语');
-INSERT INTO `major` VALUES ('139', '斯瓦希里语');
-INSERT INTO `major` VALUES ('140', '阿尔巴尼亚语');
-INSERT INTO `major` VALUES ('141', '保加利亚语');
-INSERT INTO `major` VALUES ('142', '波兰语');
-INSERT INTO `major` VALUES ('143', '捷克语');
-INSERT INTO `major` VALUES ('144', '罗马尼亚语');
-INSERT INTO `major` VALUES ('145', '葡萄牙语');
-INSERT INTO `major` VALUES ('146', '瑞典语');
-INSERT INTO `major` VALUES ('147', '塞尔维亚——克罗地亚语');
-INSERT INTO `major` VALUES ('148', '土耳其语');
-INSERT INTO `major` VALUES ('149', '希腊语');
-INSERT INTO `major` VALUES ('150', '匈牙利语');
-INSERT INTO `major` VALUES ('151', '意大利语');
-INSERT INTO `major` VALUES ('152', '捷克语——斯洛伐克语');
-INSERT INTO `major` VALUES ('153', '泰米尔语');
-INSERT INTO `major` VALUES ('154', '普什图语');
-INSERT INTO `major` VALUES ('155', '世界语');
-INSERT INTO `major` VALUES ('156', '孟加拉语');
-INSERT INTO `major` VALUES ('157', '尼泊尔语');
-INSERT INTO `major` VALUES ('158', '塞尔维亚语——克罗地亚语');
-INSERT INTO `major` VALUES ('159', '荷兰语');
-INSERT INTO `major` VALUES ('160', '芬兰语');
-INSERT INTO `major` VALUES ('161', '乌克兰语');
-INSERT INTO `major` VALUES ('162', '韩国语');
-INSERT INTO `major` VALUES ('163', '新闻传播学类');
-INSERT INTO `major` VALUES ('164', '新闻学');
-INSERT INTO `major` VALUES ('165', '广播电视新闻学');
-INSERT INTO `major` VALUES ('166', '广告学');
-INSERT INTO `major` VALUES ('167', '编辑出版学');
-INSERT INTO `major` VALUES ('168', '传播学');
-INSERT INTO `major` VALUES ('169', '媒体创意');
-INSERT INTO `major` VALUES ('170', '艺术类');
-INSERT INTO `major` VALUES ('171', '音乐学');
-INSERT INTO `major` VALUES ('172', '作曲与作曲技术理论');
-INSERT INTO `major` VALUES ('173', '音乐表演');
-INSERT INTO `major` VALUES ('174', '绘画');
-INSERT INTO `major` VALUES ('175', '雕塑');
-INSERT INTO `major` VALUES ('176', '美术学');
-INSERT INTO `major` VALUES ('177', '艺术设计学');
-INSERT INTO `major` VALUES ('178', '艺术设计');
-INSERT INTO `major` VALUES ('179', '舞蹈学');
-INSERT INTO `major` VALUES ('180', '舞蹈编导');
-INSERT INTO `major` VALUES ('181', '戏剧学');
-INSERT INTO `major` VALUES ('182', '表演');
-INSERT INTO `major` VALUES ('183', '导演');
-INSERT INTO `major` VALUES ('184', '戏剧影视文学');
-INSERT INTO `major` VALUES ('185', '戏剧影视美术设计');
-INSERT INTO `major` VALUES ('186', '摄影');
-INSERT INTO `major` VALUES ('187', '录音艺术');
-INSERT INTO `major` VALUES ('188', '动画');
-INSERT INTO `major` VALUES ('189', '播音与主持艺术');
-INSERT INTO `major` VALUES ('190', '广播电视编导');
-INSERT INTO `major` VALUES ('191', '影视教育');
-INSERT INTO `major` VALUES ('192', '艺术学');
-INSERT INTO `major` VALUES ('193', '影视学');
-INSERT INTO `major` VALUES ('194', '广播影视编导');
-INSERT INTO `major` VALUES ('195', '历史学类');
-INSERT INTO `major` VALUES ('196', '历史学');
-INSERT INTO `major` VALUES ('197', '世界历史');
-INSERT INTO `major` VALUES ('198', '考古学');
-INSERT INTO `major` VALUES ('199', '博物馆学');
-INSERT INTO `major` VALUES ('200', '民族学');
-INSERT INTO `major` VALUES ('201', '文物保护技术');
-INSERT INTO `major` VALUES ('202', '数学类');
-INSERT INTO `major` VALUES ('203', '数学与应用数学');
-INSERT INTO `major` VALUES ('204', '信息与计算科学');
-INSERT INTO `major` VALUES ('205', '数理基础科学');
-INSERT INTO `major` VALUES ('206', '物理学类');
-INSERT INTO `major` VALUES ('207', '物理学');
-INSERT INTO `major` VALUES ('208', '应用物理学');
-INSERT INTO `major` VALUES ('209', '声学');
-INSERT INTO `major` VALUES ('210', '化学类');
-INSERT INTO `major` VALUES ('211', '化学');
-INSERT INTO `major` VALUES ('212', '应用化学');
-INSERT INTO `major` VALUES ('213', '化学生物学');
-INSERT INTO `major` VALUES ('214', '分子科学与工程');
-INSERT INTO `major` VALUES ('215', '生物科学类');
-INSERT INTO `major` VALUES ('216', '生物科学');
-INSERT INTO `major` VALUES ('217', '生物技术');
-INSERT INTO `major` VALUES ('218', '生物信息学');
-INSERT INTO `major` VALUES ('219', '生物信息技术');
-INSERT INTO `major` VALUES ('220', '生物科学与生物技术');
-INSERT INTO `major` VALUES ('221', '动植物检疫');
-INSERT INTO `major` VALUES ('222', '生物化学与分子生物学');
-INSERT INTO `major` VALUES ('223', '医学信息学');
-INSERT INTO `major` VALUES ('224', '植物生物技术');
-INSERT INTO `major` VALUES ('225', '动物生物技术');
-INSERT INTO `major` VALUES ('226', '生物资源科学');
-INSERT INTO `major` VALUES ('227', '天文学类');
-INSERT INTO `major` VALUES ('228', '天文学');
-INSERT INTO `major` VALUES ('229', '地质学类');
-INSERT INTO `major` VALUES ('230', '地质学');
-INSERT INTO `major` VALUES ('231', '地球化学');
-INSERT INTO `major` VALUES ('232', '地理科学类');
-INSERT INTO `major` VALUES ('233', '地理科学');
-INSERT INTO `major` VALUES ('234', '资源环境与城乡规划管理');
-INSERT INTO `major` VALUES ('235', '地理信息系统');
-INSERT INTO `major` VALUES ('236', '地理信息科学与技术');
-INSERT INTO `major` VALUES ('237', '地球物理学类');
-INSERT INTO `major` VALUES ('238', '地球物理学');
-INSERT INTO `major` VALUES ('239', '地球与空间科学');
-INSERT INTO `major` VALUES ('240', '空间科学与技术');
-INSERT INTO `major` VALUES ('241', '大气科学类');
-INSERT INTO `major` VALUES ('242', '大气科学');
-INSERT INTO `major` VALUES ('243', '应用气象学');
-INSERT INTO `major` VALUES ('244', '海洋科学类');
-INSERT INTO `major` VALUES ('245', '海洋科学');
-INSERT INTO `major` VALUES ('246', '海洋技术');
-INSERT INTO `major` VALUES ('247', '海洋管理');
-INSERT INTO `major` VALUES ('248', '军事海洋学');
-INSERT INTO `major` VALUES ('249', '海洋生物资源与环境');
-INSERT INTO `major` VALUES ('250', '力学类');
-INSERT INTO `major` VALUES ('251', '理论与应用力学');
-INSERT INTO `major` VALUES ('252', '电子信息科学类');
-INSERT INTO `major` VALUES ('253', '电子信息科学与技术');
-INSERT INTO `major` VALUES ('254', '微电子学');
-INSERT INTO `major` VALUES ('255', '光信息科学与技术');
-INSERT INTO `major` VALUES ('256', '科技防卫');
-INSERT INTO `major` VALUES ('257', '信息安全');
-INSERT INTO `major` VALUES ('258', '信息科学技术');
-INSERT INTO `major` VALUES ('259', '光电子技术科学');
-INSERT INTO `major` VALUES ('260', '材料科学类');
-INSERT INTO `major` VALUES ('261', '材料物理');
-INSERT INTO `major` VALUES ('262', '材料化学');
-INSERT INTO `major` VALUES ('263', '环境科学类');
-INSERT INTO `major` VALUES ('264', '环境科学');
-INSERT INTO `major` VALUES ('265', '生态学');
-INSERT INTO `major` VALUES ('266', '资源环境科学');
-INSERT INTO `major` VALUES ('267', '心理学类');
-INSERT INTO `major` VALUES ('268', '心理学');
-INSERT INTO `major` VALUES ('269', '应用心理学');
-INSERT INTO `major` VALUES ('270', '统计学类');
-INSERT INTO `major` VALUES ('271', '统计学');
-INSERT INTO `major` VALUES ('272', '系统科学类');
-INSERT INTO `major` VALUES ('273', '系统理论');
-INSERT INTO `major` VALUES ('274', '系统科学与工程');
-INSERT INTO `major` VALUES ('275', '地矿类');
-INSERT INTO `major` VALUES ('276', '采矿工程');
-INSERT INTO `major` VALUES ('277', '石油工程');
-INSERT INTO `major` VALUES ('278', '矿物加工工程');
-INSERT INTO `major` VALUES ('279', '勘查技术与工程');
-INSERT INTO `major` VALUES ('280', '资源勘查工程');
-INSERT INTO `major` VALUES ('281', '地质工程');
-INSERT INTO `major` VALUES ('282', '矿物资源工程');
-INSERT INTO `major` VALUES ('283', '材料类');
-INSERT INTO `major` VALUES ('284', '冶金工程');
-INSERT INTO `major` VALUES ('285', '金属材料工程');
-INSERT INTO `major` VALUES ('286', '无机非金属材料工程');
-INSERT INTO `major` VALUES ('287', '高分子材料与工程');
-INSERT INTO `major` VALUES ('288', '材料科学与工程');
-INSERT INTO `major` VALUES ('289', '复合材料与工程');
-INSERT INTO `major` VALUES ('290', '焊接技术与工程');
-INSERT INTO `major` VALUES ('291', '宝石与材料工艺学');
-INSERT INTO `major` VALUES ('292', '粉体材料科学与工程');
-INSERT INTO `major` VALUES ('293', '再生资源科学与技术');
-INSERT INTO `major` VALUES ('294', '稀土工程');
-INSERT INTO `major` VALUES ('295', '高分子材料加工工程');
-INSERT INTO `major` VALUES ('296', '生物功能材料');
-INSERT INTO `major` VALUES ('297', '机械类');
-INSERT INTO `major` VALUES ('298', '机械设计制造及其自动化');
-INSERT INTO `major` VALUES ('299', '材料成型及控制工程');
-INSERT INTO `major` VALUES ('300', '工业设计');
-INSERT INTO `major` VALUES ('301', '过程装备与控制工程');
-INSERT INTO `major` VALUES ('302', '机械工程及自动化');
-INSERT INTO `major` VALUES ('303', '车辆工程');
-INSERT INTO `major` VALUES ('304', '机械电子工程');
-INSERT INTO `major` VALUES ('305', '汽车服务工程');
-INSERT INTO `major` VALUES ('306', '制造自动化与测控技术');
-INSERT INTO `major` VALUES ('307', '微机电系统工程');
-INSERT INTO `major` VALUES ('308', '制造工程');
-INSERT INTO `major` VALUES ('309', '仪器仪表类');
-INSERT INTO `major` VALUES ('310', '测控技术与仪器');
-INSERT INTO `major` VALUES ('311', '电子信息技术及仪器');
-INSERT INTO `major` VALUES ('312', '能源动力类');
-INSERT INTO `major` VALUES ('313', '热能与动力工程');
-INSERT INTO `major` VALUES ('314', '核工程与核技术');
-INSERT INTO `major` VALUES ('315', '工程物理');
-INSERT INTO `major` VALUES ('316', '能源环境工程及自动化');
-INSERT INTO `major` VALUES ('317', '能源工程及自动化');
-INSERT INTO `major` VALUES ('318', '能源动力系统及自动化');
-INSERT INTO `major` VALUES ('319', '电气信息类');
-INSERT INTO `major` VALUES ('320', '电气工程及其自动化');
-INSERT INTO `major` VALUES ('321', '自动化');
-INSERT INTO `major` VALUES ('322', '电子信息工程');
-INSERT INTO `major` VALUES ('323', '通信工程');
-INSERT INTO `major` VALUES ('324', '计算机科学与技术');
-INSERT INTO `major` VALUES ('325', '电子科学与技术');
-INSERT INTO `major` VALUES ('326', '生物医学工程');
-INSERT INTO `major` VALUES ('327', '电气工程与自动化');
-INSERT INTO `major` VALUES ('328', '信息工程');
-INSERT INTO `major` VALUES ('329', '光源与照明');
-INSERT INTO `major` VALUES ('330', '软件工程');
-INSERT INTO `major` VALUES ('331', '影视艺术技术');
-INSERT INTO `major` VALUES ('332', '网络工程');
-INSERT INTO `major` VALUES ('333', '信息显示与光电技术');
-INSERT INTO `major` VALUES ('334', '集成电路设计与集成系统');
-INSERT INTO `major` VALUES ('335', '光电信息工程');
-INSERT INTO `major` VALUES ('336', '广播电视工程');
-INSERT INTO `major` VALUES ('337', '电气信息工程');
-INSERT INTO `major` VALUES ('338', '计算机软件');
-INSERT INTO `major` VALUES ('339', '电力工程与管理');
-INSERT INTO `major` VALUES ('340', '微电子制造工程');
-INSERT INTO `major` VALUES ('341', '假肢矫形工程');
-INSERT INTO `major` VALUES ('342', '数字媒体艺术');
-INSERT INTO `major` VALUES ('343', '医学信息工程');
-INSERT INTO `major` VALUES ('344', '信息物理工程');
-INSERT INTO `major` VALUES ('345', '医疗器械工程');
-INSERT INTO `major` VALUES ('346', '智能科学与技术');
-INSERT INTO `major` VALUES ('347', '数字媒体技术');
-INSERT INTO `major` VALUES ('348', '土建类');
-INSERT INTO `major` VALUES ('349', '建筑学');
-INSERT INTO `major` VALUES ('350', '城市规划');
-INSERT INTO `major` VALUES ('351', '土木工程');
-INSERT INTO `major` VALUES ('352', '建筑环境与设备工程');
-INSERT INTO `major` VALUES ('353', '给水排水工程');
-INSERT INTO `major` VALUES ('354', '城市地下空间工程');
-INSERT INTO `major` VALUES ('355', '历史建筑保护工程');
-INSERT INTO `major` VALUES ('356', '景观建筑设计');
-INSERT INTO `major` VALUES ('357', '水务工程');
-INSERT INTO `major` VALUES ('358', '建筑设施智能技术');
-INSERT INTO `major` VALUES ('359', '道路桥梁与渡河工程');
-INSERT INTO `major` VALUES ('360', '水利类');
-INSERT INTO `major` VALUES ('361', '水利水电工程');
-INSERT INTO `major` VALUES ('362', '水文与水资源工程');
-INSERT INTO `major` VALUES ('363', '港口航道与海岸工程');
-INSERT INTO `major` VALUES ('364', '港口海岸及治河工程');
-INSERT INTO `major` VALUES ('365', '水资源与海洋工程');
-INSERT INTO `major` VALUES ('366', '测绘类');
-INSERT INTO `major` VALUES ('367', '测绘工程');
-INSERT INTO `major` VALUES ('368', '遥感科学与技术');
-INSERT INTO `major` VALUES ('369', '空间信息与数字技术');
-INSERT INTO `major` VALUES ('370', '环境与安全类');
-INSERT INTO `major` VALUES ('371', '环境工程');
-INSERT INTO `major` VALUES ('372', '安全工程');
-INSERT INTO `major` VALUES ('373', '水质科学与技术');
-INSERT INTO `major` VALUES ('374', '灾害防治工程');
-INSERT INTO `major` VALUES ('375', '环境科学与工程');
-INSERT INTO `major` VALUES ('376', '环境监察');
-INSERT INTO `major` VALUES ('377', '化工与制药类');
-INSERT INTO `major` VALUES ('378', '化学工程与工艺');
-INSERT INTO `major` VALUES ('379', '制药工程');
-INSERT INTO `major` VALUES ('380', '化工与制药');
-INSERT INTO `major` VALUES ('381', '化学工程与工业生物工程');
-INSERT INTO `major` VALUES ('382', '资源科学与工程');
-INSERT INTO `major` VALUES ('383', '交通运输类');
-INSERT INTO `major` VALUES ('384', '交通运输');
-INSERT INTO `major` VALUES ('385', '交通工程');
-INSERT INTO `major` VALUES ('386', '油气储运工程');
-INSERT INTO `major` VALUES ('387', '飞行技术');
-INSERT INTO `major` VALUES ('388', '航海技术');
-INSERT INTO `major` VALUES ('389', '轮机工程');
-INSERT INTO `major` VALUES ('390', '物流工程');
-INSERT INTO `major` VALUES ('391', '海事管理');
-INSERT INTO `major` VALUES ('392', '交通设备信息工程');
-INSERT INTO `major` VALUES ('393', '海洋工程类');
-INSERT INTO `major` VALUES ('394', '船舶与海洋工程');
-INSERT INTO `major` VALUES ('395', '轻工纺织食品类');
-INSERT INTO `major` VALUES ('396', '食品科学与工程');
-INSERT INTO `major` VALUES ('397', '轻化工程');
-INSERT INTO `major` VALUES ('398', '包装工程');
-INSERT INTO `major` VALUES ('399', '印刷工程');
-INSERT INTO `major` VALUES ('400', '纺织工程');
-INSERT INTO `major` VALUES ('401', '服装设计与工程');
-INSERT INTO `major` VALUES ('402', '食品质量与安全');
-INSERT INTO `major` VALUES ('403', '酿酒工程');
-INSERT INTO `major` VALUES ('404', '葡萄与葡萄酒工程');
-INSERT INTO `major` VALUES ('405', '轻工生物技术');
-INSERT INTO `major` VALUES ('406', '农产品质量与安全');
-INSERT INTO `major` VALUES ('407', '航空航天类');
-INSERT INTO `major` VALUES ('408', '飞行器设计与工程');
-INSERT INTO `major` VALUES ('409', '飞行器动力工程');
-INSERT INTO `major` VALUES ('410', '飞行器制造工程');
-INSERT INTO `major` VALUES ('411', '飞行器环境与生命保障工程');
-INSERT INTO `major` VALUES ('412', '航空航天工程');
-INSERT INTO `major` VALUES ('413', '工程力学与航天航空工程');
-INSERT INTO `major` VALUES ('414', '武器类');
-INSERT INTO `major` VALUES ('415', '武器系统与发射工程');
-INSERT INTO `major` VALUES ('416', '探测制导与控制技术');
-INSERT INTO `major` VALUES ('417', '弹药工程与爆炸技术');
-INSERT INTO `major` VALUES ('418', '特种能源工程与烟火技术');
-INSERT INTO `major` VALUES ('419', '地面武器机动工程');
-INSERT INTO `major` VALUES ('420', '信息对抗技术');
-INSERT INTO `major` VALUES ('421', '武器系统与工程');
-INSERT INTO `major` VALUES ('422', '工程力学类');
-INSERT INTO `major` VALUES ('423', '工程力学');
-INSERT INTO `major` VALUES ('424', '工程结构分析');
-INSERT INTO `major` VALUES ('425', '生物工程类');
-INSERT INTO `major` VALUES ('426', '生物工程');
-INSERT INTO `major` VALUES ('427', '农业工程类');
-INSERT INTO `major` VALUES ('428', '农业机械化及其自动化');
-INSERT INTO `major` VALUES ('429', '农业电气化与自动化');
-INSERT INTO `major` VALUES ('430', '农业建筑环境与能源工程');
-INSERT INTO `major` VALUES ('431', '农业水利工程');
-INSERT INTO `major` VALUES ('432', '农业工程');
-INSERT INTO `major` VALUES ('433', '生物系统工程');
-INSERT INTO `major` VALUES ('434', '林业工程类');
-INSERT INTO `major` VALUES ('435', '森林工程');
-INSERT INTO `major` VALUES ('436', '木材科学与工程');
-INSERT INTO `major` VALUES ('437', '林产化工');
-INSERT INTO `major` VALUES ('438', '公安技术类');
-INSERT INTO `major` VALUES ('439', '刑事科学技术');
-INSERT INTO `major` VALUES ('440', '消防工程');
-INSERT INTO `major` VALUES ('441', '安全防范工程');
-INSERT INTO `major` VALUES ('442', '交通管理工程');
-INSERT INTO `major` VALUES ('443', '核生化消防');
-INSERT INTO `major` VALUES ('444', '植物生产类');
-INSERT INTO `major` VALUES ('445', '农学');
-INSERT INTO `major` VALUES ('446', '园艺');
-INSERT INTO `major` VALUES ('447', '植物保护');
-INSERT INTO `major` VALUES ('448', '茶学');
-INSERT INTO `major` VALUES ('449', '烟草');
-INSERT INTO `major` VALUES ('450', '植物科学与技术');
-INSERT INTO `major` VALUES ('451', '种子科学与工程');
-INSERT INTO `major` VALUES ('452', '应用生物科学');
-INSERT INTO `major` VALUES ('453', '设施农业科学与工程');
-INSERT INTO `major` VALUES ('454', '草业科学类');
-INSERT INTO `major` VALUES ('455', '草业科学');
-INSERT INTO `major` VALUES ('456', '森林资源类');
-INSERT INTO `major` VALUES ('457', '林学');
-INSERT INTO `major` VALUES ('458', '森林资源保护与游憩');
-INSERT INTO `major` VALUES ('459', '野生动物与自然保护区管理');
-INSERT INTO `major` VALUES ('460', '环境生态类');
-INSERT INTO `major` VALUES ('461', '园林');
-INSERT INTO `major` VALUES ('462', '水土保持与荒漠化防治');
-INSERT INTO `major` VALUES ('463', '农业资源与环境');
-INSERT INTO `major` VALUES ('464', '动物生产类');
-INSERT INTO `major` VALUES ('465', '动物科学');
-INSERT INTO `major` VALUES ('466', '蚕学');
-INSERT INTO `major` VALUES ('467', '蜂学');
-INSERT INTO `major` VALUES ('468', '动物医学类');
-INSERT INTO `major` VALUES ('469', '动物医学');
-INSERT INTO `major` VALUES ('470', '动物药学');
-INSERT INTO `major` VALUES ('471', '水产类');
-INSERT INTO `major` VALUES ('472', '水产养殖学');
-INSERT INTO `major` VALUES ('473', '海洋渔业科学与技术');
-INSERT INTO `major` VALUES ('474', '水族科学与技术');
-INSERT INTO `major` VALUES ('475', '基础医学类');
-INSERT INTO `major` VALUES ('476', '基础医学');
-INSERT INTO `major` VALUES ('477', '预防医学类');
-INSERT INTO `major` VALUES ('478', '预防医学');
-INSERT INTO `major` VALUES ('479', '卫生检验');
-INSERT INTO `major` VALUES ('480', '妇幼保健医学');
-INSERT INTO `major` VALUES ('481', '营养学');
-INSERT INTO `major` VALUES ('482', '临床医学与医学技术类');
-INSERT INTO `major` VALUES ('483', '临床医学');
-INSERT INTO `major` VALUES ('484', '麻醉学');
-INSERT INTO `major` VALUES ('485', '医学影像学');
-INSERT INTO `major` VALUES ('486', '医学检验');
-INSERT INTO `major` VALUES ('487', '放射医学');
-INSERT INTO `major` VALUES ('488', '眼视光学');
-INSERT INTO `major` VALUES ('489', '康复治疗学');
-INSERT INTO `major` VALUES ('490', '精神医学');
-INSERT INTO `major` VALUES ('491', '医学技术');
-INSERT INTO `major` VALUES ('492', '听力学');
-INSERT INTO `major` VALUES ('493', '医学实验学');
-INSERT INTO `major` VALUES ('494', '口腔医学类');
-INSERT INTO `major` VALUES ('495', '口腔医学');
-INSERT INTO `major` VALUES ('496', '口腔修复工艺学');
-INSERT INTO `major` VALUES ('497', '中医学类');
-INSERT INTO `major` VALUES ('498', '中医学');
-INSERT INTO `major` VALUES ('499', '针灸推拿学');
-INSERT INTO `major` VALUES ('500', '蒙医学');
-INSERT INTO `major` VALUES ('501', '藏医学');
-INSERT INTO `major` VALUES ('502', '中西医临床医学');
-INSERT INTO `major` VALUES ('503', '法医学类');
-INSERT INTO `major` VALUES ('504', '法医学');
-INSERT INTO `major` VALUES ('505', '护理学类');
-INSERT INTO `major` VALUES ('506', '护理学');
-INSERT INTO `major` VALUES ('507', '药学类');
-INSERT INTO `major` VALUES ('508', '药学');
-INSERT INTO `major` VALUES ('509', '中药学');
-INSERT INTO `major` VALUES ('510', '药物制剂');
-INSERT INTO `major` VALUES ('511', '中草药栽培与鉴定');
-INSERT INTO `major` VALUES ('512', '藏药学');
-INSERT INTO `major` VALUES ('513', '中药资源与开发');
-INSERT INTO `major` VALUES ('514', '应用药学');
-INSERT INTO `major` VALUES ('515', '海洋药学');
-INSERT INTO `major` VALUES ('516', '药事管理');
-INSERT INTO `major` VALUES ('517', '管理科学与工程类');
-INSERT INTO `major` VALUES ('518', '管理科学');
-INSERT INTO `major` VALUES ('519', '信息管理与信息系统');
-INSERT INTO `major` VALUES ('520', '工业工程');
-INSERT INTO `major` VALUES ('521', '工程管理');
-INSERT INTO `major` VALUES ('522', '工程造价');
-INSERT INTO `major` VALUES ('523', '房地产经营管理');
-INSERT INTO `major` VALUES ('524', '产品质量工程');
-INSERT INTO `major` VALUES ('525', '项目管理');
-INSERT INTO `major` VALUES ('526', '工商管理类');
-INSERT INTO `major` VALUES ('527', '工商管理');
-INSERT INTO `major` VALUES ('528', '市场营销');
-INSERT INTO `major` VALUES ('529', '会计学');
-INSERT INTO `major` VALUES ('530', '财务管理');
-INSERT INTO `major` VALUES ('531', '人力资源管理');
-INSERT INTO `major` VALUES ('532', '旅游管理');
-INSERT INTO `major` VALUES ('533', '商品学');
-INSERT INTO `major` VALUES ('534', '审计学');
-INSERT INTO `major` VALUES ('535', '电子商务');
-INSERT INTO `major` VALUES ('536', '物流管理');
-INSERT INTO `major` VALUES ('537', '国际商务');
-INSERT INTO `major` VALUES ('538', '物业管理');
-INSERT INTO `major` VALUES ('539', '特许经营管理');
-INSERT INTO `major` VALUES ('540', '公共管理类');
-INSERT INTO `major` VALUES ('541', '行政管理');
-INSERT INTO `major` VALUES ('542', '公共事业管理');
-INSERT INTO `major` VALUES ('543', '劳动与社会保障');
-INSERT INTO `major` VALUES ('544', '土地资源管理');
-INSERT INTO `major` VALUES ('545', '公共关系学');
-INSERT INTO `major` VALUES ('546', '公共政策学');
-INSERT INTO `major` VALUES ('547', '城市管理');
-INSERT INTO `major` VALUES ('548', '公共管理');
-INSERT INTO `major` VALUES ('549', '文化产业管理');
-INSERT INTO `major` VALUES ('550', '会展经济与管理');
-INSERT INTO `major` VALUES ('551', '国防教育与管理');
-INSERT INTO `major` VALUES ('552', '航运管理');
-INSERT INTO `major` VALUES ('553', '农业经济管理类');
-INSERT INTO `major` VALUES ('554', '农业经济管理');
-INSERT INTO `major` VALUES ('555', '农村区域发展');
-INSERT INTO `major` VALUES ('556', '图书档案学类');
-INSERT INTO `major` VALUES ('557', '图书馆学');
-INSERT INTO `major` VALUES ('558', '档案学');
-INSERT INTO `major` VALUES ('559', '信息资源管理');
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `license`
+--
+
+CREATE TABLE `license` (
+  `id` int(9) NOT NULL,
+  `content` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `major`
+--
+
+CREATE TABLE `major` (
+  `id` int(9) NOT NULL,
+  `name` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 转存表中的数据 `major`
+--
+
+INSERT INTO `major` (`id`, `name`) VALUES
+(1, '哲学类'),
+(2, '哲学'),
+(3, '逻辑学'),
+(4, '宗教学'),
+(5, '伦理学'),
+(6, '经济学类'),
+(7, '经济学'),
+(8, '国际经济与贸易'),
+(9, '财政学'),
+(10, '金融学'),
+(11, '国民经济管理'),
+(12, '贸易经济'),
+(13, '保险'),
+(14, '金融工程'),
+(15, '税务'),
+(16, '信用管理'),
+(17, '网络经济学'),
+(18, '体育经济'),
+(19, '投资学'),
+(20, '环境资源与发展经济学'),
+(21, '海洋经济学'),
+(22, '法学类'),
+(23, '法学'),
+(24, '知识产权'),
+(25, '监狱学'),
+(26, '马克思主义理论类'),
+(27, '科学社会主义与国际共产主义运动'),
+(28, '中国革命史与中国共产党党史'),
+(29, '社会学类'),
+(30, '社会学'),
+(31, '社会工作'),
+(32, '家政学'),
+(33, '人类学'),
+(34, '政治学类'),
+(35, '政治学与行政学'),
+(36, '国际政治'),
+(37, '外交学'),
+(38, '思想政治教育'),
+(39, '国际政治经济学'),
+(40, '国际事务'),
+(41, '公安学类'),
+(42, '治安学'),
+(43, '侦察学'),
+(44, '边防管理'),
+(45, '火灾勘测'),
+(46, '禁毒学'),
+(47, '警犬技术'),
+(48, '经济犯罪侦察'),
+(49, '边防指挥'),
+(50, '消防指挥'),
+(51, '警卫学'),
+(52, '教育学类'),
+(53, '教育学'),
+(54, '学前教育'),
+(55, '特殊教育'),
+(56, '教育技术学'),
+(57, '小学教育'),
+(58, '艺术教育'),
+(59, '人文教育'),
+(60, '科学教育'),
+(61, '言语听觉科学'),
+(62, '体育学类'),
+(63, '体育教育'),
+(64, '运动训练'),
+(65, '社会体育'),
+(66, '运动人体科学'),
+(67, '民族传统体育'),
+(68, '职业技术教育类'),
+(69, '农艺教育'),
+(70, '园艺教育'),
+(71, '特用作物教育'),
+(72, '林木生产教育'),
+(73, '特用动物教育'),
+(74, '畜禽生产教育'),
+(75, '水产养殖教育'),
+(76, '应用生物教育'),
+(77, '农业机械教育'),
+(78, '农业建筑与环境控制教育'),
+(79, '农产品储运与加工教育'),
+(80, '农业经营管理教育'),
+(81, '机械制造工艺教育'),
+(82, '机械维修及检测技术教育'),
+(83, '机电技术教育'),
+(84, '电气技术教育'),
+(85, '汽车维修工程教育'),
+(86, '应用电子技术教育'),
+(87, '制浆造纸工艺教育'),
+(88, '印刷工艺教育'),
+(89, '橡塑制品成型工艺教育'),
+(90, '食品工艺教育'),
+(91, '纺织工艺教育'),
+(92, '染整工艺教育'),
+(93, '化工工艺教育'),
+(94, '化工分析与检测技术教育'),
+(95, '建筑材料工程教育'),
+(96, '建筑工程教育'),
+(97, '服装设计与工艺教育'),
+(98, '装潢设计与工艺教育'),
+(99, '旅游管理与服务教育'),
+(100, '食品营养与检验教育'),
+(101, '烹饪与营养教育'),
+(102, '财务会计教育'),
+(103, '文秘教育'),
+(104, '市场营销教育'),
+(105, '职业技术教育管理'),
+(106, '中国语言文学类'),
+(107, '汉语言文学'),
+(108, '汉语言'),
+(109, '对外汉语'),
+(110, '中国少数民族语言文学'),
+(111, '古典文献'),
+(112, '中国语言文化'),
+(113, '应用语言学'),
+(114, '外国语言文学类'),
+(115, '英语'),
+(116, '俄语'),
+(117, '德语'),
+(118, '法语'),
+(119, '西班牙语'),
+(120, '阿拉伯语'),
+(121, '日语'),
+(122, '波斯语'),
+(123, '朝鲜语'),
+(124, '菲律宾语'),
+(125, '梵语巴利语'),
+(126, '印度尼西亚语'),
+(127, '印地语'),
+(128, '柬埔寨语'),
+(129, '老挝语'),
+(130, '缅甸语'),
+(131, '马来语'),
+(132, '蒙古语'),
+(133, '僧加罗语'),
+(134, '泰语'),
+(135, '乌尔都语'),
+(136, '希伯莱语'),
+(137, '越南语'),
+(138, '豪萨语'),
+(139, '斯瓦希里语'),
+(140, '阿尔巴尼亚语'),
+(141, '保加利亚语'),
+(142, '波兰语'),
+(143, '捷克语'),
+(144, '罗马尼亚语'),
+(145, '葡萄牙语'),
+(146, '瑞典语'),
+(147, '塞尔维亚——克罗地亚语'),
+(148, '土耳其语'),
+(149, '希腊语'),
+(150, '匈牙利语'),
+(151, '意大利语'),
+(152, '捷克语——斯洛伐克语'),
+(153, '泰米尔语'),
+(154, '普什图语'),
+(155, '世界语'),
+(156, '孟加拉语'),
+(157, '尼泊尔语'),
+(158, '塞尔维亚语——克罗地亚语'),
+(159, '荷兰语'),
+(160, '芬兰语'),
+(161, '乌克兰语'),
+(162, '韩国语'),
+(163, '新闻传播学类'),
+(164, '新闻学'),
+(165, '广播电视新闻学'),
+(166, '广告学'),
+(167, '编辑出版学'),
+(168, '传播学'),
+(169, '媒体创意'),
+(170, '艺术类'),
+(171, '音乐学'),
+(172, '作曲与作曲技术理论'),
+(173, '音乐表演'),
+(174, '绘画'),
+(175, '雕塑'),
+(176, '美术学'),
+(177, '艺术设计学'),
+(178, '艺术设计'),
+(179, '舞蹈学'),
+(180, '舞蹈编导'),
+(181, '戏剧学'),
+(182, '表演'),
+(183, '导演'),
+(184, '戏剧影视文学'),
+(185, '戏剧影视美术设计'),
+(186, '摄影'),
+(187, '录音艺术'),
+(188, '动画'),
+(189, '播音与主持艺术'),
+(190, '广播电视编导'),
+(191, '影视教育'),
+(192, '艺术学'),
+(193, '影视学'),
+(194, '广播影视编导'),
+(195, '历史学类'),
+(196, '历史学'),
+(197, '世界历史'),
+(198, '考古学'),
+(199, '博物馆学'),
+(200, '民族学'),
+(201, '文物保护技术'),
+(202, '数学类'),
+(203, '数学与应用数学'),
+(204, '信息与计算科学'),
+(205, '数理基础科学'),
+(206, '物理学类'),
+(207, '物理学'),
+(208, '应用物理学'),
+(209, '声学'),
+(210, '化学类'),
+(211, '化学'),
+(212, '应用化学'),
+(213, '化学生物学'),
+(214, '分子科学与工程'),
+(215, '生物科学类'),
+(216, '生物科学'),
+(217, '生物技术'),
+(218, '生物信息学'),
+(219, '生物信息技术'),
+(220, '生物科学与生物技术'),
+(221, '动植物检疫'),
+(222, '生物化学与分子生物学'),
+(223, '医学信息学'),
+(224, '植物生物技术'),
+(225, '动物生物技术'),
+(226, '生物资源科学'),
+(227, '天文学类'),
+(228, '天文学'),
+(229, '地质学类'),
+(230, '地质学'),
+(231, '地球化学'),
+(232, '地理科学类'),
+(233, '地理科学'),
+(234, '资源环境与城乡规划管理'),
+(235, '地理信息系统'),
+(236, '地理信息科学与技术'),
+(237, '地球物理学类'),
+(238, '地球物理学'),
+(239, '地球与空间科学'),
+(240, '空间科学与技术'),
+(241, '大气科学类'),
+(242, '大气科学'),
+(243, '应用气象学'),
+(244, '海洋科学类'),
+(245, '海洋科学'),
+(246, '海洋技术'),
+(247, '海洋管理'),
+(248, '军事海洋学'),
+(249, '海洋生物资源与环境'),
+(250, '力学类'),
+(251, '理论与应用力学'),
+(252, '电子信息科学类'),
+(253, '电子信息科学与技术'),
+(254, '微电子学'),
+(255, '光信息科学与技术'),
+(256, '科技防卫'),
+(257, '信息安全'),
+(258, '信息科学技术'),
+(259, '光电子技术科学'),
+(260, '材料科学类'),
+(261, '材料物理'),
+(262, '材料化学'),
+(263, '环境科学类'),
+(264, '环境科学'),
+(265, '生态学'),
+(266, '资源环境科学'),
+(267, '心理学类'),
+(268, '心理学'),
+(269, '应用心理学'),
+(270, '统计学类'),
+(271, '统计学'),
+(272, '系统科学类'),
+(273, '系统理论'),
+(274, '系统科学与工程'),
+(275, '地矿类'),
+(276, '采矿工程'),
+(277, '石油工程'),
+(278, '矿物加工工程'),
+(279, '勘查技术与工程'),
+(280, '资源勘查工程'),
+(281, '地质工程'),
+(282, '矿物资源工程'),
+(283, '材料类'),
+(284, '冶金工程'),
+(285, '金属材料工程'),
+(286, '无机非金属材料工程'),
+(287, '高分子材料与工程'),
+(288, '材料科学与工程'),
+(289, '复合材料与工程'),
+(290, '焊接技术与工程'),
+(291, '宝石与材料工艺学'),
+(292, '粉体材料科学与工程'),
+(293, '再生资源科学与技术'),
+(294, '稀土工程'),
+(295, '高分子材料加工工程'),
+(296, '生物功能材料'),
+(297, '机械类'),
+(298, '机械设计制造及其自动化'),
+(299, '材料成型及控制工程'),
+(300, '工业设计'),
+(301, '过程装备与控制工程'),
+(302, '机械工程及自动化'),
+(303, '车辆工程'),
+(304, '机械电子工程'),
+(305, '汽车服务工程'),
+(306, '制造自动化与测控技术'),
+(307, '微机电系统工程'),
+(308, '制造工程'),
+(309, '仪器仪表类'),
+(310, '测控技术与仪器'),
+(311, '电子信息技术及仪器'),
+(312, '能源动力类'),
+(313, '热能与动力工程'),
+(314, '核工程与核技术'),
+(315, '工程物理'),
+(316, '能源环境工程及自动化'),
+(317, '能源工程及自动化'),
+(318, '能源动力系统及自动化'),
+(319, '电气信息类'),
+(320, '电气工程及其自动化'),
+(321, '自动化'),
+(322, '电子信息工程'),
+(323, '通信工程'),
+(324, '计算机科学与技术'),
+(325, '电子科学与技术'),
+(326, '生物医学工程'),
+(327, '电气工程与自动化'),
+(328, '信息工程'),
+(329, '光源与照明'),
+(330, '软件工程'),
+(331, '影视艺术技术'),
+(332, '网络工程'),
+(333, '信息显示与光电技术'),
+(334, '集成电路设计与集成系统'),
+(335, '光电信息工程'),
+(336, '广播电视工程'),
+(337, '电气信息工程'),
+(338, '计算机软件'),
+(339, '电力工程与管理'),
+(340, '微电子制造工程'),
+(341, '假肢矫形工程'),
+(342, '数字媒体艺术'),
+(343, '医学信息工程'),
+(344, '信息物理工程'),
+(345, '医疗器械工程'),
+(346, '智能科学与技术'),
+(347, '数字媒体技术'),
+(348, '土建类'),
+(349, '建筑学'),
+(350, '城市规划'),
+(351, '土木工程'),
+(352, '建筑环境与设备工程'),
+(353, '给水排水工程'),
+(354, '城市地下空间工程'),
+(355, '历史建筑保护工程'),
+(356, '景观建筑设计'),
+(357, '水务工程'),
+(358, '建筑设施智能技术'),
+(359, '道路桥梁与渡河工程'),
+(360, '水利类'),
+(361, '水利水电工程'),
+(362, '水文与水资源工程'),
+(363, '港口航道与海岸工程'),
+(364, '港口海岸及治河工程'),
+(365, '水资源与海洋工程'),
+(366, '测绘类'),
+(367, '测绘工程'),
+(368, '遥感科学与技术'),
+(369, '空间信息与数字技术'),
+(370, '环境与安全类'),
+(371, '环境工程'),
+(372, '安全工程'),
+(373, '水质科学与技术'),
+(374, '灾害防治工程'),
+(375, '环境科学与工程'),
+(376, '环境监察'),
+(377, '化工与制药类'),
+(378, '化学工程与工艺'),
+(379, '制药工程'),
+(380, '化工与制药'),
+(381, '化学工程与工业生物工程'),
+(382, '资源科学与工程'),
+(383, '交通运输类'),
+(384, '交通运输'),
+(385, '交通工程'),
+(386, '油气储运工程'),
+(387, '飞行技术'),
+(388, '航海技术'),
+(389, '轮机工程'),
+(390, '物流工程'),
+(391, '海事管理'),
+(392, '交通设备信息工程'),
+(393, '海洋工程类'),
+(394, '船舶与海洋工程'),
+(395, '轻工纺织食品类'),
+(396, '食品科学与工程'),
+(397, '轻化工程'),
+(398, '包装工程'),
+(399, '印刷工程'),
+(400, '纺织工程'),
+(401, '服装设计与工程'),
+(402, '食品质量与安全'),
+(403, '酿酒工程'),
+(404, '葡萄与葡萄酒工程'),
+(405, '轻工生物技术'),
+(406, '农产品质量与安全'),
+(407, '航空航天类'),
+(408, '飞行器设计与工程'),
+(409, '飞行器动力工程'),
+(410, '飞行器制造工程'),
+(411, '飞行器环境与生命保障工程'),
+(412, '航空航天工程'),
+(413, '工程力学与航天航空工程'),
+(414, '武器类'),
+(415, '武器系统与发射工程'),
+(416, '探测制导与控制技术'),
+(417, '弹药工程与爆炸技术'),
+(418, '特种能源工程与烟火技术'),
+(419, '地面武器机动工程'),
+(420, '信息对抗技术'),
+(421, '武器系统与工程'),
+(422, '工程力学类'),
+(423, '工程力学'),
+(424, '工程结构分析'),
+(425, '生物工程类'),
+(426, '生物工程'),
+(427, '农业工程类'),
+(428, '农业机械化及其自动化'),
+(429, '农业电气化与自动化'),
+(430, '农业建筑环境与能源工程'),
+(431, '农业水利工程'),
+(432, '农业工程'),
+(433, '生物系统工程'),
+(434, '林业工程类'),
+(435, '森林工程'),
+(436, '木材科学与工程'),
+(437, '林产化工'),
+(438, '公安技术类'),
+(439, '刑事科学技术'),
+(440, '消防工程'),
+(441, '安全防范工程'),
+(442, '交通管理工程'),
+(443, '核生化消防'),
+(444, '植物生产类'),
+(445, '农学'),
+(446, '园艺'),
+(447, '植物保护'),
+(448, '茶学'),
+(449, '烟草'),
+(450, '植物科学与技术'),
+(451, '种子科学与工程'),
+(452, '应用生物科学'),
+(453, '设施农业科学与工程'),
+(454, '草业科学类'),
+(455, '草业科学'),
+(456, '森林资源类'),
+(457, '林学'),
+(458, '森林资源保护与游憩'),
+(459, '野生动物与自然保护区管理'),
+(460, '环境生态类'),
+(461, '园林'),
+(462, '水土保持与荒漠化防治'),
+(463, '农业资源与环境'),
+(464, '动物生产类'),
+(465, '动物科学'),
+(466, '蚕学'),
+(467, '蜂学'),
+(468, '动物医学类'),
+(469, '动物医学'),
+(470, '动物药学'),
+(471, '水产类'),
+(472, '水产养殖学'),
+(473, '海洋渔业科学与技术'),
+(474, '水族科学与技术'),
+(475, '基础医学类'),
+(476, '基础医学'),
+(477, '预防医学类'),
+(478, '预防医学'),
+(479, '卫生检验'),
+(480, '妇幼保健医学'),
+(481, '营养学'),
+(482, '临床医学与医学技术类'),
+(483, '临床医学'),
+(484, '麻醉学'),
+(485, '医学影像学'),
+(486, '医学检验'),
+(487, '放射医学'),
+(488, '眼视光学'),
+(489, '康复治疗学'),
+(490, '精神医学'),
+(491, '医学技术'),
+(492, '听力学'),
+(493, '医学实验学'),
+(494, '口腔医学类'),
+(495, '口腔医学'),
+(496, '口腔修复工艺学'),
+(497, '中医学类'),
+(498, '中医学'),
+(499, '针灸推拿学'),
+(500, '蒙医学'),
+(501, '藏医学'),
+(502, '中西医临床医学'),
+(503, '法医学类'),
+(504, '法医学'),
+(505, '护理学类'),
+(506, '护理学'),
+(507, '药学类'),
+(508, '药学'),
+(509, '中药学'),
+(510, '药物制剂'),
+(511, '中草药栽培与鉴定'),
+(512, '藏药学'),
+(513, '中药资源与开发'),
+(514, '应用药学'),
+(515, '海洋药学'),
+(516, '药事管理'),
+(517, '管理科学与工程类'),
+(518, '管理科学'),
+(519, '信息管理与信息系统'),
+(520, '工业工程'),
+(521, '工程管理'),
+(522, '工程造价'),
+(523, '房地产经营管理'),
+(524, '产品质量工程'),
+(525, '项目管理'),
+(526, '工商管理类'),
+(527, '工商管理'),
+(528, '市场营销'),
+(529, '会计学'),
+(530, '财务管理'),
+(531, '人力资源管理'),
+(532, '旅游管理'),
+(533, '商品学'),
+(534, '审计学'),
+(535, '电子商务'),
+(536, '物流管理'),
+(537, '国际商务'),
+(538, '物业管理'),
+(539, '特许经营管理'),
+(540, '公共管理类'),
+(541, '行政管理'),
+(542, '公共事业管理'),
+(543, '劳动与社会保障'),
+(544, '土地资源管理'),
+(545, '公共关系学'),
+(546, '公共政策学'),
+(547, '城市管理'),
+(548, '公共管理'),
+(549, '文化产业管理'),
+(550, '会展经济与管理'),
+(551, '国防教育与管理'),
+(552, '航运管理'),
+(553, '农业经济管理类'),
+(554, '农业经济管理'),
+(555, '农村区域发展'),
+(556, '图书档案学类'),
+(557, '图书馆学'),
+(558, '档案学'),
+(559, '信息资源管理');
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `messages`
+--
+
+CREATE TABLE `messages` (
+  `id` int(10) NOT NULL,
+  `user` int(10) NOT NULL,
+  `target` int(10) NOT NULL,
+  `content` text,
+  `visibility` tinyint(2) DEFAULT NULL,
+  `read` tinyint(1) DEFAULT NULL,
+  `created_at` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `msgreplies`
+--
+
+CREATE TABLE `msgreplies` (
+  `id` int(10) NOT NULL,
+  `user` int(10) NOT NULL,
+  `target` int(10) NOT NULL,
+  `content` text,
+  `visibility` tinyint(2) DEFAULT NULL,
+  `read` tinyint(1) DEFAULT NULL,
+  `created_at` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `notification`
+--
+
+CREATE TABLE `notification` (
+  `id` int(10) NOT NULL,
+  `title` text,
+  `content` text,
+  `read` tinyint(1) DEFAULT NULL,
+  `created_at` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 转存表中的数据 `notification`
+--
+
+INSERT INTO `notification` (`id`, `title`, `content`, `read`, `created_at`) VALUES
+(1, '测试公告', '这是一条测试公告', 0, 0);
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `pageview`
+--
+
+CREATE TABLE `pageview` (
+  `id` int(10) NOT NULL,
+  `user` int(10) DEFAULT NULL,
+  `path` text,
+  `ip_addr` text,
+  `time` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `photos`
+--
+
+CREATE TABLE `photos` (
+  `id` int(10) NOT NULL,
+  `user` int(10) NOT NULL,
+  `url` text,
+  `desc` text,
+  `created_at` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `province`
+--
+
+CREATE TABLE `province` (
+  `id` int(9) NOT NULL,
+  `name` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 转存表中的数据 `province`
+--
+
+INSERT INTO `province` (`id`, `name`) VALUES
+(1, '北京市'),
+(2, '天津市'),
+(3, '上海市'),
+(4, '重庆市'),
+(5, '河北省'),
+(6, '山西省'),
+(7, '台湾省'),
+(8, '辽宁省'),
+(9, '吉林省'),
+(10, '黑龙江省'),
+(11, '江苏省'),
+(12, '浙江省'),
+(13, '安徽省'),
+(14, '福建省'),
+(15, '江西省'),
+(16, '山东省'),
+(17, '河南省'),
+(18, '湖北省'),
+(19, '湖南省'),
+(20, '广东省'),
+(21, '甘肃省'),
+(22, '四川省'),
+(23, '贵州省'),
+(24, '海南省'),
+(25, '云南省'),
+(26, '青海省'),
+(27, '陕西省'),
+(28, '广西壮族自治区'),
+(29, '西藏自治区'),
+(30, '宁夏回族自治区'),
+(31, '新疆维吾尔自治区'),
+(32, '内蒙古自治区'),
+(33, '澳门特别行政区'),
+(34, '香港特别行政区');
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `replies`
+--
+
+CREATE TABLE `replies` (
+  `id` int(10) NOT NULL,
+  `user` int(10) NOT NULL,
+  `target` int(10) NOT NULL,
+  `content` text,
+  `visibility` tinyint(2) DEFAULT NULL,
+  `read` tinyint(1) DEFAULT NULL,
+  `created_at` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `school`
+--
+
+CREATE TABLE `school` (
+  `id` int(9) NOT NULL,
+  `name` text,
+  `location` text,
+  `type` text,
+  `properties` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- 转存表中的数据 `school`
+--
+
+INSERT INTO `school` (`id`, `name`, `location`, `type`, `properties`) VALUES
+(1, '北京大学', '北京', '综合', '本科'),
+(2, '中国人民大学', '北京', '综合', '本科'),
+(3, '清华大学', '北京', '工科', '本科'),
+(4, '北京航空航天大学', '北京', '工科', '本科'),
+(5, '北京理工大学', '北京', '工科', '本科'),
+(6, '中国农业大学', '北京', '农业', '本科'),
+(7, '北京师范大学', '北京', '师范', '本科'),
+(8, '中央民族大学', '北京', '民族', '本科'),
+(9, '南开大学', '天津', '综合', '本科'),
+(10, '天津大学', '天津', '工科', '本科'),
+(11, '大连理工大学', '辽宁', '工科', '本科'),
+(12, '东北大学', '辽宁', '工科', '本科'),
+(13, '吉林大学', '吉林', '综合', '本科'),
+(14, '哈尔滨工业大学', '黑龙江', '工科', '本科'),
+(15, '复旦大学', '上海', '综合', '本科'),
+(16, '同济大学', '上海', '工科', '本科'),
+(17, '上海交通大学', '上海', '综合', '本科'),
+(18, '华东师范大学', '上海', '师范', '本科'),
+(19, '南京大学', '江苏', '综合', '本科'),
+(20, '东南大学', '江苏', '综合', '本科'),
+(21, '中国矿业大学（徐州）', '江苏', '工科', '本科'),
+(22, '浙江大学', '浙江', '综合', '本科'),
+(23, '中国科学技术大学', '安徽', '工科', '本科'),
+(24, '厦门大学', '福建', '综合', '本科'),
+(25, '山东大学', '山东', '综合', '本科'),
+(26, '中国海洋大学', '山东', '综合', '本科'),
+(27, '武汉大学', '湖北', '综合', '本科'),
+(28, '湖南大学', '湖南', '综合', '本科'),
+(29, '中山大学', '广东', '综合', '本科'),
+(30, '华南理工大学', '广东', '工科', '本科'),
+(31, '重庆大学', '重庆', '综合', '本科'),
+(32, '电子科技大学', '四川', '工科', '本科'),
+(33, '西安交通大学', '陕西', '综合', '本科'),
+(34, '西北工业大学', '陕西', '工科', '本科'),
+(35, '兰州大学', '甘肃', '综合', '本科'),
+(36, '四川大学', '四川', '综合', '本科'),
+(37, '西北农林科技大学', '陕西', '农业', '本科'),
+(38, '中南大学', '湖南', '综合', '本科'),
+(39, '华中科技大学', '湖北', '工科', '本科'),
+(40, '东北大学秦皇岛分校', '河北', '工科', '本科'),
+(41, '山东大学威海分校', '山东', '综合', '------'),
+(42, '哈尔滨工业大学（威海）', '山东', '综合', '本科'),
+(43, '北京交通大学', '北京', '工科', '本科'),
+(44, '北京工业大学', '北京', '工科', '本科'),
+(45, '北京科技大学', '北京', '工科', '本科'),
+(46, '北京化工大学', '北京', '工科', '本科'),
+(47, '北京邮电大学', '北京', '工科', '本科'),
+(48, '北京林业大学', '北京', '林业', '本科'),
+(49, '北京协和医学院', '北京', '医药', '本科'),
+(50, '北京中医药大学', '北京', '医药', '本科'),
+(51, '北京外国语大学', '北京', '语言', '本科'),
+(52, '中央财经大学', '北京', '财经', '本科'),
+(53, '对外经济贸易大学', '北京', '财经', '本科'),
+(54, '北京体育大学', '北京', '体育', '本科'),
+(55, '中央音乐学院', '北京', '艺术', '本科'),
+(56, '中国政法大学', '北京', '政法', '本科'),
+(57, '华北电力大学', '北京', '工科', '本科'),
+(58, '华北电力大学(保定)', '河北', '工科', '本科'),
+(59, '河北工业大学', '天津', '工科', '本科'),
+(60, '太原理工大学', '山西', '工科', '本科'),
+(61, '内蒙古大学', '内蒙古', '综合', '本科'),
+(62, '辽宁大学', '辽宁', '综合', '本科'),
+(63, '大连海事大学', '辽宁', '工科', '本科'),
+(64, '延边大学', '吉林', '综合', '本科'),
+(65, '东北师范大学', '吉林', '师范', '本科'),
+(66, '哈尔滨工程大学', '黑龙江', '工科', '本科'),
+(67, '东北林业大学', '黑龙江', '林业', '本科'),
+(68, '华东理工大学', '上海', '工科', '本科'),
+(69, '东华大学', '上海', '工科', '本科'),
+(70, '上海中医药大学', '上海', '医药', '本科'),
+(71, '上海外国语大学', '上海', '语言', '本科'),
+(72, '上海财经大学', '上海', '财经', '本科'),
+(73, '苏州大学', '江苏', '综合', '本科'),
+(74, '南京航空航天大学', '江苏', '工科', '本科'),
+(75, '南京理工大学', '江苏', '工科', '本科'),
+(76, '河海大学', '江苏', '工科', '本科'),
+(77, '江南大学', '江苏', '综合', '本科'),
+(78, '南京农业大学', '江苏', '农业', '本科'),
+(79, '中国药科大学', '江苏', '医药', '本科'),
+(80, '南京师范大学', '江苏', '师范', '本科'),
+(81, '安徽大学', '安徽', '综合', '本科'),
+(82, '合肥工业大学', '安徽', '工科', '本科'),
+(83, '福州大学', '福建', '工科', '本科'),
+(84, '郑州大学', '河南', '综合', '本科'),
+(85, '华中农业大学', '湖北', '农业', '本科'),
+(86, '华中师范大学', '湖北', '师范', '本科'),
+(87, '湖南师范大学', '湖南', '师范', '本科'),
+(88, '暨南大学', '广东', '综合', '本科'),
+(89, '华南农业大学', '广东', '农业', '本科'),
+(90, '广州中医药大学', '广东', '医药', '本科'),
+(91, '华南师范大学', '广东', '师范', '本科'),
+(92, '海南大学', '海南', '综合', '本科'),
+(93, '广西大学', '广西', '综合', '本科'),
+(94, '西南交通大学', '四川', '工科', '本科'),
+(95, '四川农业大学', '四川', '农业', '本科'),
+(96, '西南大学', '重庆', '师范', '本科'),
+(97, '西南财经大学', '四川', '财经', '本科'),
+(98, '贵州大学', '贵州', '综合', '本科'),
+(99, '云南大学', '云南', '综合', '本科'),
+(100, '西藏大学', '西藏', '综合', '本科'),
+(101, '西北大学', '陕西', '综合', '本科'),
+(102, '西安电子科技大学', '陕西', '工科', '本科'),
+(103, '陕西师范大学', '陕西', '师范', '本科'),
+(104, '青海大学', '青海', '综合', '本科'),
+(105, '宁夏大学', '宁夏', '综合', '本科'),
+(106, '新疆大学', '新疆', '综合', '本科'),
+(107, '石河子大学', '新疆', '综合', '本科'),
+(108, '中国矿业大学(北京)', '北京', '工科', '本科'),
+(109, '中国地质大学(北京)', '北京', '工科', '本科'),
+(110, '南昌大学', '江西', '综合', '本科'),
+(111, '上海大学', '上海', '综合', '本科'),
+(112, '天津医科大学', '天津', '医药', '本科'),
+(113, '长安大学', '陕西', '工科', '本科'),
+(114, '中南财经政法大学', '湖北', '财经', '本科'),
+(115, '武汉理工大学', '湖北', '工科', '本科'),
+(116, '东北农业大学', '黑龙江', '农业', '本科'),
+(117, '国防科学技术大学', '湖南', '军事', '------'),
+(118, '第二军医大学', '上海', '军事', '其它'),
+(119, '第四军医大学', '陕西', '军事', '其它'),
+(120, '上海交通大学医学院', '上海', '医药', '------'),
+(121, '中国传媒大学', '北京', '语言', '本科'),
+(122, '中国地质大学(武汉)', '湖北', '工科', '本科'),
+(123, '中国石油大学(北京)', '北京', '工科', '本科'),
+(124, '中国石油大学(华东)', '山东', '工科', '本科'),
+(125, '北方工业大学', '北京', '工科', '本科'),
+(126, '北京服装学院', '北京', '工科', '本科'),
+(127, '北京印刷学院', '北京', '工科', '本科'),
+(128, '北京建筑大学', '北京', '工科', '本科'),
+(129, '北京石油化工学院', '北京', '工科', '本科'),
+(130, '北京电子科技学院', '北京', '工科', '本科'),
+(131, '北京农学院', '北京', '农业', '本科'),
+(132, '首都医科大学', '北京', '医药', '本科'),
+(133, '首都师范大学', '北京', '师范', '本科'),
+(134, '首都体育学院', '北京', '体育', '本科'),
+(135, '北京第二外国语学院', '北京', '语言', '本科'),
+(136, '北京语言大学', '北京', '语言', '本科'),
+(137, '北京物资学院', '北京', '财经', '本科'),
+(138, '外交学院', '北京', '语言', '本科'),
+(139, '中国人民公安大学', '北京', '政法', '本科'),
+(140, '国际关系学院', '北京', '政法', '本科'),
+(141, '中国音乐学院', '北京', '艺术', '本科'),
+(142, '中央美术学院', '北京', '艺术', '本科'),
+(143, '中央戏剧学院', '北京', '艺术', '本科'),
+(144, '中国戏曲学院', '北京', '艺术', '本科'),
+(145, '北京电影学院', '北京', '艺术', '本科'),
+(146, '北京舞蹈学院', '北京', '艺术', '本科'),
+(147, '天津科技大学', '天津', '工科', '本科'),
+(148, '天津工业大学', '天津', '工科', '本科'),
+(149, '中国民航大学', '天津', '工科', '本科'),
+(150, '天津理工大学', '天津', '工科', '本科'),
+(151, '天津农学院', '天津', '农业', '本科'),
+(152, '天津中医药大学', '天津', '医药', '本科'),
+(153, '天津师范大学', '天津', '师范', '本科'),
+(154, '天津外国语学院', '天津', '语言', '本科'),
+(155, '天津商业大学', '天津', '财经', '本科'),
+(156, '天津体育学院', '天津', '体育', '本科'),
+(157, '天津音乐学院', '天津', '艺术', '本科'),
+(158, '天津美术学院', '天津', '艺术', '本科'),
+(159, '河北大学', '河北', '综合', '本科'),
+(160, '石家庄经济学院', '河北', '财经', '本科'),
+(161, '河北科技大学', '河北', '工科', '本科'),
+(162, '河北建筑工程学院', '河北', '工科', '本科'),
+(163, '承德医学院', '河北', '医药', '本科'),
+(164, '河北师范大学', '河北', '师范', '本科'),
+(165, '唐山师范学院', '河北', '师范', '本科'),
+(166, '廊坊师范学院', '河北', '师范', '本科'),
+(167, '邢台学院', '河北', '师范', '本科'),
+(168, '石家庄铁道大学', '河北', '工科', '本科'),
+(169, '山西大学', '山西', '综合', '本科'),
+(170, '山西农业大学', '山西', '农业', '本科'),
+(171, '山西医科大学', '山西', '医药', '本科'),
+(172, '长治医学院', '山西', '医药', '本科'),
+(173, '山西师范大学', '山西', '师范', '本科'),
+(174, '太原师范学院', '山西', '师范', '本科'),
+(175, '晋中学院', '山西', '师范', '本科'),
+(176, '运城学院', '山西', '师范', '本科'),
+(177, '忻州师范学院', '山西', '师范', '本科'),
+(178, '山西财经大学', '山西', '财经', '本科'),
+(179, '内蒙古工业大学', '内蒙古', '工科', '本科'),
+(180, '内蒙古医科大学', '内蒙古', '医药', '本科'),
+(181, '包头医学院', '内蒙古', '医药', '其它'),
+(182, '内蒙古师范大学', '内蒙古', '师范', '本科'),
+(183, '内蒙古财经大学', '内蒙古', '财经', '本科'),
+(184, '沈阳工业大学', '辽宁', '工科', '本科'),
+(185, '沈阳航空航天大学', '辽宁', '工科', '本科'),
+(186, '辽宁科技大学', '辽宁', '工科', '本科'),
+(187, '辽宁工程技术大学', '辽宁', '工科', '本科'),
+(188, '辽宁石油化工大学', '辽宁', '工科', '本科'),
+(189, '沈阳化工大学', '辽宁', '工科', '本科'),
+(190, '大连工业大学', '辽宁', '工科', '本科'),
+(191, '辽宁工业大学', '辽宁', '工科', '本科'),
+(192, '沈阳农业大学', '辽宁', '农业', '本科'),
+(193, '大连水产学院', '辽宁', '农业', '本科'),
+(194, '中国医科大学', '辽宁', '医药', '本科'),
+(195, '辽宁医学院', '辽宁', '医药', '本科'),
+(196, '大连医科大学', '辽宁', '医药', '本科'),
+(197, '辽宁中医药大学', '辽宁', '医药', '本科'),
+(198, '沈阳药科大学', '辽宁', '医药', '本科'),
+(199, '沈阳医学院', '辽宁', '医药', '本科'),
+(200, '辽宁师范大学', '辽宁', '师范', '本科'),
+(201, '沈阳师范大学', '辽宁', '师范', '本科'),
+(202, '鞍山师范学院', '辽宁', '师范', '本科'),
+(203, '大连外国语大学', '辽宁', '语言', '本科'),
+(204, '东北财经大学', '辽宁', '财经', '本科'),
+(205, '中国刑事警察学院', '辽宁', '政法', '本科'),
+(206, '沈阳体育学院', '辽宁', '体育', '本科'),
+(207, '沈阳音乐学院', '辽宁', '艺术', '本科'),
+(208, '鲁迅美术学院', '辽宁', '艺术', '本科'),
+(209, '长春理工大学', '吉林', '工科', '本科'),
+(210, '东北电力大学', '吉林', '工科', '本科'),
+(211, '长春工业大学', '吉林', '工科', '本科'),
+(212, '吉林建筑大学', '吉林', '工科', '本科'),
+(213, '吉林化工学院', '吉林', '工科', '本科'),
+(214, '吉林农业大学', '吉林', '农业', '本科'),
+(215, '通化师范学院', '吉林', '师范', '本科'),
+(216, '吉林师范大学', '吉林', '师范', '本科'),
+(217, '吉林工程技术师范学院', '吉林', '师范', '本科'),
+(218, '长春师范大学', '吉林', '师范', '本科'),
+(219, '白城师范学院', '吉林', '师范', '本科'),
+(220, '长春税务学院', '吉林', '财经', '本科'),
+(221, '吉林体育学院', '吉林', '体育', '本科'),
+(222, '吉林艺术学院', '吉林', '艺术', '本科'),
+(223, '黑龙江大学', '黑龙江', '综合', '本科'),
+(224, '燕山大学', '河北', '工科', '本科'),
+(225, '黑龙江科技大学', '黑龙江', '工科', '本科'),
+(226, '东北石油大学', '黑龙江', '工科', '本科'),
+(227, '齐齐哈尔大学', '黑龙江', '综合', '本科'),
+(228, '黑龙江八一农垦大学', '黑龙江', '农业', '本科'),
+(229, '黑龙江中医药大学', '黑龙江', '医药', '本科'),
+(230, '牡丹江医学院', '黑龙江', '医药', '本科'),
+(231, '哈尔滨师范大学', '黑龙江', '师范', '本科'),
+(232, '牡丹江师范学院', '黑龙江', '师范', '本科'),
+(233, '绥化学院', '黑龙江', '综合', '本科'),
+(234, '哈尔滨商业大学', '黑龙江', '财经', '本科'),
+(235, '哈尔滨体育学院', '黑龙江', '体育', '本科'),
+(236, '上海理工大学', '上海', '工科', '本科'),
+(237, '上海电力学院', '上海', '工科', '本科'),
+(238, '上海师范大学', '上海', '师范', '本科'),
+(239, '上海对外经贸大学', '上海', '财经', '本科'),
+(240, '华东政法大学', '上海', '政法', '本科'),
+(241, '上海体育学院', '上海', '体育', '本科'),
+(242, '上海音乐学院', '上海', '艺术', '本科'),
+(243, '上海戏剧学院', '上海', '艺术', '本科'),
+(244, '南京工业大学', '江苏', '工科', '本科'),
+(245, '江苏工业学院', '江苏', '工科', '本科'),
+(246, '南京林业大学', '江苏', '林业', '本科'),
+(247, '江苏大学', '江苏', '综合', '本科'),
+(248, '盐城工学院', '江苏', '工科', '本科'),
+(249, '南京医科大学', '江苏', '医药', '本科'),
+(250, '徐州医学院', '江苏', '医药', '本科'),
+(251, '南京中医药大学', '江苏', '医药', '本科'),
+(252, '江苏师范大学', '江苏', '师范', '本科'),
+(253, '淮阴师范学院', '江苏', '师范', '本科'),
+(254, '盐城师范学院', '江苏', '师范', '本科'),
+(255, '南京体育学院', '江苏', '体育', '本科'),
+(256, '南京艺术学院', '江苏', '艺术', '本科'),
+(257, '常熟理工学院', '江苏', '综合', '本科'),
+(258, '浙江工业大学', '浙江', '工科', '本科'),
+(259, '浙江理工大学', '浙江', '工科', '本科'),
+(260, '浙江海洋学院', '浙江', '农业', '本科'),
+(261, '浙江林学院', '浙江', '林业', '本科'),
+(262, '温州医科大学', '浙江', '医药', '本科'),
+(263, '浙江中医药大学', '浙江', '医药', '本科'),
+(264, '浙江师范大学', '浙江', '师范', '本科'),
+(265, '杭州师范大学', '浙江', '师范', '本科'),
+(266, '湖州师范学院', '浙江', '师范', '本科'),
+(267, '绍兴文理学院', '浙江', '师范', '本科'),
+(268, '台州学院', '浙江', '综合', '本科'),
+(269, '中国美术学院', '浙江', '艺术', '本科'),
+(270, '中国计量学院', '浙江', '工科', '本科'),
+(271, '安徽工业大学', '安徽', '工科', '本科'),
+(272, '安徽理工大学', '安徽', '工科', '本科'),
+(273, '安徽工程大学', '安徽', '工科', '本科'),
+(274, '安徽农业大学', '安徽', '农业', '本科'),
+(275, '安徽医科大学', '安徽', '医药', '本科'),
+(276, '蚌埠医学院', '安徽', '医药', '本科'),
+(277, '皖南医学院', '安徽', '医药', '本科'),
+(278, '安徽中医药大学', '安徽', '医药', '本科'),
+(279, '安徽师范大学', '安徽', '师范', '本科'),
+(280, '阜阳师范学院', '安徽', '师范', '本科'),
+(281, '安庆师范学院', '安徽', '师范', '本科'),
+(282, '淮北煤炭师范学院', '安徽', '师范', '本科'),
+(283, '黄山学院', '安徽', '师范', '本科'),
+(284, '巢湖学院', '安徽', '师范', '本科'),
+(285, '淮南师范学院', '安徽', '师范', '本科'),
+(286, '铜陵学院', '安徽', '财经', '本科'),
+(287, '华侨大学', '福建', '综合', '本科'),
+(288, '福建工程学院', '福建', '工科', '本科'),
+(289, '福建医科大学', '福建', '医药', '本科'),
+(290, '福建中医药大学', '福建', '医药', '本科'),
+(291, '福建师范大学', '福建', '师范', '本科'),
+(292, '闽江学院', '福建', '工科', '本科'),
+(293, '泉州师范学院', '福建', '师范', '本科'),
+(294, '闽南师范大学', '福建', '师范', '本科'),
+(295, '华东交通大学', '江西', '工科', '本科'),
+(296, '东华理工学院', '江西', '工科', '其它'),
+(297, '南昌航空大学', '江西', '工科', '本科'),
+(298, '景德镇陶瓷学院', '江西', '工科', '本科'),
+(299, '江西农业大学', '江西', '农业', '本科'),
+(300, '江西中医药大学', '江西', '医药', '本科'),
+(301, '赣南医学院', '江西', '医药', '本科'),
+(302, '江西师范大学', '江西', '师范', '本科'),
+(303, '上饶师范学院', '江西', '师范', '本科'),
+(304, '赣南师范学院', '江西', '师范', '本科'),
+(305, '江西财经大学', '江西', '财经', '本科'),
+(306, '山东科技大学', '山东', '综合', '本科'),
+(307, '青岛科技大学', '山东', '工科', '本科'),
+(308, '山东建筑大学', '山东', '工科', '本科'),
+(309, '齐鲁工业大学', '山东', '工科', '本科'),
+(310, '山东农业大学', '山东', '农业', '本科'),
+(311, '青岛农业大学', '山东', '农业', '本科'),
+(312, '潍坊医学院', '山东', '医药', '本科'),
+(313, '泰山医学院', '山东', '医药', '本科'),
+(314, '滨州医学院', '山东', '医药', '本科'),
+(315, '山东中医药大学', '山东', '医药', '本科'),
+(316, '济宁医学院', '山东', '医药', '本科'),
+(317, '山东师范大学', '山东', '师范', '本科'),
+(318, '曲阜师范大学', '山东', '师范', '本科'),
+(319, '聊城大学', '山东', '综合', '本科'),
+(320, '德州学院', '山东', '综合', '本科'),
+(321, '临沂大学', '山东', '综合', '本科'),
+(322, '泰山学院', '山东', '综合', '本科'),
+(323, '山东财经大学', '山东', '财经', '本科'),
+(324, '山东艺术学院', '山东', '艺术', '本科'),
+(325, '郑州轻工业学院', '河南', '工科', '本科'),
+(326, '河南科技大学', '河南', '工科', '本科'),
+(327, '中原工学院', '河南', '工科', '本科'),
+(328, '河南农业大学', '河南', '农业', '本科'),
+(329, '河南中医学院', '河南', '医药', '本科'),
+(330, '新乡医学院', '河南', '医药', '本科'),
+(331, '河南大学', '河南', '综合', '本科'),
+(332, '河南师范大学', '河南', '师范', '本科'),
+(333, '信阳师范学院', '河南', '师范', '本科'),
+(334, '周口师范学院', '河南', '师范', '本科'),
+(335, '安阳师范学院', '河南', '师范', '本科'),
+(336, '许昌学院', '河南', '工科', '本科'),
+(337, '南阳师范学院', '河南', '师范', '本科'),
+(338, '洛阳师范学院', '河南', '师范', '本科'),
+(339, '商丘师范学院', '河南', '师范', '本科'),
+(340, '河南财经政法大学', '河南', '财经', '本科'),
+(341, '郑州航空工业管理学院', '河南', '财经', '本科'),
+(342, '武汉工程大学', '湖北', '工科', '本科'),
+(343, '武汉纺织大学', '湖北', '工科', '本科'),
+(344, '武汉轻工大学', '湖北', '工科', '本科'),
+(345, '湖北中医药大学', '湖北', '医药', '本科'),
+(346, '湖北大学', '湖北', '综合', '本科'),
+(347, '湖北师范学院', '湖北', '师范', '本科'),
+(348, '黄冈师范学院', '湖北', '师范', '本科'),
+(349, '湖北民族学院', '湖北', '民族', '本科'),
+(350, '湖北文理学院', '湖北', '综合', '本科'),
+(351, '武汉体育学院', '湖北', '体育', '本科'),
+(352, '湖北美术学院', '湖北', '艺术', '本科'),
+(353, '中南民族大学', '湖北', '民族', '本科'),
+(354, '湖北汽车工业学院', '湖北', '工科', '本科'),
+(355, '湖北工程学院', '湖北', '综合', '本科'),
+(356, '湘潭大学', '湖南', '综合', '本科'),
+(357, '吉首大学', '湖南', '综合', '本科'),
+(358, '湖南农业大学', '湖南', '农业', '本科'),
+(359, '中南林业科技大学', '湖南', '林业', '本科'),
+(360, '湖南中医药大学', '湖南', '医药', '本科'),
+(361, '湖南理工学院', '湖南', '工科', '本科'),
+(362, '衡阳师范学院', '湖南', '师范', '本科'),
+(363, '怀化学院', '湖南', '综合', '本科'),
+(364, '湖南文理学院', '湖南', '综合', '本科'),
+(365, '湖南商学院', '湖南', '财经', '本科'),
+(366, '汕头大学', '广东', '综合', '本科'),
+(367, '华南热带农业大学', '海南', '农业', '其它'),
+(368, '广东海洋大学', '广东', '农业', '本科'),
+(369, '广州医科大学', '广东', '医药', '本科'),
+(370, '广东医学院', '广东', '医药', '本科'),
+(371, '广东药学院', '广东', '医药', '本科'),
+(372, '韶关学院', '广东', '综合', '本科'),
+(373, '惠州学院', '广东', '综合', '本科'),
+(374, '韩山师范学院', '广东', '师范', '本科'),
+(375, '湛江师范学院', '广东', '师范', '本科'),
+(376, '肇庆学院', '广东', '综合', '本科'),
+(377, '惠州大学', '广东', '综合', '其它'),
+(378, '嘉应学院', '广东', '综合', '本科'),
+(379, '广州体育学院', '广东', '体育', '本科'),
+(380, '广州美术学院', '广东', '艺术', '本科'),
+(381, '星海音乐学院', '广东', '艺术', '本科'),
+(382, '广东技术师范学院', '广东', '师范', '本科'),
+(383, '深圳大学', '广东', '综合', '本科'),
+(384, '广东商学院', '广东', '财经', '本科'),
+(385, '广西科技大学', '广西', '工科', '本科'),
+(386, '桂林电子科技大学', '广西', '工科', '本科'),
+(387, '桂林理工大学', '广西', '工科', '本科'),
+(388, '广西医科大学', '广西', '医药', '本科'),
+(389, '右江民族医学院', '广西', '医药', '本科'),
+(390, '广西中医药大学', '广西', '医药', '本科'),
+(391, '桂林医学院', '广西', '医药', '本科'),
+(392, '广西师范大学', '广西', '师范', '本科'),
+(393, '广西师范学院', '广西', '师范', '本科'),
+(394, '河池学院', '广西', '师范', '本科'),
+(395, '玉林师范学院', '广西', '师范', '本科'),
+(396, '广西艺术学院', '广西', '艺术', '本科'),
+(397, '广西民族大学', '广西', '民族', '本科'),
+(398, '百色学院', '广西', '综合', '本科'),
+(399, '西南石油大学', '四川', '工科', '本科'),
+(400, '成都理工大学', '四川', '工科', '本科'),
+(401, '重庆邮电大学', '重庆', '工科', '本科'),
+(402, '重庆交通大学', '重庆', '工科', '本科'),
+(403, '西南科技大学', '四川', '工科', '本科'),
+(404, '成都信息工程学院', '四川', '工科', '本科'),
+(405, '中国民用航空飞行学院', '四川', '工科', '本科'),
+(406, '西南农业大学', '重庆', '农业', '其它'),
+(407, '重庆医科大学', '重庆', '医药', '本科'),
+(408, '泸州医学院', '四川', '医药', '本科'),
+(409, '成都中医药大学', '四川', '医药', '本科'),
+(410, '川北医学院', '四川', '医药', '本科'),
+(411, '四川师范大学', '四川', '师范', '本科'),
+(412, '绵阳师范学院', '四川', '师范', '本科'),
+(413, '内江师范学院', '四川', '师范', '本科'),
+(414, '宜宾学院', '四川', '综合', '本科'),
+(415, '重庆三峡学院', '重庆', '综合', '本科'),
+(416, '四川文理学院', '四川', '综合', '本科'),
+(417, '长江师范学院', '重庆', '师范', '本科'),
+(418, '乐山师范学院', '四川', '师范', '本科'),
+(419, '四川外语学院', '重庆', '语言', '本科'),
+(420, '西南政法大学', '重庆', '政法', '本科'),
+(421, '成都体育学院', '四川', '体育', '本科'),
+(422, '四川音乐学院', '四川', '艺术', '本科'),
+(423, '四川美术学院', '重庆', '艺术', '本科'),
+(424, '贵阳医学院', '贵州', '医药', '本科'),
+(425, '遵义医学院', '贵州', '医药', '本科'),
+(426, '贵阳中医学院', '贵州', '医药', '本科'),
+(427, '贵州师范大学', '贵州', '师范', '本科'),
+(428, '遵义师范学院', '贵州', '师范', '本科'),
+(429, '黔南民族师范学院', '贵州', '师范', '本科'),
+(430, '贵州财经大学', '贵州', '财经', '本科'),
+(431, '贵州民族大学', '贵州', '民族', '本科'),
+(432, '昆明理工大学', '云南', '工科', '本科'),
+(433, '云南农业大学', '云南', '农业', '本科'),
+(434, '西南林学院', '云南', '林业', '本科'),
+(435, '昆明医科大学', '云南', '医药', '本科'),
+(436, '大理学院', '云南', '综合', '本科'),
+(437, '云南中医学院', '云南', '医药', '本科'),
+(438, '云南师范大学', '云南', '师范', '本科'),
+(439, '曲靖师范学院', '云南', '师范', '本科'),
+(440, '云南艺术学院', '云南', '艺术', '本科'),
+(441, '西藏民族学院', '西藏', '民族', '本科'),
+(442, '西藏藏医学院', '西藏', '医药', '本科'),
+(443, '西安理工大学', '陕西', '工科', '本科'),
+(444, '西安工业大学', '陕西', '工科', '本科'),
+(445, '西安建筑科技大学', '陕西', '工科', '本科'),
+(446, '陕西科技大学', '陕西', '工科', '本科'),
+(447, '西安工程大学', '陕西', '工科', '本科'),
+(448, '陕西中医学院', '陕西', '医药', '本科'),
+(449, '延安大学', '陕西', '综合', '本科'),
+(450, '咸阳师范学院', '陕西', '师范', '本科'),
+(451, '渭南师范学院', '陕西', '师范', '本科'),
+(452, '西安外国语大学', '陕西', '语言', '本科'),
+(453, '西安体育学院', '陕西', '体育', '本科'),
+(454, '西安音乐学院', '陕西', '艺术', '本科'),
+(455, '西安美术学院', '陕西', '艺术', '本科'),
+(456, '兰州理工大学', '甘肃', '工科', '本科'),
+(457, '甘肃农业大学', '甘肃', '农业', '本科'),
+(458, '甘肃中医学院', '甘肃', '医药', '本科'),
+(459, '西北师范大学', '甘肃', '师范', '本科'),
+(460, '天水师范学院', '甘肃', '师范', '本科'),
+(461, '河西学院', '甘肃', '综合', '本科'),
+(462, '兰州商学院', '甘肃', '财经', '本科'),
+(463, '青海师范大学', '青海', '师范', '本科'),
+(464, '青海民族大学', '青海', '民族', '本科'),
+(465, '宁夏医科大学', '宁夏', '医药', '本科'),
+(466, '塔里木大学', '新疆', '综合', '本科'),
+(467, '新疆农业大学', '新疆', '农业', '本科'),
+(468, '新疆师范大学', '新疆', '师范', '本科'),
+(469, '喀什师范学院', '新疆', '师范', '本科'),
+(470, '伊犁师范学院', '新疆', '师范', '本科'),
+(471, '新疆财经学院', '新疆', '财经', '其它'),
+(472, '新疆艺术学院', '新疆', '艺术', '本科'),
+(473, '北京信息科技大学', '北京', '工科', '本科'),
+(474, '天津城建大学', '天津', '工科', '本科'),
+(475, '河北科技师范学院', '河北', '师范', '本科'),
+(476, '山西中医学院', '山西', '医药', '本科'),
+(477, '呼伦贝尔学院', '内蒙古', '综合', '本科'),
+(478, '上海工程技术大学', '上海', '工科', '本科'),
+(479, '浙江万里学院', '浙江', '工科', '本科'),
+(480, '安徽建筑大学', '安徽', '工科', '本科'),
+(481, '枣庄学院', '山东', '综合', '本科'),
+(482, '山东工艺美术学院', '山东', '艺术', '本科'),
+(483, '平顶山学院', '河南', '师范', '本科'),
+(484, '湖北科技学院', '湖北', '综合', '本科'),
+(485, '湖北医药学院', '湖北', '医药', '本科'),
+(486, '昌吉学院', '新疆', '师范', '本科'),
+(487, '沈阳大学', '辽宁', '综合', '本科'),
+(488, '淮阴工学院', '江苏', '工科', '本科'),
+(489, '徐州工程学院', '江苏', '工科', '本科'),
+(490, '常州工学院', '江苏', '工科', '本科'),
+(491, '浙江科技学院', '浙江', '工科', '本科'),
+(492, '宁波工程学院', '浙江', '工科', '本科'),
+(493, '合肥学院', '安徽', '工科', '本科'),
+(494, '烟台大学', '山东', '综合', '本科'),
+(495, '中州大学', '河南', '工科', '高职专科'),
+(496, '开封大学', '河南', '工科', '高职专科'),
+(497, '洛阳理工学院', '河南', '综合', '本科'),
+(498, '新乡学院', '河南', '综合', '本科'),
+(499, '江汉大学', '湖北', '综合', '本科'),
+(500, '沙市大学', '湖北', '综合', '其它'),
+(501, '广州大学', '广东', '综合', '本科'),
+(502, '成都大学', '四川', '综合', '其它'),
+(503, '华北科技学院', '河北', '工科', '本科'),
+(504, '中国人民武装警察部队学院', '河北', '政法', '本科'),
+(505, '广东警官学院', '广东', '政法', '本科'),
+(506, '扬州大学', '江苏', '综合', '本科'),
+(507, '齐齐哈尔医学院', '黑龙江', '医药', '本科'),
+(508, '北京机械工业学院', '北京', '综合', '其它'),
+(509, '河北体育学院', '河北', '体育', '本科'),
+(510, '大连民族学院', '辽宁', '民族', '本科'),
+(511, '大连大学', '辽宁', '综合', '本科'),
+(512, '南京审计学院', '江苏', '财经', '本科'),
+(513, '温州大学', '浙江', '工科', '本科'),
+(514, '江西科技师范大学', '江西', '师范', '本科'),
+(515, '五邑大学', '广东', '综合', '本科'),
+(516, '攀枝花学院', '四川', '综合', '本科'),
+(517, '玉溪师范学院', '云南', '师范', '本科'),
+(518, '楚雄师范学院', '云南', '师范', '本科'),
+(519, '甘肃政法学院', '甘肃', '政法', '本科'),
+(520, '北方民族大学', '宁夏', '民族', '本科'),
+(521, '北京联合大学', '北京', '综合', '本科'),
+(522, '佳木斯大学', '黑龙江', '综合', '本科'),
+(523, '浙江财经大学', '浙江', '财经', '本科'),
+(524, '莆田学院', '福建', '综合', '本科'),
+(525, '山东交通学院', '山东', '工科', '本科'),
+(526, '焦作大学', '河南', '工科', '高职专科'),
+(527, '武汉音乐学院', '湖北', '艺术', '本科'),
+(528, '甘肃联合大学', '甘肃', '综合', '高职专科'),
+(529, '中国青年政治学院', '北京', '政法', '本科'),
+(530, '北京青年政治学院', '北京', '语言', '高职专科'),
+(531, '淮海工学院', '江苏', '工科', '本科'),
+(532, '宁波大学', '浙江', '综合', '本科'),
+(533, '南阳理工学院', '河南', '工科', '本科'),
+(534, '广东石油化工学院', '广东', '综合', '本科'),
+(535, '海南师范大学', '海南', '师范', '本科'),
+(536, '重庆理工大学', '重庆', '工科', '本科'),
+(537, '西安邮电大学', '陕西', '工科', '本科'),
+(538, '山东工商学院', '山东', '工科', '本科'),
+(539, '长春大学', '吉林', '综合', '本科'),
+(540, '平顶山工学院', '河南', '工科', '本科'),
+(541, '防灾科技学院', '河北', '工科', '本科'),
+(542, '海南医学院', '海南', '医药', '本科'),
+(543, '东莞理工学院', '广东', '工科', '本科'),
+(544, '首钢工学院', '北京', '工科', '本科'),
+(545, '上海政法学院', '上海', '政法', '本科'),
+(546, '集美大学', '福建', '综合', '本科'),
+(547, '宝鸡文理学院', '陕西', '师范', '本科'),
+(548, '青岛大学', '山东', '综合', '本科'),
+(549, '佛山科学技术学院', '广东', '综合', '本科'),
+(550, '广东外语外贸大学', '广东', '语言', '本科'),
+(551, '广东工业大学', '广东', '工科', '本科'),
+(552, '首都经济贸易大学', '北京', '财经', '本科'),
+(553, '哈尔滨理工大学', '黑龙江', '工科', '本科'),
+(554, '武汉科技大学', '湖北', '工科', '本科'),
+(555, '重庆电力高等专科学校', '重庆', '工科', '高职专科'),
+(556, '河北经贸大学', '河北', '财经', '本科'),
+(557, '河北医科大学', '河北', '医药', '本科'),
+(558, '河北农业大学', '河北', '农业', '本科'),
+(559, '北京工商大学', '北京', '财经', '本科'),
+(560, '内蒙古农业大学', '内蒙古', '农业', '本科'),
+(561, '北华大学', '吉林', '综合', '本科'),
+(562, '新疆医科大学', '新疆', '医药', '本科'),
+(563, '嘉兴学院', '浙江', '财经', '本科'),
+(564, '长春工程学院', '吉林', '工科', '本科'),
+(565, '哈尔滨学院', '黑龙江', '综合', '本科'),
+(566, '黑龙江工程学院', '黑龙江', '工科', '本科'),
+(567, '南京晓庄学院', '江苏', '师范', '本科'),
+(568, '皖西学院', '安徽', '师范', '本科'),
+(569, '潍坊学院', '山东', '综合', '本科'),
+(570, '三峡大学', '湖北', '综合', '本科'),
+(571, '南华大学', '湖南', '综合', '本科'),
+(572, '四川警察学院', '四川', '政法', '本科'),
+(573, '宜春学院', '江西', '综合', '本科'),
+(574, '济南大学', '山东', '综合', '本科'),
+(575, '内蒙古民族大学', '内蒙古', '综合', '本科'),
+(576, '福建农林大学', '福建', '农业', '本科'),
+(577, '湖南工程学院', '湖南', '工科', '本科'),
+(578, '南京工程学院', '江苏', '工科', '本科'),
+(579, '苏州科技学院', '江苏', '工科', '本科'),
+(580, '陕西理工学院', '陕西', '工科', '本科'),
+(581, '西安财经学院', '陕西', '财经', '本科'),
+(582, '中华女子学院', '北京', '语言', '本科'),
+(583, '九江学院', '江西', '综合', '本科'),
+(584, '湖北经济学院', '湖北', '财经', '本科'),
+(585, '唐山学院', '河北', '工科', '本科'),
+(586, '邵阳学院', '湖南', '工科', '本科'),
+(587, '湖南城市学院', '湖南', '综合', '本科'),
+(588, '山东理工大学', '山东', '工科', '本科'),
+(589, '中央司法警官学院', '河北', '政法', '本科'),
+(590, '重庆师范大学涉外商贸学院', '重庆', '财经', '独立学院'),
+(591, '成都医学院', '四川', '医药', '本科'),
+(592, '吉林医药学院', '吉林', '医药', '本科'),
+(593, '黑河学院', '黑龙江', '综合', '本科'),
+(594, '山东政法学院', '山东', '政法', '本科'),
+(595, '内蒙古科技大学包头师范学院', '内蒙古', '综合', '其它'),
+(596, '四川理工学院', '四川', '工科', '本科'),
+(597, '辽东学院', '辽宁', '财经', '本科'),
+(598, '解放军信息工程大学', '河南', '军事', '其它'),
+(599, '解放军理工大学', '江苏', '军事', '其它'),
+(600, '解放军外国语学院', '河南', '军事', '其它'),
+(601, '解放军西安通信学院', '陕西', '工科', '其它'),
+(602, '郑州防空兵学院', '河南', '军事', '其它'),
+(603, '西安政治学院', '陕西', '军事', '其它'),
+(604, '海军工程大学', '湖北', '军事', '其它'),
+(605, '空军工程大学', '陕西', '军事', '其它'),
+(606, '桂林空军学院', '广西', '军事', '其它'),
+(607, '空军第一航空学院', '河南', '军事', '其它'),
+(608, '上海第二工业大学', '上海', '工科', '本科'),
+(609, '浙江外国语学院', '浙江', '语言', '本科'),
+(610, '河南教育学院', '河南', '师范', '其它'),
+(611, '湖北第二师范学院', '湖北', '师范', '本科'),
+(612, '十堰教育学院', '湖北', '师范', '其它'),
+(613, '上海市广播电视大学', '上海', '语言', '其它'),
+(614, '山东体育学院', '山东', '体育', '本科'),
+(615, '安徽财经大学', '安徽', '财经', '本科'),
+(616, '北华航天工业学院', '河北', '工科', '本科'),
+(617, '北京大学医学部', '北京', '综合', '------'),
+(618, '北京工业大学(实验学院)', '北京', '综合', '其它'),
+(619, '长江大学', '湖北', '综合', '本科'),
+(620, '长沙理工大学', '湖南', '工科', '本科'),
+(621, '长沙学院', '湖南', '工科', '本科'),
+(622, '大连交通大学', '辽宁', '工科', '本科'),
+(623, '广东金融学院', '广东', '财经', '本科'),
+(624, '广西财经学院', '广西', '财经', '本科'),
+(625, '杭州电子科技大学', '浙江', '工科', '本科'),
+(626, '河北工程大学', '河北', '工科', '本科'),
+(627, '河南工业大学', '河南', '工科', '本科'),
+(628, '河南理工大学', '河南', '工科', '本科'),
+(629, '红河学院', '云南', '综合', '本科'),
+(630, '湖南工业大学', '湖南', '工科', '本科'),
+(631, '湖南科技大学', '湖南', '综合', '本科'),
+(632, '华北水利水电大学', '河南', '工科', '本科'),
+(633, '黄淮学院', '河南', '师范', '本科'),
+(634, '吉林华侨外国语学院', '吉林', '语言', '其它'),
+(635, '江苏科技大学', '江苏', '工科', '本科'),
+(636, '江西理工大学', '江西', '工科', '本科'),
+(637, '金陵科技学院', '江苏', '综合', '本科'),
+(638, '井冈山大学', '江西', '综合', '本科'),
+(639, '兰州交通大学', '甘肃', '工科', '本科'),
+(640, '内蒙古科技大学', '内蒙古', '综合', '本科'),
+(641, '南昌大学医学院', '江西', '医药', '其它'),
+(642, '南昌工程学院', '江西', '工科', '本科'),
+(643, '南京财经大学', '江苏', '财经', '本科'),
+(644, '南京信息工程大学', '江苏', '工科', '本科'),
+(645, '南京邮电大学', '江苏', '工科', '本科'),
+(646, '南通大学', '江苏', '综合', '本科'),
+(647, '青岛理工大学', '山东', '工科', '本科'),
+(648, '上海海事大学', '上海', '工科', '本科'),
+(649, '上海商学院', '上海', '财经', '本科'),
+(650, '沈阳建筑大学', '辽宁', '工科', '本科'),
+(651, '沈阳理工大学', '辽宁', '工科', '本科'),
+(652, '首都师范大学科德学院', '北京', '语言', '独立学院'),
+(653, '太原科技大学', '山西', '工科', '本科'),
+(654, '天津财经大学', '天津', '财经', '本科'),
+(655, '天津工程师范学院', '天津', '师范', '本科'),
+(656, '西安科技大学', '陕西', '工科', '本科'),
+(657, '西安石油大学', '陕西', '工科', '本科'),
+(658, '西安文理学院', '陕西', '师范', '本科'),
+(659, '西北民族大学', '甘肃', '民族', '本科'),
+(660, '西华师范大学', '四川', '师范', '本科'),
+(661, '西南民族大学', '四川', '民族', '本科'),
+(662, '香港城市大学', '香港', '综合', '本科'),
+(663, '香港中文大学', '香港', '综合', '其它'),
+(664, '浙江工商大学', '浙江', '财经', '本科'),
+(665, '中北大学', '山西', '工科', '本科'),
+(666, '太原工业学院', '山西', '工科', '本科'),
+(667, '中国劳动关系学院', '北京', '财经', '本科'),
+(668, '重庆工商大学', '重庆', '综合', '本科'),
+(669, '重庆科技学院', '重庆', '工科', '本科'),
+(670, '重庆师范大学', '重庆', '师范', '本科'),
+(671, '重庆文理学院', '重庆', '综合', '本科'),
+(672, '云南民族大学', '云南', '民族', '本科'),
+(673, '湖北工业大学', '湖北', '工科', '本科'),
+(674, '西华大学', '四川', '综合', '本科'),
+(675, '厦门理工学院', '福建', '工科', '本科'),
+(676, '长春中医药大学', '吉林', '医药', '本科'),
+(677, '云南财经大学', '云南', '财经', '本科'),
+(678, '新疆财经大学', '新疆', '财经', '本科'),
+(679, '宁波诺丁汉大学', '浙江', '综合', '本科'),
+(680, '香港科技大学', '香港', '综合', '其它'),
+(681, '香港大学', '香港', '综合', '其它'),
+(682, '香港理工大学', '香港', '综合', '其它'),
+(683, '香港浸会大学', '香港', '综合', '其它'),
+(684, '香港岭南大学', '香港', '综合', '其它'),
+(685, '香港教育学院', '香港', '综合', '本科'),
+(686, '西交利物浦大学', '江苏', '------', '本科'),
+(687, '梧州学院', '广西', '综合', '本科'),
+(688, '山西大同大学', '山西', '综合', '本科'),
+(689, '河北北方学院', '河北', '医药', '本科'),
+(690, '衡水学院', '河北', '师范', '本科'),
+(691, '河南科技学院', '河南', '师范', '本科'),
+(692, '吉林农业科技学院', '吉林', '农业', '本科'),
+(693, '鲁东大学', '山东', '综合', '本科'),
+(694, '滨州学院', '山东', '师范', '本科'),
+(695, '安徽科技学院', '安徽', '师范', '本科'),
+(696, '安阳工学院', '河南', '工科', '本科'),
+(697, '湖北理工学院', '湖北', '工科', '本科'),
+(698, '渤海大学', '辽宁', '综合', '本科'),
+(699, '解放军军事经济学院', '湖北', '综合', '其它'),
+(700, '解放军南京政治学院', '江苏', '综合', '其它'),
+(701, '南方医科大学', '广东', '医药', '本科'),
+(702, '中国人民解放军工程兵指挥学院', '江苏', '工科', '其它'),
+(703, '中国人民解放军军事交通学院', '天津', '军事', '其它'),
+(704, '上海金融学院', '上海', '财经', '本科'),
+(705, '石家庄学院', '河北', '师范', '本科'),
+(706, '邯郸学院', '河北', '师范', '本科'),
+(707, '河北金融学院', '河北', '财经', '本科'),
+(708, '菏泽学院', '山东', '综合', '本科'),
+(709, '山东警察学院', '山东', '政法', '本科'),
+(710, '济宁学院', '山东', '------', '本科'),
+(711, '长治学院', '山西', '师范', '本科'),
+(712, '滁州学院', '安徽', '师范', '本科'),
+(713, '宿州学院', '安徽', '师范', '本科'),
+(714, '东华理工大学', '江西', '工科', '本科'),
+(715, '丽水学院', '浙江', '师范', '本科'),
+(716, '湘南学院', '湖南', '工科', '本科'),
+(717, '贺州学院', '广西', '综合', '本科'),
+(718, '钦州学院', '广西', '综合', '本科'),
+(719, '西昌学院', '四川', '综合', '本科'),
+(720, '榆林学院', '陕西', '师范', '本科'),
+(721, '西安医学院', '陕西', '医药', '本科'),
+(722, '西北政法大学', '陕西', '政法', '本科'),
+(723, '安康学院', '陕西', '综合', '本科'),
+(724, '宁夏师范学院', '宁夏', '师范', '本科'),
+(725, '吉林工商学院', '吉林', '财经', '本科'),
+(726, '琼州学院', '海南', '综合', '本科'),
+(727, '三明学院', '福建', '综合', '本科'),
+(728, '龙岩学院', '福建', '师范', '本科'),
+(729, '陇东学院', '甘肃', '师范', '本科'),
+(730, '澳门科技大学', '澳门', '综合', '其它'),
+(731, '澳门旅游学院', '澳门', '------', '------'),
+(732, '河北工程技术高等专科学校', '河北', '工科', '高职专科'),
+(733, '承德民族师范高等专科学校', '河北', '师范', '高职专科'),
+(734, '澳门科技大学', '澳门', '师范', '高职专科'),
+(735, '澳门旅游学院', '辽宁', '师范', '高职专科'),
+(736, '抚顺师范高等专科学校', '辽宁', '师范', '高职专科'),
+(737, '锦州师范高等专科学校', '辽宁', '师范', '高职专科'),
+(738, '铁岭师范高等专科学校', '辽宁', '师范', '高职专科'),
+(739, '哈尔滨医科大学', '黑龙江', '医药', '本科'),
+(740, '大庆师范学院', '黑龙江', '综合', '本科'),
+(741, '哈尔滨金融学院', '黑龙江', '财经', '本科'),
+(742, '上海医疗器械高等专科学校', '上海', '工科', '高职专科'),
+(743, '上海公安高等专科学校', '上海', '政法', '高职专科'),
+(744, '江苏警官学院', '江苏', '政法', '本科'),
+(745, '宁德师范高等专科学校', '福建', '师范', '高职专科'),
+(746, '菏泽医学专科学校', '山东', '医药', '高职专科'),
+(747, '河南牧业经济学院', '河南', '农业', '本科'),
+(748, '郧阳师范高等专科学校', '湖北', '师范', '高职专科'),
+(749, '广东培正学院', '广东', '财经', '本科'),
+(750, '广西民族师范学院', '广西', '师范', '本科'),
+(751, '阿坝师范高等专科学校', '四川', '师范', '高职专科'),
+(752, '兴义民族师范学院', '贵州', '师范', '本科'),
+(753, '昭通师范高等专科学校', '云南', '师范', '高职专科'),
+(754, '普洱学院', '云南', '师范', '本科'),
+(755, '保山学院', '云南', '师范', '本科'),
+(756, '兰州城市学院', '甘肃', '综合', '本科'),
+(757, '和田师范专科学校', '新疆', '师范', '高职专科'),
+(758, '吕梁高等专科学校', '山西', '师范', '高职专科'),
+(759, '广东白云学院', '广东', '工科', '本科'),
+(760, '公安海警高等专科学校', '浙江', '政法', '高职专科'),
+(761, '青岛滨海学院', '山东', '综合', '本科'),
+(762, '江西医学院上饶分院', '江西', '医药', '其它'),
+(763, '景德镇学院', '江西', '综合', '本科'),
+(764, '萍乡学院', '江西', '综合', '本科'),
+(765, '六盘水师范学院', '贵州', '师范', '本科'),
+(766, '新疆工程学院', '新疆', '工科', '本科'),
+(767, '新疆警察学院', '新疆', '政法', '本科'),
+(768, '天津职业大学', '天津', '工科', '高职专科'),
+(769, '抚顺职业技术学院', '辽宁', '综合', '高职专科'),
+(770, '牡丹江大学', '黑龙江', '综合', '高职专科'),
+(771, '镇江市高等专科学校', '江苏', '工科', '高职专科'),
+(772, '南通职业大学', '江苏', '工科', '高职专科'),
+(773, '铁道警察学院', '河南', '政法', '本科'),
+(774, '三亚学院', '海南', '综合', '本科'),
+(775, '广州航海学院', '广东', '工科', '本科'),
+(776, '成都工业学院', '四川', '工科', '本科'),
+(777, '私立华联学院', '广东', '综合', '高职专科'),
+(778, '太原学院', '山西', '工科', '本科'),
+(779, '辽宁农业职业技术学院', '辽宁', '农业', '高职专科'),
+(780, '阜新高等专科学校', '辽宁', '综合', '高职专科'),
+(781, '沙洲职业工学院', '江苏', '工科', '高职专科'),
+(782, '淮南联合大学', '安徽', '工科', '高职专科'),
+(783, '福建商业高等专科学校', '福建', '财经', '高职专科'),
+(784, '黎明职业大学', '福建', '综合', '高职专科'),
+(785, '信阳农林学院', '河南', '农业', '本科'),
+(786, '湖南科技学院', '湖南', '综合', '本科'),
+(787, '河南机电高等专科学校', '河南', '工科', '高职专科'),
+(788, '湖北警官学院', '湖北', '政法', '本科'),
+(789, '鄂州职业大学', '湖北', '工科', '高职专科'),
+(790, '广西体育高等专科学校', '广西', '体育', '高职专科'),
+(791, '北京城市学院', '北京', '综合', '本科'),
+(792, '集宁师范学院', '内蒙古', '师范', '本科'),
+(793, '辽宁警官高等专科学校', '辽宁', '政法', '高职专科'),
+(794, '长春汽车工业高等专科学校', '吉林', '工科', '高职专科'),
+(795, '长春金融高等专科学校', '吉林', '财经', '高职专科'),
+(796, '吉林警察学院', '吉林', '政法', '本科'),
+(797, '黑龙江工业学院', '黑龙江', '工科', '本科'),
+(798, '扬州市职业大学', '江苏', '工科', '高职专科'),
+(799, '江苏理工学院', '江苏', '师范', '本科'),
+(800, '南京森林公安高等专科学校', '江苏', '政法', '高职专科'),
+(801, '浙江水利水电学院', '浙江', '工科', '本科'),
+(802, '福建华南女子职业学院', '福建', '综合', '高职专科'),
+(803, '辽宁交通高等专科学校', '辽宁', '工科', '高职专科'),
+(804, '江西公安专科学校', '江西', '政法', '高职专科'),
+(805, '九江职业大学', '江西', '综合', '高职专科'),
+(806, '新余高等专科学校', '江西', '综合', '高职专科'),
+(807, '湖南财政经济学院', '湖南', '财经', '本科'),
+(808, '湖南警察学院', '湖南', '政法', '本科'),
+(809, '湖南女子职业大学', '湖南', '语言', '高职专科'),
+(810, '柳州师范高等专科学校', '广西', '师范', '高职专科'),
+(811, '南宁学院', '广西', '工科', '本科'),
+(812, '四川旅游学院', '四川', '综合', '本科'),
+(813, '成都纺织高等专科学校', '四川', '工科', '高职专科'),
+(814, '文山学院', '云南', '师范', '本科'),
+(815, '昆明冶金高等专科学校', '云南', '工科', '高职专科'),
+(816, '合作民族师范高等专科学校', '甘肃', '师范', '高职专科'),
+(817, '乌鲁木齐职业大学', '新疆', '综合', '高职专科'),
+(818, '河套学院', '内蒙古', '师范', '本科'),
+(819, '河南财政税务高等专科学校', '河南', '财经', '高职专科'),
+(820, '武汉商学院', '湖北', '财经', '本科'),
+(821, '四川民族学院', '四川', '师范', '本科'),
+(822, '黔南民族医学高等专科学校', '贵州', '医药', '高职专科'),
+(823, '呼和浩特民族学院', '内蒙古', '语言', '本科'),
+(824, '贵州商业高等专科学校', '贵州', '财经', '高职专科'),
+(825, '上海出版印刷高等专科学校', '上海', '工科', '高职专科'),
+(826, '西安航空学院', '陕西', '工科', '本科'),
+(827, '承德石油高等专科学校', '河北', '工科', '高职专科'),
+(828, '仰恩大学', '福建', '综合', '本科'),
+(829, '河南公安高等专科学校', '河南', '政法', '高职专科'),
+(830, '湖北财经高等专科学校', '湖北', '财经', '高职专科'),
+(831, '兰州工业学院', '甘肃', '工科', '本科'),
+(832, '新疆维吾尔医学专科学校', '新疆', '医药', '高职专科'),
+(833, '邢台职业技术学院', '河北', '工科', '高职专科'),
+(834, '长春医学高等专科学校', '吉林', '医药', '高职专科'),
+(835, '桂林师范高等专科学校', '广西', '师范', '高职专科'),
+(836, '桂林航天工业学院', '广西', '工科', '本科'),
+(837, '西安电力高等专科学校', '陕西', '工科', '高职专科'),
+(838, '郑州电力高等专科学校', '河南', '工科', '高职专科'),
+(839, '上海杉达学院', '上海', '财经', '本科'),
+(840, '黄河科技学院', '河南', '工科', '本科'),
+(841, '桂林旅游高等专科学校', '广西', '财经', '高职专科'),
+(842, '民办四川天一学院', '四川', '财经', '高职专科'),
+(843, '浙江树人学院', '浙江', '工科', '本科'),
+(844, '长沙航空职业技术学院', '湖南', '工科', '高职专科'),
+(845, '郑州澍青医学高等专科学校', '河南', '医药', '高职专科'),
+(846, '天津医学高等专科学校', '天津', '医药', '高职专科'),
+(847, '三江学院', '江苏', '综合', '本科'),
+(848, '黑龙江东方学院', '黑龙江', '综合', '本科'),
+(849, '山西警官高等专科学校', '山西', '政法', '高职专科'),
+(850, '连云港师范高等专科学校', '江苏', '师范', '高职专科'),
+(851, '上海应用技术学院', '上海', '工科', '本科'),
+(852, '浙江医药高等专科学校', '浙江', '医药', '高职专科'),
+(853, '泰州学院', '江苏', '师范', '本科'),
+(854, '鹤岗师范高等专科学校', '黑龙江', '师范', '高职专科'),
+(855, '安徽医学高等专科学校', '安徽', '医药', '高职专科'),
+(856, '亳州师范高等专科学校', '安徽', '师范', '高职专科'),
+(857, '邢台医学高等专科学校', '河北', '医药', '高职专科'),
+(858, '湖北中医药高等专科学校', '湖北', '医药', '高职专科'),
+(859, '焦作师范高等专科学校', '河南', '师范', '高职专科'),
+(860, '安徽中医药高等专科学校', '安徽', '医药', '高职专科'),
+(861, '郑州师范高等专科学校', '河南', '师范', '高职专科'),
+(862, '安徽新华学院', '安徽', '工科', '本科'),
+(863, '烟台南山学院', '山东', '工科', '本科'),
+(864, '湘潭大学兴湘学院', '湖南', '综合', '独立学院'),
+(865, '重庆大学城市科技学院', '重庆', '综合', '独立学院'),
+(866, '华南理工大学广州学院', '广东', '工科', '本科'),
+(867, '广州大学华软软件学院', '广东', '工科', '独立学院'),
+(868, '中山大学南方学院', '广东', '综合', '独立学院'),
+(869, '广东外语外贸大学南国商学院', '广东', '财经', '独立学院'),
+(870, '广东商学院华商学院', '广东', '财经', '独立学院'),
+(871, '广东海洋大学寸金学院', '广东', '综合', '独立学院'),
+(872, '华南农业大学珠江学院', '广东', '农业', '独立学院'),
+(873, '湖南师范大学树达学院', '湖南', '师范', '独立学院'),
+(874, '湖南文理学院芙蓉学院', '湖南', '综合', '独立学院'),
+(875, '湖南理工学院南湖学院', '湖南', '工科', '独立学院'),
+(876, '衡阳师范学院南岳学院', '湖南', '师范', '独立学院'),
+(877, '湖南中医药大学湘杏学院', '湖南', '医药', '独立学院'),
+(878, '广东技术师范学院天河学院', '广东', '工科', '独立学院'),
+(879, '东南大学成贤学院', '江苏', '综合', '独立学院'),
+(880, '西安欧亚学院', '陕西', '财经', '本科'),
+(881, '上海建桥学院', '上海', '综合', '本科'),
+(882, '福建师范大学闽南科技学院', '福建', '工科', '独立学院'),
+(883, '福建农林大学东方学院', '福建', '工科', '独立学院'),
+(884, '武汉大学珞珈学院', '湖北', '综合', '独立学院'),
+(885, '沈阳城市建设学院', '辽宁', '工科', '本科'),
+(886, '大连医科大学中山学院', '辽宁', '医药', '独立学院'),
+(887, '辽宁师范大学海华学院', '辽宁', '师范', '独立学院'),
+(888, '湖北工业大学工程技术学院', '湖北', '工科', '独立学院'),
+(889, '武汉科技学院外经贸学院', '湖北', '财经', '独立学院'),
+(890, '湖北民族学院科技学院', '湖北', '工科', '独立学院'),
+(891, '湖北经济学院法商学院', '湖北', '财经', '独立学院'),
+(892, '武汉体育学院体育科技学院', '湖北', '体育', '独立学院'),
+(893, '襄樊学院理工学院', '湖北', '工科', '独立学院'),
+(894, '孝感学院新技术学院', '湖北', '工科', '独立学院'),
+(895, '浙江工业大学之江学院', '浙江', '工科', '独立学院'),
+(896, '浙江师范大学行知学院', '浙江', '综合', '独立学院'),
+(897, '宁波大学科学技术学院', '浙江', '综合', '独立学院'),
+(898, '杭州电子科技大学信息工程学院', '浙江', '工科', '独立学院'),
+(899, '浙江理工大学科技与艺术学院', '浙江', '工科', '独立学院'),
+(900, '浙江海洋学院东海科学技术学院', '浙江', '农业', '独立学院'),
+(901, '浙江林学院天目学院', '浙江', '林业', '独立学院'),
+(902, '温州医学院仁济学院', '浙江', '医药', '独立学院'),
+(903, '浙江中医药大学滨江学院', '浙江', '医药', '独立学院'),
+(904, '湖州师范学院求真学院', '浙江', '师范', '独立学院'),
+(905, '绍兴文理学院元培学院', '浙江', '师范', '独立学院'),
+(906, '温州大学瓯江学院', '浙江', '师范', '独立学院'),
+(907, '浙江工商大学杭州商学院', '浙江', '财经', '独立学院'),
+(908, '嘉兴学院南湖学院', '浙江', '财经', '独立学院'),
+(909, '浙江财经学院东方学院', '浙江', '财经', '独立学院'),
+(910, '大庆石油学院华瑞学院', '黑龙江', '工科', '独立学院'),
+(911, '哈尔滨剑桥学院', '黑龙江', '综合', '本科'),
+(912, '青岛理工大学琴岛学院', '山东', '工科', '独立学院'),
+(913, '中国石油大学胜利学院', '山东', '工科', '独立学院'),
+(914, '赣南师范学院科技学院', '江西', '师范', '独立学院'),
+(915, '福州大学阳光学院', '福建', '工科', '独立学院'),
+(916, '福州大学至诚学院', '福建', '综合', '独立学院'),
+(917, '河南师范大学新联学院', '河南', '师范', '独立学院'),
+(918, '信阳师范学院华锐学院', '河南', '师范', '独立学院'),
+(919, '安阳师范学院人文管理学院', '河南', '师范', '独立学院'),
+(920, '河南理工大学万方科技学院', '河南', '工科', '独立学院'),
+(921, '兰州交通大学博文学院', '甘肃', '工科', '独立学院'),
+(922, '兰州理工大学技术工程学院', '甘肃', '工科', '独立学院'),
+(923, '山西大学商务学院', '山西', '财经', '独立学院'),
+(924, '山西农业大学信息学院', '山西', '农业', '独立学院'),
+(925, '新疆大学科学技术学院', '新疆', '综合', '独立学院'),
+(926, '新疆农业大学科学技术学院', '新疆', '农业', '独立学院'),
+(927, '江南大学太湖学院', '江苏', '综合', '独立学院'),
+(928, '大连艺术学院', '辽宁', '艺术', '本科'),
+(929, '吉林动画学院', '吉林', '艺术', '本科'),
+(930, '安徽工程大学机电学院', '安徽', '工科', '独立学院'),
+(931, '安徽工业大学工商学院', '安徽', '工科', '独立学院'),
+(932, '安徽师范大学皖江学院', '安徽', '师范', '独立学院'),
+(933, '安徽医科大学临床医学院', '安徽', '医药', '独立学院'),
+(934, '阜阳师范学院信息工程学院', '安徽', '综合', '独立学院'),
+(935, '吉林师范大学博达学院', '吉林', '师范', '独立学院'),
+(936, '长春大学旅游学院', '吉林', '综合', '独立学院'),
+(937, '山东科技大学泰山科技学院', '山东', '综合', '独立学院'),
+(938, '上海外国语大学贤达经济人文学院', '上海', '财经', '独立学院'),
+(939, '温州大学城市学院', '浙江', '综合', '独立学院'),
+(940, '广西师范大学漓江学院', '广西', '综合', '独立学院'),
+(941, '广西师范学院师园学院', '广西', '综合', '独立学院'),
+(942, '桂林工学院博文管理学院', '广西', '综合', '独立学院'),
+(943, '南京大学金陵学院', '江苏', '综合', '独立学院'),
+(944, '贵州民族学院人文科技学院', '贵州', '民族', '独立学院'),
+(945, '遵义医学院医学与科技学院', '贵州', '医药', '独立学院'),
+(946, '南京理工大学紫金学院', '江苏', '工科', '独立学院'),
+(947, '广东工业大学华立学院', '广东', '工科', '独立学院'),
+(948, '广州大学松田学院', '广东', '综合', '独立学院'),
+(949, '成都理工大学工程技术学院', '四川', '工科', '独立学院'),
+(950, '四川师范大学成都学院', '四川', '工科', '独立学院'),
+(951, '西安交通大学城市学院', '陕西', '工科', '独立学院'),
+(952, '西北大学现代学院', '陕西', '工科', '独立学院'),
+(953, '南京理工大学泰州科技学院', '江苏', '工科', '独立学院'),
+(954, '东莞理工学院城市学院', '广东', '工科', '独立学院'),
+(955, '北京航空航天大学北海学院', '广西', '综合', '独立学院'),
+(956, '上海师范大学天华学院', '上海', '综合', '独立学院'),
+(957, '中山大学新华学院', '广东', '综合', '独立学院'),
+(958, '四川大学锦城学院', '四川', '综合', '独立学院'),
+(959, '南京师范大学中北学院', '江苏', '综合', '独立学院'),
+(960, '南京医科大学康达学院', '江苏', '综合', '独立学院'),
+(961, '南京中医药大学翰林学院', '江苏', '综合', '独立学院'),
+(962, '苏州大学文正学院', '江苏', '综合', '独立学院'),
+(963, '苏州大学应用技术学院', '江苏', '综合', '独立学院'),
+(964, '苏州科技学院天平学院', '江苏', '综合', '独立学院'),
+(965, '扬州大学广陵学院', '江苏', '综合', '独立学院'),
+(966, '徐州师范大学科文学院', '江苏', '综合', '独立学院'),
+(967, '南京财经大学红山学院', '江苏', '综合', '独立学院'),
+(968, '江苏工业学院怀德学院', '江苏', '综合', '独立学院'),
+(969, '南通大学杏林学院', '江苏', '综合', '独立学院'),
+(970, '青岛工学院', '山东', '综合', '本科'),
+(971, '曲阜师范大学杏坛学院', '山东', '综合', '独立学院'),
+(972, '山东师范大学历山学院', '山东', '综合', '独立学院'),
+(973, '聊城大学东昌学院', '山东', '综合', '独立学院'),
+(974, '商丘学院', '河南', '综合', '本科'),
+(975, '长安大学兴华学院', '陕西', '综合', '独立学院'),
+(976, '华中农业大学楚天学院', '湖北', '农业', '独立学院'),
+(977, '同济大学同科学院', '上海', '综合', '独立学院'),
+(978, '西南财经大学天府学院', '四川', '财经', '独立学院'),
+(979, '四川大学锦江学院', '四川', '综合', '独立学院'),
+(980, '河南财经学院成功学院', '河南', '财经', '独立学院'),
+(981, '西安理工大学高科学院', '陕西', '工科', '独立学院'),
+(982, '西安科技大学高新学院', '陕西', '工科', '独立学院'),
+(983, '四川音乐学院绵阳艺术学院', '四川', '艺术', '独立学院'),
+(984, '西南科技大学城市学院', '安徽', '工科', '独立学院'),
+(985, '福建农林大学金山学院', '福建', '农业', '独立学院'),
+(986, '天津财经大学珠江学院', '天津', '综合', '独立学院'),
+(987, '北京师范大学-香港浸会大学联合国', '广东', '------', '本科'),
+(988, '浙江大学宁波理工学院', '浙江', '工科', '独立学院'),
+(989, '北京师范大学珠海分校', '广东', '综合', '独立学院'),
+(990, '大连理工大学城市学院', '辽宁', '工科', '独立学院'),
+(991, '浙江大学城市学院', '浙江', '工科', '独立学院'),
+(992, '武汉东湖学院', '湖北', '工科', '本科'),
+(993, '汉口学院', '湖北', '工科', '本科'),
+(994, '电子科技大学中山学院', '广东', '综合', '独立学院'),
+(995, '武昌理工学院', '湖北', '工科', '本科'),
+(996, '华中科技大学武昌分校', '湖北', '工科', '独立学院'),
+(997, '北京工业职业技术学院', '北京', '工科', '高职专科'),
+(998, '北京信息职业技术学院', '北京', '工科', '高职专科'),
+(999, '北京电子科技职业学院', '北京', '工科', '高职专科'),
+(1000, '北京科技经营管理学院', '北京', '财经', '高职专科'),
+(1001, '北京吉利大学', '北京', '财经', '高职专科'),
+(1002, '北京农业职业学院', '北京', '农业', '高职专科'),
+(1003, '北京戏曲艺术职业学院', '北京', '艺术', '高职专科'),
+(1004, '北京京北职业技术学院', '北京', '工科', '高职专科'),
+(1005, '北京经贸职业学院', '北京', '财经', '高职专科'),
+(1006, '北京经济技术职业学院', '河北', '财经', '高职专科'),
+(1007, '北京北大方正软件职业技术学院', '河北', '工科', '高职专科'),
+(1008, '北京财贸职业学院', '北京', '财经', '高职专科'),
+(1009, '天津滨海职业学院', '天津', '综合', '高职专科'),
+(1010, '天津工程职业技术学院', '天津', '工科', '高职专科'),
+(1011, '天津现代职业技术学院', '天津', '综合', '高职专科'),
+(1012, '天津轻工职业技术学院', '天津', '综合', '高职专科'),
+(1013, '天津电子信息职业技术学院', '天津', '工科', '高职专科'),
+(1014, '天津公安警官职业学院', '天津', '政法', '高职专科'),
+(1015, '天津机电职业技术学院', '天津', '工科', '高职专科'),
+(1016, '天津渤海职业技术学院', '天津', '综合', '高职专科'),
+(1017, '天津中德职业技术学院', '天津', '工科', '高职专科'),
+(1018, '天津青年职业学院', '天津', '语言', '高职专科'),
+(1019, '天津对外经济贸易职业学院', '天津', '财经', '高职专科'),
+(1020, '天津交通职业学院', '天津', '综合', '高职专科'),
+(1021, '天津开发区职业技术学院', '天津', '综合', '高职专科'),
+(1022, '河北工业职业技术学院', '河北', '工科', '高职专科'),
+(1023, '邯郸职业技术学院', '河北', '综合', '高职专科'),
+(1024, '石家庄职业技术学院', '河北', '工科', '高职专科'),
+(1025, '张家口职业技术学院', '河北', '综合', '高职专科'),
+(1026, '沧州职业技术学院', '河北', '工科', '高职专科'),
+(1027, '石家庄铁路职业技术学院', '河北', '工科', '高职专科'),
+(1028, '河北能源职业技术学院', '河北', '工科', '高职专科'),
+(1029, '保定职业技术学院', '河北', '综合', '高职专科'),
+(1030, '河北建材职业技术学院', '河北', '工科', '高职专科'),
+(1031, '河北政法职业学院', '河北', '政法', '高职专科'),
+(1032, '河北石油职业技术学院', '河北', '工科', '高职专科'),
+(1033, '衡水职业技术学院', '河北', '财经', '高职专科'),
+(1034, '秦皇岛职业技术学院', '河北', '工科', '高职专科'),
+(1035, '唐山职业技术学院', '河北', '医药', '高职专科'),
+(1036, '唐山工业职业技术学院', '河北', '工科', '高职专科'),
+(1037, '石家庄工程职业学院', '河北', '工科', '高职专科'),
+(1038, '石家庄法商职业学院', '河北', '财经', '高职专科'),
+(1039, '河北省艺术职业学院', '河北', '综合', '高职专科'),
+(1040, '河北交通职业技术学院', '河北', '工科', '高职专科'),
+(1041, '河北化工医药职业技术学院', '河北', '工科', '高职专科'),
+(1042, '秦皇岛外国语职业学院', '河北', '语言', '高职专科'),
+(1043, '石家庄信息工程职业学院', '河北', '工科', '高职专科'),
+(1044, '石家庄外经贸职业学院', '河北', '财经', '高职专科'),
+(1045, '河北美术学院', '河北', '艺术', '本科'),
+(1046, '河北京都高尔夫职业学院', '河北', '综合', '其它'),
+(1047, '山西建筑职业技术学院', '山西', '工科', '高职专科'),
+(1048, '山西工程职业技术学院', '山西', '工科', '高职专科'),
+(1049, '晋城职业技术学院', '山西', '工科', '高职专科'),
+(1050, '北岳职业技术学院', '山西', '工科', '高职专科'),
+(1051, '山西药科职业学院', '山西', '医药', '高职专科'),
+(1052, '山西交通职业技术学院', '山西', '工科', '高职专科'),
+(1053, '山西兴华职业学院', '山西', '工科', '高职专科'),
+(1054, '长治职业技术学院', '山西', '工科', '高职专科'),
+(1055, '山西艺术职业学院', '山西', '艺术', '高职专科'),
+(1056, '阳泉职业技术学院', '山西', '工科', '高职专科'),
+(1057, '山西水利职业技术学院', '山西', '工科', '高职专科'),
+(1058, '山西林业职业技术学院', '山西', '林业', '高职专科'),
+(1059, '山西财贸职业技术学院', '山西', '财经', '高职专科'),
+(1060, '山西戏剧职业学院', '山西', '艺术', '高职专科'),
+(1061, '山西机电职业技术学院', '山西', '工科', '高职专科'),
+(1062, '临汾职业技术学院', '山西', '农业', '高职专科'),
+(1063, '山西综合职业技术学院', '山西', '工科', '高职专科'),
+(1064, '太原城市职业技术学院', '山西', '工科', '高职专科'),
+(1065, '山西煤炭职业技术学院', '山西', '工科', '高职专科'),
+(1066, '包头职业技术学院', '内蒙古', '工科', '高职专科'),
+(1067, '内蒙古建筑职业技术学院', '内蒙古', '工科', '高职专科'),
+(1068, '兴安职业技术学院', '内蒙古', '师范', '高职专科'),
+(1069, '内蒙古警察职业学院', '内蒙古', '政法', '高职专科'),
+(1070, '内蒙古体育职业学院', '内蒙古', '体育', '高职专科'),
+(1071, '包头轻工职业技术学院', '内蒙古', '工科', '高职专科'),
+(1072, '呼和浩特职业学院', '内蒙古', '综合', '高职专科'),
+(1073, '渤海船舶职业学院', '辽宁', '工科', '高职专科'),
+(1074, '盘锦职业技术学院', '辽宁', '综合', '高职专科'),
+(1075, '辽宁金融职业学院', '辽宁', '财经', '高职专科'),
+(1076, '大连职业技术学院', '辽宁', '综合', '高职专科'),
+(1077, '大连商务职业学院', '辽宁', '财经', '高职专科'),
+(1078, '辽阳职业技术学院', '辽宁', '综合', '高职专科'),
+(1079, '营口职业技术学院', '辽宁', '综合', '高职专科'),
+(1080, '郑州幼儿师范高等专科学校', '河南', '师范', '高职专科'),
+(1081, '福建幼儿师范高等专科学校', '福建', '师范', '高职专科'),
+(1082, '辽宁石化职业技术学院', '辽宁', '工科', '高职专科'),
+(1083, '辽宁经济职业技术学院', '辽宁', '综合', '高职专科'),
+(1084, '辽宁机电职业技术学院', '辽宁', '工科', '高职专科'),
+(1085, '辽宁广告职业学院', '辽宁', '艺术', '高职专科'),
+(1086, '辽宁信息职业技术学院', '辽宁', '工科', '高职专科'),
+(1087, '辽宁体育运动职业技术学院', '辽宁', '体育', '高职专科'),
+(1088, '辽宁林业职业技术学院', '辽宁', '林业', '高职专科'),
+(1089, '沈阳航空职业技术学院', '辽宁', '综合', '高职专科'),
+(1090, '沈阳职业技术学院', '辽宁', '综合', '高职专科'),
+(1091, '吉林交通职业技术学院', '吉林', '工科', '高职专科'),
+(1092, '辽源职业技术学院', '吉林', '工科', '高职专科'),
+(1093, '吉林对外经贸职业学院', '吉林', '财经', '其它'),
+(1094, '长春东方职业学院', '吉林', '医药', '高职专科'),
+(1095, '吉林电子信息职业技术学院', '吉林', '工科', '高职专科'),
+(1096, '吉林工业职业技术学院', '吉林', '工科', '高职专科'),
+(1097, '吉林司法警官职业学院', '吉林', '政法', '高职专科'),
+(1098, '吉林农业工程职业技术学院', '吉林', '农业', '高职专科'),
+(1099, '长春职业技术学院', '吉林', '综合', '高职专科'),
+(1100, '黑龙江建筑职业技术学院', '黑龙江', '工科', '高职专科'),
+(1101, '伊春职业学院', '黑龙江', '综合', '高职专科'),
+(1102, '黑龙江司法警官职业学院', '黑龙江', '政法', '高职专科'),
+(1103, '齐齐哈尔工程学院', '黑龙江', '综合', '本科'),
+(1104, '黑龙江林业职业技术学院', '黑龙江', '林业', '高职专科'),
+(1105, '黑龙江农业职业技术学院', '黑龙江', '农业', '高职专科'),
+(1106, '黑龙江农业工程职业学院', '黑龙江', '农业', '高职专科'),
+(1107, '大庆职业学院', '黑龙江', '综合', '高职专科'),
+(1108, '黑龙江农垦职业学院', '黑龙江', '农业', '高职专科'),
+(1109, '哈尔滨职业技术学院', '黑龙江', '综合', '高职专科'),
+(1110, '哈尔滨电力职业技术学院', '黑龙江', '工科', '高职专科'),
+(1111, '哈尔滨铁道职业技术学院', '黑龙江', '工科', '高职专科'),
+(1112, '大兴安岭职业学院', '黑龙江', '综合', '高职专科'),
+(1113, '黑龙江畜牧兽医职业学院', '黑龙江', '农业', '高职专科'),
+(1114, '黑龙江农业经济职业学院', '黑龙江', '农业', '高职专科'),
+(1115, '黑龙江艺术职业学院', '黑龙江', '艺术', '高职专科'),
+(1116, '哈尔滨华夏计算机职业技术学院', '黑龙江', '工科', '高职专科'),
+(1117, '黑龙江职业学院', '黑龙江', '综合', '高职专科'),
+(1118, '上海建峰职业技术学院', '上海', '综合', '高职专科'),
+(1119, '上海科学技术职业学院', '上海', '综合', '高职专科'),
+(1120, '上海海事职业技术学院', '上海', '工科', '高职专科'),
+(1121, '上海电子信息职业技术学院', '上海', '工科', '高职专科'),
+(1122, '上海交通职业技术学院', '上海', '工科', '高职专科'),
+(1123, '上海城市管理职业技术学院', '上海', '工科', '高职专科'),
+(1124, '上海行健职业学院', '上海', '财经', '高职专科'),
+(1125, '上海农林职业技术学院', '上海', '农业', '高职专科'),
+(1126, '民办明达职业技术学院', '江苏', '语言', '高职专科'),
+(1127, '连云港职业技术学院', '江苏', '工科', '高职专科'),
+(1128, '南京工业职业技术学院', '江苏', '工科', '高职专科'),
+(1129, '徐州建筑职业技术学院', '江苏', '工科', '高职专科'),
+(1130, '泰州职业技术学院', '江苏', '工科', '高职专科'),
+(1131, '无锡职业技术学院', '江苏', '工科', '高职专科'),
+(1132, '南通纺织职业技术学院', '江苏', '工科', '高职专科'),
+(1133, '苏州工艺美术职业技术学院', '江苏', '艺术', '高职专科'),
+(1134, '常州信息职业技术学院', '江苏', '工科', '高职专科'),
+(1135, '南通航运职业技术学院', '江苏', '工科', '高职专科'),
+(1136, '无锡商业职业技术学院', '江苏', '财经', '高职专科'),
+(1137, '南京交通职业技术学院', '江苏', '工科', '高职专科'),
+(1138, '淮安信息职业技术学院', '江苏', '工科', '高职专科'),
+(1139, '江苏畜牧兽医职业技术学院', '江苏', '农业', '高职专科'),
+(1140, '常州纺织服装职业技术学院', '江苏', '工科', '高职专科'),
+(1141, '苏州农业职业技术学院', '江苏', '农业', '高职专科'),
+(1142, '苏州工业园区职业技术学院', '江苏', '工科', '高职专科'),
+(1143, '南京化工职业技术学院', '江苏', '工科', '高职专科'),
+(1144, '正德职业技术学院', '江苏', '工科', '高职专科'),
+(1145, '无锡南洋职业技术学院', '江苏', '工科', '高职专科'),
+(1146, '钟山职业技术学院', '江苏', '工科', '高职专科'),
+(1147, '炎黄职业技术学院', '江苏', '工科', '高职专科'),
+(1148, '金肯职业技术学院', '江苏', '财经', '高职专科'),
+(1149, '紫琅职业技术学院', '江苏', '工科', '高职专科'),
+(1150, '九州职业技术学院', '江苏', '工科', '高职专科'),
+(1151, '硅湖职业技术学院', '江苏', '工科', '高职专科'),
+(1152, '江阴职业技术学院', '江苏', '工科', '高职专科'),
+(1153, '宿迁职业技术学院', '江苏', '工科', '高职专科'),
+(1154, '南京信息职业技术学院', '江苏', '工科', '高职专科'),
+(1155, '常州工程职业技术学院', '江苏', '工科', '高职专科'),
+(1156, '常州轻工职业技术学院', '江苏', '工科', '高职专科'),
+(1157, '常州机电职业技术学院', '江苏', '工科', '高职专科'),
+(1158, '徐州工业职业技术学院', '江苏', '工科', '高职专科'),
+(1159, '江苏食品职业技术学院', '江苏', '工科', '高职专科'),
+(1160, '江苏农林职业技术学院', '江苏', '农业', '高职专科'),
+(1161, '江苏信息职业技术学院', '江苏', '工科', '高职专科'),
+(1162, '南京特殊教育职业技术学院', '江苏', '师范', '高职专科'),
+(1163, '浙江艺术职业学院', '浙江', '艺术', '高职专科'),
+(1164, '浙江交通职业技术学院', '浙江', '工科', '高职专科'),
+(1165, '杭州职业技术学院', '浙江', '综合', '高职专科'),
+(1166, '义乌工商职业技术学院', '浙江', '综合', '高职专科'),
+(1167, '宁波职业技术学院', '浙江', '综合', '高职专科'),
+(1168, '温州职业技术学院', '浙江', '综合', '高职专科'),
+(1169, '浙江工商职业技术学院', '浙江', '财经', '高职专科'),
+(1170, '浙江工贸职业技术学院', '浙江', '综合', '高职专科'),
+(1171, '台州职业技术学院', '浙江', '工科', '高职专科'),
+(1172, '浙江机电职业技术学院', '浙江', '工科', '高职专科'),
+(1173, '浙江商业职业技术学院', '浙江', '财经', '高职专科'),
+(1174, '浙江警官职业学院', '浙江', '政法', '高职专科'),
+(1175, '浙江工业职业技术学院', '浙江', '综合', '高职专科'),
+(1176, '浙江旅游职业学院', '浙江', '财经', '高职专科'),
+(1177, '浙江金融职业学院', '浙江', '财经', '高职专科'),
+(1178, '浙江经济职业技术学院', '浙江', '财经', '高职专科'),
+(1179, '浙江建设职业技术学院', '浙江', '工科', '高职专科'),
+(1180, '浙江经贸职业技术学院', '浙江', '财经', '高职专科'),
+(1181, '浙江育英职业技术学院', '浙江', '财经', '高职专科'),
+(1182, '绍兴托普信息职业技术学院', '浙江', '工科', '高职专科'),
+(1183, '嘉兴职业技术学院', '浙江', '综合', '高职专科'),
+(1184, '湖州职业技术学院', '浙江', '综合', '高职专科'),
+(1185, '衢州职业技术学院', '浙江', '工科', '高职专科'),
+(1186, '丽水职业技术学院', '浙江', '综合', '高职专科'),
+(1187, '浙江东方职业技术学院', '浙江', '综合', '高职专科'),
+(1188, '安徽职业技术学院', '安徽', '工科', '高职专科'),
+(1189, '民办三联职业技术学院', '安徽', '综合', '其它'),
+(1190, '淮北职业技术学院', '安徽', '工科', '高职专科'),
+(1191, '芜湖职业技术学院', '安徽', '工科', '高职专科'),
+(1192, '民办万博科技职业学院', '安徽', '工科', '高职专科'),
+(1193, '铜陵职业技术学院', '安徽', '工科', '高职专科'),
+(1194, '安徽商贸职业技术学院', '安徽', '财经', '高职专科'),
+(1195, '安徽警官职业学院', '安徽', '政法', '高职专科'),
+(1196, '安徽水利水电职业技术学院', '安徽', '工科', '高职专科'),
+(1197, '淮南职业技术学院', '安徽', '工科', '高职专科'),
+(1198, '安徽电子信息职业技术学院', '安徽', '工科', '高职专科'),
+(1199, '安徽工贸职业技术学院', '安徽', '工科', '高职专科'),
+(1200, '安徽工业经济职业技术学院', '安徽', '财经', '高职专科'),
+(1201, '安徽交通职业技术学院', '安徽', '工科', '高职专科'),
+(1202, '安徽体育运动职业技术学院', '安徽', '体育', '高职专科'),
+(1203, '阜阳职业技术学院', '安徽', '工科', '高职专科'),
+(1204, '合肥通用职业技术学院', '安徽', '工科', '高职专科'),
+(1205, '六安职业技术学院', '安徽', '工科', '高职专科'),
+(1206, '安徽文达信息工程学院', '安徽', '工科', '本科'),
+(1207, '民办合肥经济技术职业学院', '安徽', '财经', '高职专科'),
+(1208, '宿州职业技术学院', '安徽', '工科', '高职专科'),
+(1209, '安徽广播影视职业技术学院', '安徽', '艺术', '高职专科'),
+(1210, '民办安徽明星科技职业学院', '安徽', '综合', '高职专科'),
+(1211, '池州职业技术学院', '安徽', '工科', '高职专科'),
+(1212, '滁州职业技术学院', '安徽', '工科', '高职专科'),
+(1213, '宣城职业技术学院', '安徽', '工科', '高职专科'),
+(1214, '安徽外国语学院', '安徽', '语言', '本科'),
+(1215, '合肥职业技术学院', '安徽', '工科', '高职专科'),
+(1216, '福建船政交通职业学院', '福建', '工科', '高职专科'),
+(1217, '福州职业技术学院', '福建', '综合', '高职专科'),
+(1218, '福州英华职业学院', '福建', '语言', '高职专科'),
+(1219, '厦门华夏职业学院', '福建', '综合', '高职专科'),
+(1220, '闽南理工学院', '福建', '工科', '本科'),
+(1221, '漳州职业技术学院', '福建', '工科', '高职专科'),
+(1222, '泉州华光摄影艺术职业学院', '福建', '综合', '高职专科'),
+(1223, '福建信息职业技术学院', '福建', '工科', '高职专科'),
+(1224, '福建水利电力职业技术学院', '福建', '工科', '高职专科'),
+(1225, '福建电力职业技术学院', '福建', '工科', '高职专科'),
+(1226, '福建林业职业技术学院', '福建', '林业', '高职专科'),
+(1227, '福建农业职业技术学院', '福建', '农业', '高职专科'),
+(1228, '厦门海洋职业技术学院', '福建', '农业', '高职专科'),
+(1229, '九江职业技术学院', '江西', '综合', '高职专科'),
+(1230, '江西工业职业技术学院', '江西', '综合', '高职专科'),
+(1231, '江西科技学院', '江西', '综合', '本科'),
+(1232, '江西司法警官职业学院', '江西', '政法', '高职专科'),
+(1233, '江西电力职业技术学院', '江西', '工科', '高职专科'),
+(1234, '江西旅游商贸职业学院', '江西', '财经', '高职专科'),
+(1235, '江西机电职业技术学院', '江西', '工科', '高职专科'),
+(1236, '江西陶瓷工艺美术职业技术学院', '江西', '艺术', '高职专科'),
+(1237, '江西环境工程职业学院', '江西', '林业', '高职专科'),
+(1238, '江西信息应用职业技术学院', '江西', '工科', '高职专科'),
+(1239, '江西工业工程职业技术学院', '江西', '工科', '高职专科'),
+(1240, '江西交通职业技术学院', '江西', '工科', '高职专科'),
+(1241, '江西艺术职业学院', '江西', '艺术', '高职专科'),
+(1242, '江西财经职业学院', '河南', '财经', '高职专科'),
+(1243, '江西应用技术职业学院', '江西', '工科', '高职专科'),
+(1244, '鹰潭职业技术学院', '江西', '综合', '高职专科'),
+(1245, '江西现代职业技术学院', '江西', '工科', '高职专科'),
+(1246, '山东商业职业技术学院', '山东', '财经', '高职专科'),
+(1247, '民办山东万杰医学高等专科学校', '山东', '医药', '本科'),
+(1248, '日照职业技术学院', '山东', '综合', '高职专科'),
+(1249, '山东水利职业学院', '山东', '工科', '高职专科'),
+(1250, '济南铁道职业技术学院', '山东', '工科', '高职专科'),
+(1251, '莱芜职业技术学院', '山东', '综合', '高职专科'),
+(1252, '威海职业学院', '山东', '综合', '高职专科'),
+(1253, '青岛职业技术学院', '山东', '综合', '高职专科'),
+(1254, '聊城职业技术学院', '山东', '综合', '高职专科'),
+(1255, '济宁职业技术学院', '山东', '综合', '高职专科'),
+(1256, '山东劳动职业技术学院', '山东', '工科', '高职专科'),
+(1257, '曲阜远东职业技术学院', '山东', '综合', '高职专科'),
+(1258, '烟台职业学院', '山东', '综合', '高职专科'),
+(1259, '滨州职业学院', '山东', '综合', '高职专科'),
+(1260, '潍坊职业学院', '山东', '综合', '高职专科'),
+(1261, '东营职业学院', '山东', '综合', '高职专科'),
+(1262, '山东服装职业学院', '山东', '综合', '高职专科'),
+(1263, '德州科技职业学院', '山东', '综合', '高职专科'),
+(1264, '山东力明科技职业学院', '山东', '综合', '高职专科'),
+(1265, '山东畜牧兽医职业学院', '山东', '农业', '高职专科'),
+(1266, '山东圣翰财贸职业学院', '山东', '综合', '高职专科'),
+(1267, '淄博职业学院', '山东', '综合', '高职专科'),
+(1268, '山东交通职业学院', '山东', '工科', '高职专科'),
+(1269, '山东信息职业技术学院', '山东', '工科', '高职专科'),
+(1270, '山东外贸职业学院', '山东', '财经', '高职专科'),
+(1271, '青岛酒店管理职业技术学院', '山东', '财经', '高职专科'),
+(1272, '山东大王职业学院', '山东', '综合', '高职专科'),
+(1273, '青岛飞洋职业技术学院', '山东', '综合', '高职专科'),
+(1274, '河南职业技术学院', '河南', '工科', '高职专科'),
+(1275, '漯河职业技术学院', '河南', '工科', '高职专科'),
+(1276, '黄河水利职业技术学院', '河南', '工科', '高职专科'),
+(1277, '三门峡职业技术学院', '河南', '工科', '高职专科'),
+(1278, '郑州铁路职业技术学院', '河南', '工科', '高职专科'),
+(1279, '濮阳职业技术学院', '河南', '工科', '高职专科'),
+(1280, '许昌职业技术学院', '河南', '工科', '高职专科'),
+(1281, '鹤壁职业技术学院', '河南', '工科', '高职专科'),
+(1282, '商丘职业技术学院', '河南', '财经', '高职专科'),
+(1283, '河南工业职业技术学院', '河南', '工科', '高职专科'),
+(1284, '河南司法警官职业学院', '河南', '政法', '高职专科'),
+(1285, '平顶山工业职业技术学院', '河南', '工科', '高职专科'),
+(1286, '济源职业技术学院', '河南', '工科', '高职专科'),
+(1287, '周口职业技术学院', '河南', '工科', '高职专科'),
+(1288, '武汉职业技术学院', '湖北', '工科', '高职专科'),
+(1289, '武汉船舶职业技术学院', '湖北', '工科', '高职专科'),
+(1290, '长江职业学院', '湖北', '工科', '高职专科'),
+(1291, '黄冈职业技术学院', '湖北', '工科', '高职专科'),
+(1292, '十堰职业技术学院', '湖北', '工科', '高职专科'),
+(1293, '襄阳职业技术学院', '湖北', '工科', '高职专科'),
+(1294, '恩施职业技术学院', '湖北', '工科', '高职专科'),
+(1295, '湖北交通职业技术学院', '湖北', '工科', '高职专科'),
+(1296, '湖北轻工职业技术学院', '湖北', '工科', '高职专科'),
+(1297, '仙桃职业学院', '湖北', '工科', '高职专科'),
+(1298, '荆州职业技术学院', '湖北', '工科', '高职专科'),
+(1299, '武汉工程职业技术学院', '湖北', '工科', '高职专科'),
+(1300, '武汉航海职业技术学院', '湖北', '工科', '高职专科'),
+(1301, '武汉电力职业技术学院', '湖北', '工科', '高职专科'),
+(1302, '湖北城市建设职业技术学院', '湖北', '工科', '高职专科'),
+(1303, '湖北水利水电职业技术学院', '湖北', '工科', '高职专科'),
+(1304, '武汉外语外事职业学院', '湖北', '工科', '高职专科'),
+(1305, '武汉商贸职业学院', '湖北', '财经', '高职专科'),
+(1306, '武汉科技职业学院', '湖北', '工科', '高职专科'),
+(1307, '武汉信息传播职业技术学院', '湖北', '工科', '高职专科'),
+(1308, '湖北开放职业学院', '湖北', '工科', '高职专科'),
+(1309, '武汉警官职业学院', '湖北', '政法', '高职专科'),
+(1310, '随州职业技术学院', '湖北', '工科', '高职专科'),
+(1311, '长沙民政职业技术学院', '湖南', '工科', '高职专科'),
+(1312, '湖南工业职业技术学院', '湖南', '工科', '高职专科'),
+(1313, '湖南交通职业技术学院', '湖南', '工科', '高职专科'),
+(1314, '怀化医学高等专科学校', '湖南', '医药', '高职专科'),
+(1315, '湖南科技职业学院', '湖南', '综合', '高职专科'),
+(1316, '湖南环境生物职业技术学院', '湖南', '农业', '高职专科'),
+(1317, '湖南铁道职业技术学院', '湖南', '工科', '高职专科'),
+(1318, '永州职业技术学院', '湖南', '综合', '高职专科'),
+(1319, '湖南大众传媒职业技术学院', '湖南', '综合', '高职专科'),
+(1320, '长沙通信职业技术学院', '湖南', '工科', '高职专科'),
+(1321, '湘潭职业技术学院', '湖南', '综合', '高职专科'),
+(1322, '湖南商务职业技术学院', '湖南', '财经', '高职专科'),
+(1323, '郴州职业技术学院', '湖南', '综合', '高职专科'),
+(1324, '娄底职业技术学院', '湖南', '综合', '高职专科'),
+(1325, '张家界航空工业职业技术学院', '湖南', '工科', '高职专科'),
+(1326, '湖南工程职业技术学院', '湖南', '工科', '高职专科'),
+(1327, '长沙环境保护职业技术学院', '湖南', '工科', '高职专科'),
+(1328, '湖南艺术职业学院', '湖南', '艺术', '高职专科'),
+(1329, '湖南体育职业学院', '湖南', '体育', '高职专科'),
+(1330, '湖南机电职业技术学院', '湖南', '工科', '高职专科'),
+(1331, '广州民航职业技术学院', '广东', '工科', '高职专科'),
+(1332, '广东轻工职业技术学院', '广东', '工科', '高职专科'),
+(1333, '顺德职业技术学院', '广东', '综合', '高职专科'),
+(1334, '广东交通职业技术学院', '广东', '工科', '高职专科'),
+(1335, '番禺职业技术学院', '广东', '综合', '高职专科'),
+(1336, '广东水利电力职业技术学院', '广东', '工科', '高职专科'),
+(1337, '深圳信息职业技术学院', '广东', '综合', '高职专科'),
+(1338, '深圳职业技术学院', '广东', '综合', '高职专科'),
+(1339, '潮汕职业技术学院', '广东', '综合', '高职专科'),
+(1340, '广东松山职业技术学院', '广东', '工科', '高职专科'),
+(1341, '广东农工商职业技术学院', '广东', '综合', '高职专科'),
+(1342, '佛山职业技术学院', '广东', '综合', '高职专科'),
+(1343, '广东新安职业技术学院', '广东', '综合', '高职专科'),
+(1344, '广东省外语艺术职业学院', '广东', '综合', '高职专科'),
+(1345, '广东机电职业技术学院', '广东', '工科', '高职专科'),
+(1346, '广东建设职业技术学院', '广东', '工科', '高职专科'),
+(1347, '广东职业技术学院', '广东', '工科', '高职专科'),
+(1348, '广东女子职业技术学院', '广东', '综合', '高职专科'),
+(1349, '广东岭南职业技术学院', '广东', '综合', '高职专科'),
+(1350, '汕尾职业技术学院', '广东', '综合', '高职专科'),
+(1351, '河源职业技术学院', '广东', '综合', '高职专科'),
+(1352, '罗定职业技术学院', '广东', '综合', '高职专科'),
+(1353, '阳江职业技术学院', '广东', '综合', '高职专科'),
+(1354, '广东财经职业学院', '广东', '财经', '高职专科'),
+(1355, '揭阳职业技术学院', '广东', '综合', '高职专科'),
+(1356, '广东邮电职业技术学院', '广东', '工科', '高职专科'),
+(1357, '汕头职业技术学院', '广东', '综合', '高职专科'),
+(1358, '清远职业技术学院', '广东', '综合', '高职专科'),
+(1359, '广东亚视演艺职业学院', '广东', '艺术', '高职专科'),
+(1360, '广东司法警官职业学院', '广东', '政法', '高职专科'),
+(1361, '广东建华职业学院', '广东', '综合', '其它'),
+(1362, '广东工贸职业技术学院', '广东', '工科', '高职专科'),
+(1363, '广州康大职业技术学院', '广东', '工科', '高职专科'),
+(1364, '南海东软信息技术职业学院', '广东', '工科', '高职专科'),
+(1365, '珠海艺术职业学院', '广东', '艺术', '高职专科'),
+(1366, '广西职业技术学院', '广西', '农业', '高职专科'),
+(1367, '广西机电职业技术学院', '广西', '工科', '高职专科'),
+(1368, '柳州职业技术学院', '广西', '综合', '高职专科'),
+(1369, '南宁职业技术学院', '广西', '综合', '高职专科'),
+(1370, '广西建设职业技术学院', '广西', '工科', '高职专科'),
+(1371, '广西水利电力职业技术学院', '广西', '工科', '高职专科'),
+(1372, '广西交通职业技术学院', '广西', '工科', '高职专科'),
+(1373, '广西农业职业技术学院', '广西', '农业', '高职专科'),
+(1374, '广西生态工程职业技术学院', '广西', '林业', '高职专科'),
+(1375, '广西国际商务职业技术学院', '广西', '政法', '高职专科'),
+(1376, '海南职业技术学院', '海南', '综合', '高职专科'),
+(1377, '重庆电子职业技术学院', '重庆', '综合', '高职专科'),
+(1378, '重庆工业职业技术学院', '重庆', '工科', '高职专科'),
+(1379, '重庆工程职业技术学院', '重庆', '工科', '高职专科'),
+(1380, '重庆警察学院', '重庆', '政法', '本科'),
+(1381, '重庆信息技术职业学院', '重庆', '工科', '高职专科'),
+(1382, '重庆海联职业技术学院', '重庆', '综合', '高职专科'),
+(1383, '重庆光彩职业技术学院', '重庆', '综合', '高职专科'),
+(1384, '重庆巴渝职业技术学院', '重庆', '综合', '高职专科'),
+(1385, '重庆三峡职业学院', '重庆', '综合', '高职专科'),
+(1386, '成都航空职业技术学院', '四川', '综合', '高职专科'),
+(1387, '四川交通职业技术学院', '四川', '工科', '高职专科'),
+(1388, '达州职业技术学院', '四川', '综合', '高职专科'),
+(1389, '四川机电职业技术学院', '四川', '工科', '高职专科'),
+(1390, '四川工程职业技术学院', '四川', '工科', '高职专科'),
+(1391, '四川电力职业技术学院', '四川', '工科', '高职专科'),
+(1392, '绵阳职业技术学院', '四川', '工科', '高职专科'),
+(1393, '四川工商职业技术学院', '四川', '工科', '高职专科'),
+(1394, '四川建筑职业技术学院', '四川', '工科', '高职专科'),
+(1395, '四川国际标榜职业学院', '四川', '艺术', '高职专科'),
+(1396, '成都农业科技职业学院', '四川', '农业', '高职专科'),
+(1397, '宜宾职业技术学院', '四川', '综合', '高职专科'),
+(1398, '成都艺术职业学院', '四川', '艺术', '高职专科'),
+(1399, '四川托普信息技术职业学院', '四川', '工科', '高职专科'),
+(1400, '四川职业技术学院', '四川', '综合', '高职专科'),
+(1401, '眉山职业技术学院', '四川', '综合', '高职专科');
+INSERT INTO `school` (`id`, `name`, `location`, `type`, `properties`) VALUES
+(1402, '泸州职业技术学院', '四川', '综合', '高职专科'),
+(1403, '乐山职业技术学院', '四川', '综合', '高职专科'),
+(1404, '雅安职业技术学院', '四川', '综合', '高职专科'),
+(1405, '贵州航天职业技术学院', '贵州', '工科', '高职专科'),
+(1406, '贵州交通职业技术学院', '贵州', '工科', '高职专科'),
+(1407, '贵州电子信息职业技术学院', '贵州', '工科', '高职专科'),
+(1408, '贵州警官职业学院', '贵州', '政法', '高职专科'),
+(1409, '安顺职业技术学院', '贵州', '综合', '高职专科'),
+(1410, '黔东南民族职业技术学院', '贵州', '综合', '高职专科'),
+(1411, '黔南民族职业技术学院', '贵州', '综合', '高职专科'),
+(1412, '遵义职业技术学院', '贵州', '综合', '高职专科'),
+(1413, '贵州工业职业技术学院', '贵州', '工科', '高职专科'),
+(1414, '贵州电力职业技术学院', '贵州', '工科', '高职专科'),
+(1415, '六盘水职业技术学院', '贵州', '综合', '高职专科'),
+(1416, '铜仁职业技术学院', '贵州', '综合', '高职专科'),
+(1417, '云南国土资源职业学院', '云南', '工科', '高职专科'),
+(1418, '云南交通职业技术学院', '云南', '工科', '高职专科'),
+(1419, '昆明艺术职业学院', '云南', '艺术', '高职专科'),
+(1420, '西双版纳职业技术学院', '云南', '综合', '高职专科'),
+(1421, '玉溪农业职业技术学院', '云南', '农业', '高职专科'),
+(1422, '昆明工业职业技术学院', '云南', '工科', '高职专科'),
+(1423, '云南能源职业技术学院', '云南', '工科', '高职专科'),
+(1424, '云南农业职业技术学院', '云南', '农业', '高职专科'),
+(1425, '云南司法警官职业学院', '云南', '政法', '高职专科'),
+(1426, '陕西工业职业技术学院', '陕西', '工科', '高职专科'),
+(1427, '杨凌职业技术学院', '陕西', '农业', '高职专科'),
+(1428, '西安外事学院', '陕西', '财经', '本科'),
+(1429, '陕西财经职业技术学院', '陕西', '财经', '高职专科'),
+(1430, '陕西国防工业职业技术学院', '陕西', '工科', '高职专科'),
+(1431, '陕西交通职业技术学院', '陕西', '工科', '高职专科'),
+(1432, '陕西能源职业技术学院', '陕西', '工科', '高职专科'),
+(1433, '陕西职业技术学院', '陕西', '财经', '高职专科'),
+(1434, '西安航空职业技术学院', '陕西', '工科', '高职专科'),
+(1435, '西安高新科技职业学院', '陕西', '工科', '高职专科'),
+(1436, '陕西服装工程学院', '陕西', '工科', '本科'),
+(1437, '西安城市建设职业学院', '陕西', '工科', '高职专科'),
+(1438, '兰州石化职业技术学院', '甘肃', '工科', '高职专科'),
+(1439, '甘肃工业职业技术学院', '甘肃', '工科', '高职专科'),
+(1440, '甘肃建筑职业技术学院', '甘肃', '工科', '高职专科'),
+(1441, '甘肃警察职业学院', '甘肃', '政法', '高职专科'),
+(1442, '甘肃林业职业技术学院', '甘肃', '林业', '高职专科'),
+(1443, '酒泉职业技术学院', '甘肃', '综合', '高职专科'),
+(1444, '兰州外语职业学院', '甘肃', '综合', '高职专科'),
+(1445, '兰州职业技术学院', '甘肃', '综合', '高职专科'),
+(1446, '青海警官职业学院', '青海', '政法', '高职专科'),
+(1447, '青海畜牧兽医职业技术学院', '青海', '农业', '高职专科'),
+(1448, '青海交通职业技术学院', '青海', '工科', '高职专科'),
+(1449, '青海建筑职业技术学院', '青海', '工科', '高职专科'),
+(1450, '宁夏理工学院', '宁夏', '综合', '本科'),
+(1451, '宁夏工业职业学院', '青海', '工科', '高职专科'),
+(1452, '宁夏职业技术学院', '青海', '综合', '高职专科'),
+(1453, '宁夏财经职业技术学院', '青海', '财经', '高职专科'),
+(1454, '宁夏司法警官职业学院', '青海', '政法', '高职专科'),
+(1455, '宁夏建设职业技术学院', '青海', '工科', '高职专科'),
+(1456, '新疆农业职业技术学院', '新疆', '农业', '高职专科'),
+(1457, '新疆机电职业技术学院', '新疆', '工科', '高职专科'),
+(1458, '新疆轻工职业技术学院', '新疆', '工科', '高职专科'),
+(1459, '克拉玛依职业技术学院', '新疆', '工科', '高职专科'),
+(1460, '昌吉职业技术学院', '新疆', '工科', '高职专科'),
+(1461, '伊犁职业技术学院', '新疆', '农业', '高职专科'),
+(1462, '巴音郭楞职业技术学院', '新疆', '综合', '高职专科'),
+(1463, '阿克苏职业技术学院', '新疆', '综合', '高职专科'),
+(1464, '新疆建设职业技术学院', '新疆', '工科', '高职专科'),
+(1465, '山西传媒学院', '山西', '艺术', '本科'),
+(1466, '陕西航天职工大学', '陕西', '工科', '其它'),
+(1467, '河北地质职工大学', '河北', '工科', '其它'),
+(1468, '江西行政管理干部学院', '江西', '综合', '其它'),
+(1469, '山西职工医学院', '山西', '医药', '其它'),
+(1470, '山西煤炭职工联合大学', '山西', '综合', '其它'),
+(1471, '吉林省教育学院', '吉林', '师范', '其它'),
+(1472, '鹤岗矿务局职工大学', '黑龙江', '综合', '其它'),
+(1473, '黑龙江省农垦管理干部学院', '黑龙江', '------', '其它'),
+(1474, '黑龙江省政法管理干部学院', '黑龙江', '政法', '其它'),
+(1475, '黑龙江省教育学院', '黑龙江', '师范', '其它'),
+(1476, '佳木斯市教育学院', '黑龙江', '综合', '其它'),
+(1477, '江苏第二师范学院', '江苏', '师范', '本科'),
+(1478, '宁波教育学院', '浙江', '师范', '其它'),
+(1479, '福建教育学院', '福建', '师范', '其它'),
+(1480, '福建经济管理干部学院', '福建', '财经', '其它'),
+(1481, '南昌师范学院', '江西', '师范', '本科'),
+(1482, '山东省水利职工大学', '山东', '综合', '其它'),
+(1483, '青岛远洋船员学院', '山东', '工科', '其它'),
+(1484, '山东省贸易职工大学', '山东', '综合', '其它'),
+(1485, '山东省经济管理干部学院', '山东', '财经', '其它'),
+(1486, '山东农业工程学院', '山东', '农业', '本科'),
+(1487, '山东省教育学院', '山东', '综合', '其它'),
+(1488, '潍坊教育学院', '山东', '师范', '其它'),
+(1489, '第一拖拉机制造厂拖拉机学院', '河南', '工科', '其它'),
+(1490, '开封教育学院', '河南', '师范', '其它'),
+(1491, '平顶山教育学院', '河南', '师范', '其它'),
+(1492, '丹江口工程管理局职工大学', '湖北', '工科', '其它'),
+(1493, '荆州教育学院', '湖北', '师范', '其它'),
+(1494, '株洲市职工大学', '湖南', '综合', '其它'),
+(1495, '南方动力机械公司职工工学院', '湖南', '工科', '其它'),
+(1496, '广东教育学院', '广东', '师范', '其它'),
+(1497, '广西教育学院', '广西', '师范', '其它'),
+(1498, '成都师范学院', '四川', '师范', '本科'),
+(1499, '重庆第二师范学院', '重庆', '师范', '本科'),
+(1500, '贵州师范学院', '贵州', '师范', '本科'),
+(1501, '西安航空职工大学', '陕西', '工科', '其它'),
+(1502, '西安飞机工业公司职工工学院', '陕西', '工科', '其它'),
+(1503, '西安铁路工程职工大学', '陕西', '工科', '其它'),
+(1504, '西安电力机械制造公司机电学院', '陕西', '工科', '其它'),
+(1505, '陕西省建筑工程总公司职工大学', '陕西', '工科', '其它'),
+(1506, '西安外贸职工大学', '陕西', '综合', '其它'),
+(1507, '陕西教育学院', '陕西', '师范', '其它'),
+(1508, '甘肃机械电子职工大学', '甘肃', '工科', '其它'),
+(1509, '兰州航空工业职工大学', '甘肃', '工科', '其它'),
+(1510, '兰州铁路工程职工大学', '甘肃', '综合', '其它'),
+(1511, '湖北省经济管理干部学院', '湖北', '财经', '其它'),
+(1512, '天津市广播电视大学', '天津', '语言', '其它'),
+(1513, '天津市工会管理干部学院', '天津', '综合', '其它'),
+(1514, '石家庄职工大学', '河北', '综合', '其它'),
+(1515, '山西煤炭管理干部学院', '山西', '综合', '其它'),
+(1516, '山西青年管理干部学院', '山西', '综合', '其它'),
+(1517, '广东科学技术职业学院', '广东', '工科', '高职专科'),
+(1518, '吉林省经济管理干部学院', '吉林', '财经', '其它'),
+(1519, '大庆医学高等专科学校', '黑龙江', '医药', '高职专科'),
+(1520, '江苏省广播电视大学', '江苏', '语言', '其它'),
+(1521, '南京人口管理干部学院', '江苏', '综合', '其它'),
+(1522, '江苏省省级机关管理干部学院', '江苏', '综合', '其它'),
+(1523, '安徽城市管理职业学院', '安徽', '财经', '高职专科'),
+(1524, '闽北职业技术学院', '福建', '综合', '高职专科'),
+(1525, '福州教育学院', '福建', '------', '其它'),
+(1526, '福建财会管理干部学院', '福建', '综合', '其它'),
+(1527, '南昌教育学院', '江西', '师范', '其它'),
+(1528, '河南卫生职工学院', '河南', '综合', '其它'),
+(1529, '河南政法管理干部学院', '河南', '政法', '其它'),
+(1530, '广东文艺职业学院', '广东', '艺术', '高职专科'),
+(1531, '广东工程职业技术学院', '广东', '工科', '高职专科'),
+(1532, '广西警官高等专科学校', '广西', '政法', '高职专科'),
+(1533, '广西政法管理干部学院', '广西', '政法', '其它'),
+(1534, '陕西工运学院', '陕西', '工科', '其它'),
+(1535, '白银有色金属公司职工大学', '甘肃', '------', '其它'),
+(1536, '新疆教育学院', '新疆', '师范', '其它'),
+(1537, '北京经济管理职业学院', '北京', '财经', '高职专科'),
+(1538, '北京政法职业学院', '北京', '政法', '高职专科'),
+(1539, '南宁地区教育学院', '广西', '师范', '其它'),
+(1540, '辽宁商贸职业学院', '辽宁', '财经', '高职专科'),
+(1541, '辽宁文化艺术职工大学', '辽宁', '艺术', '其它'),
+(1542, '兰州教育学院', '甘肃', '师范', '其它'),
+(1543, '赣南教育学院', '江西', '师范', '其它'),
+(1544, '河北管理干部学院', '河北', '综合', '其它'),
+(1545, '哈尔滨市职工医学院', '黑龙江', '医药', '其它'),
+(1546, '黑龙江生态工程职业学院', '黑龙江', '林业', '高职专科'),
+(1547, '武汉冶金管理干部学院', '湖北', '综合', '其它'),
+(1548, '山东电力高等专科学校', '山东', '工科', '高职专科'),
+(1549, '山西政法管理干部学院', '山西', '综合', '其它'),
+(1550, '河北青年管理干部学院', '河北', '综合', '其它'),
+(1551, '江苏省青年管理干部学院', '江苏', '综合', '其它'),
+(1552, '广东行政职业学院', '广东', '综合', '高职专科'),
+(1553, '辽宁公安司法管理干部学院', '辽宁', '政法', '其它'),
+(1554, '山东管理学院', '山东', '综合', '本科'),
+(1555, '山东省青年管理干部学院', '山东', '综合', '其它'),
+(1556, '重庆民生职业技术学院', '重庆', '综合', '高职专科'),
+(1557, '北京锡华国际经贸职业学院', '北京', '------', '高职专科'),
+(1558, '石家庄联合技术职业学院', '河北', '------', '高职专科'),
+(1559, '河北科技学院', '河北', '工科', '本科'),
+(1560, '石家庄经济职业学院', '河北', '综合', '高职专科'),
+(1561, '石家庄工商职业学院', '河北', '财经', '高职专科'),
+(1562, '山西华澳商贸职业学院', '山西', '财经', '高职专科'),
+(1563, '山西同文外语职业学院', '山西', '语言', '高职专科'),
+(1564, '山西老区职业技术学院', '山西', '------', '高职专科'),
+(1565, '山西信息职业技术学院', '山西', '工科', '高职专科'),
+(1566, '山西工商学院', '山西', '财经', '高职专科'),
+(1567, '内蒙古丰州职业学院', '内蒙古', '工科', '高职专科'),
+(1568, '内蒙古经贸外语职业学院', '内蒙古', '语言', '高职专科'),
+(1569, '赤峰职业技术学院', '------', '综合', '高职专科'),
+(1570, '内蒙古北方职业技术学院', '内蒙古', '综合', '高职专科'),
+(1571, '内蒙古科技职业学院', '内蒙古', '工科', '高职专科'),
+(1572, '大连翻译职业学院', '------', '语言', '高职专科'),
+(1573, '辽宁美术职业学院', '辽宁', '艺术', '高职专科'),
+(1574, '锦州商务职业学院', '------', '财经', '高职专科'),
+(1575, '吉林华桥外国语学院', '吉林', '语言', '本科'),
+(1576, '长春信息技术职业学院', '------', '工科', '高职专科'),
+(1577, '哈尔滨现代公共关系职业学院', '黑龙江', '综合', '高职专科'),
+(1578, '哈尔滨应用职业技术学院', '黑龙江', '工科', '高职专科'),
+(1579, '上海新侨职业技术学院', '上海', '综合', '高职专科'),
+(1580, '上海东海职业技术学院', '上海', '综合', '高职专科'),
+(1581, '上海立达职业技术学院', '上海', '综合', '高职专科'),
+(1582, '上海民远职业技术学院', '上海', '工科', '高职专科'),
+(1583, '上海欧华职业技术学院', '上海', '综合', '高职专科'),
+(1584, '上海邦德职业技术学院', '上海', '综合', '高职专科'),
+(1585, '上海震旦职业学院', '上海', '财经', '高职专科'),
+(1586, '上海中侨职业技术学院', '上海', '综合', '高职专科'),
+(1587, '上海中华职业技术学院', '上海', '工科', '高职专科'),
+(1588, '苏州港大思培科技职业学院', '江苏', '综合', '高职专科'),
+(1589, '应天职业技术学院', '------', '工科', '高职专科'),
+(1590, '南京视觉艺术职业学院', '------', '艺术', '高职专科'),
+(1591, '建东职业技术学院', '------', '工科', '高职专科'),
+(1592, '江海职业技术学院', '------', '工科', '高职专科'),
+(1593, '昆山登云科技职业学院', '------', '工科', '高职专科'),
+(1594, '江南影视艺术职业学院', '------', '艺术', '高职专科'),
+(1595, '苏州托普信息职业技术学院', '江苏', '工科', '高职专科'),
+(1596, '太湖创意职业技术学院', '------', '工科', '高职专科'),
+(1597, '金山职业技术学院', '------', '工科', '高职专科'),
+(1598, '杭州万向职业技术学院', '------', '综合', '高职专科'),
+(1599, '浙江长征职业技术学院', '浙江', '综合', '高职专科'),
+(1600, '嘉兴南洋职业技术学院', '------', '工科', '高职专科'),
+(1601, '浙江广厦建设职业技术学院', '浙江', '工科', '高职专科'),
+(1602, '安徽绿海商务职业学院', '安徽', '------', '高职专科'),
+(1603, '合肥共达职业技术学院', '------', '------', '高职专科'),
+(1604, '蚌埠经济技术职业学院', '------', '财经', '高职专科'),
+(1605, '民办合肥财经职业学院', '------', '------', '高职专科'),
+(1606, '安徽涉外经济职业学院', '安徽', '财经', '高职专科'),
+(1607, '武夷山职业学院', '------', '------', '高职专科'),
+(1608, '泉州信息职业技术学院', '------', '工科', '高职专科'),
+(1609, '福州黎明职业技术学院', '福建', '工科', '高职专科'),
+(1610, '厦门兴才职业技术学院', '福建', '综合', '高职专科'),
+(1611, '福州软件职业技术学院', '福建', '工科', '高职专科'),
+(1612, '泉州理工职业学院', '------', '综合', '高职专科'),
+(1613, '福州外语外贸学院', '福建', '财经', '本科'),
+(1614, '漳州吉马印刷职业技术学院', '------', '------', '高职专科'),
+(1615, '漳州科技职业学院', '福建', '工科', '高职专科'),
+(1616, '厦门东海职业技术学院', '福建', '------', '高职专科'),
+(1617, '厦门南洋职业学院', '福建', '------', '高职专科'),
+(1618, '厦门软件职业技术学院', '福建', '工科', '高职专科'),
+(1619, '福州科技职业技术学院', '福建', '综合', '高职专科'),
+(1620, '福州海峡职业技术学院', '福建', '财经', '高职专科'),
+(1621, '江西渝州科技职业学院', '江西', '工科', '高职专科'),
+(1622, '江西科技职业学院', '江西', '综合', '高职专科'),
+(1623, '赣西科技职业学院', '------', '综合', '高职专科'),
+(1624, '江西城市职业学院', '江西', '综合', '高职专科'),
+(1625, '山东外国语职业学院', '山东', '语言', '高职专科'),
+(1626, '潍坊工商职业学院', '------', '财经', '高职专科'),
+(1627, '枣庄科技职业学院', '------', '工科', '高职专科'),
+(1628, '山东凯文科技职业学院', '山东', '工科', '高职专科'),
+(1629, '山东现代职业学院', '山东', '综合', '高职专科'),
+(1630, '青岛黄海学院', '山东', '综合', '本科'),
+(1631, '山东华宇职业技术学院', '山东', '工科', '高职专科'),
+(1632, '山东协和学院', '山东', '医药', '本科'),
+(1633, '山东外事翻译职业学院', '山东', '综合', '高职专科'),
+(1634, '山东杏林科技职业学院', '山东', '综合', '高职专科'),
+(1635, '郑州交通职业学院', '河南', '工科', '高职专科'),
+(1636, '郑州电子信息职业技术学院', '河南', '工科', '高职专科'),
+(1637, '嵩山少林武术职业学院', '------', '体育', '高职专科'),
+(1638, '郑州电力职业技术学院', '河南', '工科', '高职专科'),
+(1639, '商丘工学院', '', '工科', '本科'),
+(1640, '武汉工贸职业学院', '湖北', '工科', '高职专科'),
+(1641, '黄冈科技职业学院', '------', '工科', '高职专科'),
+(1642, '武昌职业学院', '湖北', '工科', '高职专科'),
+(1643, '湖北科技职业学院', '湖北', '------', '高职专科'),
+(1644, '湖南科技经贸职业学院', '湖南', '财经', '高职专科'),
+(1645, '湖南九嶷职业技术学院', '湖南', '综合', '高职专科'),
+(1646, '湖南都市职业学院', '湖南', '------', '高职专科'),
+(1647, '湖南软件职业学院', '湖南', '------', '高职专科'),
+(1648, '长沙南方职业学院', '湖南', '------', '高职专科'),
+(1649, '潇湘职业学院', '------', '综合', '高职专科'),
+(1650, '湖南外国语职业学院', '湖南', '语言', '高职专科'),
+(1651, '湖南同德职业学院', '湖南', '综合', '高职专科'),
+(1652, '石家庄幼儿师范高等专科学校', '河北', '师范', '高职专科'),
+(1653, '湖南电子科技职业学院', '湖南', '------', '高职专科'),
+(1654, '湖南信息科学职业学院', '湖南', '工科', '高职专科'),
+(1655, '民办南华工商学院', '------', '财经', '高职专科'),
+(1656, '肇庆科技职业技术学院', '------', '工科', '高职专科'),
+(1657, '广东科技学院', '广东', '综合', '本科'),
+(1658, '惠州经济职业技术学院', '------', '财经', '高职专科'),
+(1659, '广州科技职业技术学院', '广东', '综合', '高职专科'),
+(1660, '广州工商职业技术学院', '广东', '综合', '高职专科'),
+(1661, '广州珠江职业技术学院', '广东', '------', '高职专科'),
+(1662, '广州松田职业学院', '广东', '------', '高职专科'),
+(1663, '广东文理职业学院', '', '综合', '高职专科'),
+(1664, '广州涉外经济职业技术学院', '广东', '综合', '高职专科'),
+(1665, '广州城建职业学院', '广东', '------', '高职专科'),
+(1666, '肇庆工商职业技术学院', '------', '综合', '高职专科'),
+(1667, '广州华南商贸职业学院', '广东', '财经', '高职专科'),
+(1668, '广州现代信息工程职业技术学院', '广东', '工科', '高职专科'),
+(1669, '广州华立科技职业学院', '广东', '工科', '高职专科'),
+(1670, '广西英华国际职业学院', '广西', '综合', '高职专科'),
+(1671, '广西城市职业学院', '广西', '综合', '高职专科'),
+(1672, '广西工程职业学院', '广西', '------', '高职专科'),
+(1673, '广西外国语学院', '广西', '综合', '本科'),
+(1674, '广西演艺职业学院', '广西', '艺术', '高职专科'),
+(1675, '北海艺术设计职业学院', '------', '艺术', '高职专科'),
+(1676, '桂林山水职业学院', '------', '综合', '高职专科'),
+(1677, '三亚城市职业学院', '------', '语言', '高职专科'),
+(1678, '重庆正大软件职业技术学院', '重庆', '工科', '高职专科'),
+(1679, '四川科技职业学院', '四川', '工科', '高职专科'),
+(1680, '四川华新现代职业学院', '四川', '综合', '高职专科'),
+(1681, '四川文化传媒职业学院', '四川', '艺术', '高职专科'),
+(1682, '贵州亚泰职业学院', '贵州', '综合', '高职专科'),
+(1683, '云南新兴职业学院', '云南', '综合', '高职专科'),
+(1684, '云南经济管理职业学院', '云南', '财经', '高职专科'),
+(1685, '昆明扬帆职业技术学院', '------', '综合', '高职专科'),
+(1686, '云南北美职业学院', '云南', '综合', '高职专科'),
+(1687, '云南工商学院', '云南', '综合', '本科'),
+(1688, '西安东方亚太职业技术学院', '陕西', '------', '高职专科'),
+(1689, '西安汽车科技职业学院', '陕西', '工科', '高职专科'),
+(1690, '西安科技商贸职业学院', '陕西', '工科', '高职专科'),
+(1691, '陕西电子科技职业学院', '陕西', '工科', '高职专科'),
+(1692, '陕西旅游烹饪职业学院', '陕西', '综合', '高职专科'),
+(1693, '银川能源学院', '', '工科', '本科'),
+(1694, '新疆能源职业技术学院', '新疆', '工科', '高职专科'),
+(1695, '新疆天山职业技术学院', '新疆', '工科', '高职专科'),
+(1696, '新疆现代职业技术学院', '新疆', '工科', '高职专科'),
+(1697, '漳州城市职业学院', '------', '师范', '高职专科'),
+(1698, '福建卫生职业技术学院', '福建', '------', '高职专科'),
+(1699, '南昌师范高等专科学校', '------', '师范', '高职专科'),
+(1700, '江西中医药高等专科学校', '江西', '医药', '高职专科'),
+(1701, '江西泰豪动漫职业学院', '江西', '------', '高职专科'),
+(1702, '江西枫林涉外经贸职业学院', '江西', '------', '高职专科'),
+(1703, '江西太阳能科技职业学院', '江西', '工科', '高职专科'),
+(1704, '江西生物科技职业学院', '江西', '农业', '高职专科'),
+(1705, '江西航空职业技术学院', '江西', '工科', '高职专科'),
+(1706, '江西工程职业学院', '江西', '综合', '高职专科'),
+(1707, '江西青年职业学院', '江西', '综合', '高职专科'),
+(1708, '宜春职业技术学院', '------', '综合', '高职专科'),
+(1709, '江西应用工程职业学院', '江西', '工科', '高职专科'),
+(1710, '江西经济管理职业学院', '江西', '财经', '高职专科'),
+(1711, '上饶职业技术学院', '------', '工科', '高职专科'),
+(1712, '江西农业工程职业学院', '江西', '农业', '高职专科'),
+(1713, '江西护理职业技术学院', '江西', '医药', '高职专科'),
+(1714, '山东中医药高等专科学校', '山东', '医药', '高职专科'),
+(1715, '淄博师范高等专科学校', '山东', '师范', '高职专科'),
+(1716, '山东科技职业学院', '山东', '工科', '高职专科'),
+(1717, '山东城市建设职业学院', '山东', '综合', '高职专科'),
+(1718, '烟台汽车工程职业学院', '------', '工科', '高职专科'),
+(1719, '山东司法警官职业学院', '山东', '政法', '高职专科'),
+(1720, '泰山职业技术学院', '------', '综合', '高职专科'),
+(1721, '山东工业职业学院', '山东', '工科', '高职专科'),
+(1722, '德州职业技术学院', '------', '------', '高职专科'),
+(1723, '烟台工程职业技术学院', '------', '------', '高职专科'),
+(1724, '枣庄职业学院', '------', '------', '高职专科'),
+(1725, '临沂职业学院', '------', '------', '高职专科'),
+(1726, '山东传媒职业学院', '山东', '------', '高职专科'),
+(1727, '山东化工职业学院', '山东', '综合', '高职专科'),
+(1728, '山东商务职业学院', '山东', '综合', '高职专科'),
+(1729, '山东经贸职业学院', '山东', '综合', '高职专科'),
+(1730, '济南职业学院', '------', '综合', '高职专科'),
+(1731, '山东电子职业技术学院', '山东', '工科', '高职专科'),
+(1732, '山东丝绸纺织职业学院', '山东', '工科', '高职专科'),
+(1733, '山东铝业职业学院', '山东', '工科', '高职专科'),
+(1734, '菏泽家政职业学院', '------', '------', '高职专科'),
+(1735, '山东胜利职业学院', '山东', '工科', '高职专科'),
+(1736, '河南工业贸易职业学院', '河南', '财经', '高职专科'),
+(1737, '河南交通职业技术学院', '河南', '工科', '高职专科'),
+(1738, '河南经贸职业学院', '河南', '财经', '高职专科'),
+(1739, '河南农业职业学院', '河南', '农业', '高职专科'),
+(1740, '河南质量工程职业学院', '河南', '工科', '高职专科'),
+(1741, '漯河医学高等专科学校', '------', '医药', '高职专科'),
+(1742, '南阳医学高等专科学校', '------', '医药', '高职专科'),
+(1743, '商丘医学高等专科学校', '------', '医药', '高职专科'),
+(1744, '信阳职业技术学院', '------', '师范', '高职专科'),
+(1745, '郑州工业安全职业学院', '河南', '工科', '高职专科'),
+(1746, '郑州信息科技职业学院', '河南', '工科', '高职专科'),
+(1747, '郑州旅游职业学院', '河南', '财经', '高职专科'),
+(1748, '河南建筑职业技术学院', '河南', '工科', '高职专科'),
+(1749, '周口科技职业学院', '------', '------', '高职专科'),
+(1750, '沙市职业大学', '------', '工科', '高职专科'),
+(1751, '江汉艺术职业学院', '------', '艺术', '高职专科'),
+(1752, '湖北艺术职业学院', '湖北', '艺术', '高职专科'),
+(1753, '湖北生物科技职业学院', '湖北', '工科', '高职专科'),
+(1754, '咸宁职业技术学院', '------', '工科', '高职专科'),
+(1755, '武汉工业职业技术学院', '湖北', '工科', '高职专科'),
+(1756, '湖北生态工程职业技术学院', '湖北', '林业', '高职专科'),
+(1757, '三峡电力职业学院', '------', '工科', '高职专科'),
+(1758, '湖北财税职业学院', '湖北', '财经', '高职专科'),
+(1759, '武汉软件工程职业学院', '湖北', '------', '高职专科'),
+(1760, '湖北青年职业学院', '湖北', '------', '高职专科'),
+(1761, '黄石职业技术学院', '------', '------', '高职专科'),
+(1762, '益阳医学高等专科学校', '------', '------', '高职专科'),
+(1763, '湖南中医药高等专科学校', '湖南', '医药', '高职专科'),
+(1764, '邵阳医学高等专科学校', '------', '医药', '高职专科'),
+(1765, '湖南信息职业技术学院', '湖南', '工科', '高职专科'),
+(1766, '长沙电力职业技术学院', '湖南', '工科', '高职专科'),
+(1767, '湖南水利水电职业技术学院', '湖南', '工科', '高职专科'),
+(1768, '湖南现代物流职业技术学院', '湖南', '综合', '高职专科'),
+(1769, '湖南交通工程职业技术学院', '湖南', '工科', '高职专科'),
+(1770, '湖南铁路科技职业技术学院', '湖南', '工科', '高职专科'),
+(1771, '湖南工艺美术职业学院', '湖南', '艺术', '高职专科'),
+(1772, '湖南民族职业学院', '湖南', '民族', '高职专科'),
+(1773, '衡阳财经工业职业技术学院', '------', '财经', '高职专科'),
+(1774, '湖南石油化工职业技术学院', '湖南', '工科', '高职专科'),
+(1775, '湖南化工职业技术学院', '湖南', '工科', '高职专科'),
+(1776, '怀化职业技术学院', '------', '综合', '高职专科'),
+(1777, '湖南理工职业技术学院', '湖南', '工科', '高职专科'),
+(1778, '湖南安全技术职业学院', '湖南', '工科', '高职专科'),
+(1779, '长沙师范学院', '湖南', '师范', '本科'),
+(1780, '湘西民族职业技术学院', '------', '民族', '高职专科'),
+(1781, '益阳职业技术学院', '------', '综合', '高职专科'),
+(1782, '湖南电气职业技术学院', '湖南', '工科', '高职专科'),
+(1783, '株洲职业技术学院', '------', '综合', '高职专科'),
+(1784, '湖南城建职业技术学院', '湖南', '工科', '高职专科'),
+(1785, '湖南网络工程职业学院', '湖南', '综合', '高职专科'),
+(1786, '长沙职业技术学院', '湖南', '综合', '高职专科'),
+(1787, '长沙商贸旅游职业技术学院', '湖南', '财经', '高职专科'),
+(1788, '邵阳职业技术学院', '------', '综合', '高职专科'),
+(1789, '湖南对外经济贸易职业学院', '湖南', '财经', '高职专科'),
+(1790, '湖南生物与机电工程职业技术学院', '湖南', '------', '高职专科'),
+(1791, '湖南科技工业职业技术学院', '湖南', '工科', '高职专科'),
+(1792, '肇庆医学高等专科学校', '------', '医药', '高职专科'),
+(1793, '广州工程技术职业学院', '广东', '综合', '高职专科'),
+(1794, '珠海城市职业技术学院', '------', '综合', '高职专科'),
+(1795, '广州铁路职业技术学院', '广东', '工科', '高职专科'),
+(1796, '广州体育职业技术学院', '广东', '体育', '高职专科'),
+(1797, '江门职业技术学院', '------', '综合', '高职专科'),
+(1798, '广东科贸职业学院', '广东', '财经', '高职专科'),
+(1799, '茂名职业技术学院', '------', '综合', '高职专科'),
+(1800, '中山职业技术学院', '------', '综合', '高职专科'),
+(1801, '广州科技贸易职业学院', '广东', '财经', '高职专科'),
+(1802, '中山火炬职业技术学院', '------', '工科', '高职专科'),
+(1803, '广东理工职业学院', '广东', '工科', '高职专科'),
+(1804, '广州城市职业学院', '广东', '综合', '高职专科'),
+(1805, '广东体育职业技术学院', '广东', '体育', '高职专科'),
+(1806, '广东食品药品职业学院', '广东', '工科', '高职专科'),
+(1807, '河池职业学院', '------', '综合', '高职专科'),
+(1808, '北海职业学院', '------', '综合', '高职专科'),
+(1809, '广西电力职业技术学院', '广西', '工科', '高职专科'),
+(1810, '广西工业职业技术学院', '广西', '工科', '高职专科'),
+(1811, '贵港职业学院', '------', '综合', '高职专科'),
+(1812, '柳州运输职业技术学院', '------', '工科', '高职专科'),
+(1813, '广西工商职业技术学院', '广西', '财经', '高职专科'),
+(1814, '百色职业学院', '------', '综合', '高职专科'),
+(1815, '柳州城市职业学院', '------', '综合', '高职专科'),
+(1816, '广西理工职业技术学院', '广西', '------', '高职专科'),
+(1817, '梧州职业学院', '------', '------', '高职专科'),
+(1818, '海南软件职业技术学院', '海南', '工科', '高职专科'),
+(1819, '海南科技职业学院', '海南', '------', '高职专科'),
+(1820, '重庆三峡医药高等专科学校', '重庆', '医药', '高职专科'),
+(1821, '重庆医药高等专科学校', '重庆', '医药', '高职专科'),
+(1822, '重庆城市管理职业学院', '重庆', '综合', '高职专科'),
+(1823, '重庆城市职业学院', '重庆', '综合', '高职专科'),
+(1824, '重庆青年职业技术学院', '重庆', '综合', '高职专科'),
+(1825, '重庆机电职业技术学院', '重庆', '工科', '高职专科'),
+(1826, '重庆工商职业学院', '重庆', '财经', '高职专科'),
+(1827, '重庆水利电力职业技术学院', '重庆', '工科', '高职专科'),
+(1828, '重庆工贸职业技术学院', '重庆', '综合', '高职专科'),
+(1829, '重庆电子工程职业学院', '重庆', '------', '高职专科'),
+(1830, '重庆财经职业学院', '重庆', '财经', '高职专科'),
+(1831, '重庆科创职业学院', '重庆', '------', '高职专科'),
+(1832, '重庆建筑工程职业学院', '重庆', '工科', '高职专科'),
+(1833, '四川中医药高等专科学校', '四川', '医药', '高职专科'),
+(1834, '内江职业技术学院', '------', '综合', '高职专科'),
+(1835, '成都职业技术学院', '------', '综合', '高职专科'),
+(1836, '四川管理职业学院', '四川', '综合', '高职专科'),
+(1837, '四川邮电职业技术学院', '四川', '工科', '高职专科'),
+(1838, '四川化工职业技术学院', '四川', '工科', '高职专科'),
+(1839, '四川水利职业技术学院', '四川', '工科', '高职专科'),
+(1840, '四川文化产业职业学院', '四川', '综合', '高职专科'),
+(1841, '四川司法警官职业学院', '四川', '政法', '高职专科'),
+(1842, '四川信息职业技术学院', '四川', '工科', '高职专科'),
+(1843, '广安职业技术学院', '------', '师范', '高职专科'),
+(1844, '四川商务职业学院', '四川', '财经', '高职专科'),
+(1845, '四川财经职业学院', '四川', '------', '高职专科'),
+(1846, '四川艺术职业学院', '四川', '------', '高职专科'),
+(1847, '四川城市职业学院', '四川', '------', '高职专科'),
+(1848, '四川现代职业学院', '四川', '------', '高职专科'),
+(1849, '遵义医药高等专科学校', '------', '医药', '高职专科'),
+(1850, '贵阳护理职业学院', '------', '医药', '高职专科'),
+(1851, '黔西南民族职业技术学院', '------', '综合', '高职专科'),
+(1852, '贵州轻工职业技术学院', '贵州', '工科', '高职专科'),
+(1853, '贵阳职业技术学院', '------', '------', '高职专科'),
+(1854, '毕节职业技术学院', '------', '------', '高职专科'),
+(1855, '云南医学高等专科学校', '云南', '医药', '高职专科'),
+(1856, '保山中医药高等专科学校', '------', '医药', '高职专科'),
+(1857, '曲靖医学高等专科学校', '------', '医药', '高职专科'),
+(1858, '楚雄医药高等专科学校', '------', '医药', '高职专科'),
+(1859, '临沧师范高等专科学校', '------', '师范', '高职专科'),
+(1860, '德宏师范高等专科学校', '------', '师范', '高职专科'),
+(1861, '丽江师范高等专科学校', '------', '师范', '高职专科'),
+(1862, '云南林业职业技术学院', '云南', '林业', '高职专科'),
+(1863, '云南体育运动职业技术学院', '云南', '体育', '高职专科'),
+(1864, '云南文化艺术职业学院', '云南', '艺术', '高职专科'),
+(1865, '云南热带作物职业学院', '云南', '农业', '高职专科'),
+(1866, '云南机电职业技术学院', '云南', '工科', '高职专科'),
+(1867, '云南国防工业职业技术学院', '云南', '工科', '高职专科'),
+(1868, '云南锡业职业技术学院', '云南', '------', '高职专科'),
+(1869, '拉萨师范高等专科学校', '------', '------', '高职专科'),
+(1870, '西藏警官高等专科学校', '西藏', '政法', '高职专科'),
+(1871, '西藏职业技术学院', '西藏', '------', '高职专科'),
+(1872, '延安职业技术学院', '------', '综合', '高职专科'),
+(1873, '汉中职业技术学院', '------', '综合', '高职专科'),
+(1874, '商洛职业技术学院', '------', '综合', '高职专科'),
+(1875, '西安职业技术学院', '陕西', '综合', '高职专科'),
+(1876, '咸阳职业技术学院', '------', '综合', '高职专科'),
+(1877, '陕西经济管理职业技术学院', '陕西', '财经', '高职专科'),
+(1878, '宝鸡职业技术学院', '------', '师范', '高职专科'),
+(1879, '陕西航空职业技术学院', '陕西', '工科', '高职专科'),
+(1880, '陕西铁路工程职业技术学院', '陕西', '工科', '高职专科'),
+(1881, '陕西纺织服装职业技术学院', '陕西', '工科', '高职专科'),
+(1882, '铜川职业技术学院', '------', '综合', '高职专科'),
+(1883, '安康职业技术学院', '------', '综合', '高职专科'),
+(1884, '渭南职业技术学院', '------', '综合', '高职专科'),
+(1885, '张掖医学高等专科学校', '------', '医药', '高职专科'),
+(1886, '平凉医学高等专科学校', '------', '医药', '高职专科'),
+(1887, '陇南师范高等专科学校', '------', '师范', '高职专科'),
+(1888, '定西师范高等专科学校', '------', '师范', '高职专科'),
+(1889, '甘肃农业职业技术学院', '甘肃', '农业', '高职专科'),
+(1890, '甘肃畜牧工程职业技术学院', '甘肃', '农业', '高职专科'),
+(1891, '兰州资源环境职业技术学院', '------', '综合', '高职专科'),
+(1892, '甘肃交通职业技术学院', '甘肃', '工科', '高职专科'),
+(1893, '武威职业学院', '------', '综合', '高职专科'),
+(1894, '甘肃钢铁职业技术学院', '甘肃', '------', '高职专科'),
+(1895, '青海卫生职业技术学院', '青海', '医药', '高职专科'),
+(1896, '宁夏民族职业技术学院', '宁夏', '师范', '高职专科'),
+(1897, '宁夏工商职业技术学院', '宁夏', '财经', '高职专科'),
+(1898, '新疆兵团警官高等专科学校', '新疆', '------', '高职专科'),
+(1899, '新疆石河子职业技术学院', '新疆', '综合', '高职专科'),
+(1900, '新疆交通职业技术学院', '新疆', '工科', '高职专科'),
+(1901, '新疆职业大学', '新疆', '综合', '高职专科'),
+(1902, '天津商业大学宝德学院', '天津', '财经', '独立学院'),
+(1903, '大连工业大学艺术与信息工程学院', '------', '工科', '独立学院'),
+(1904, '辽宁科技大学信息技术学院', '辽宁', '工科', '独立学院'),
+(1905, '辽宁医学院医疗学院', '辽宁', '医药', '独立学院'),
+(1906, '黑龙江工程学院昆仑旅游学院', '黑龙江', '工科', '独立学院'),
+(1907, '上海视觉艺术学院', '', '艺术', '本科'),
+(1908, '杭州师范大学钱江学院', '------', '师范', '独立学院'),
+(1909, '东华理工大学长江学院', '------', '工科', '独立学院'),
+(1910, '青岛农业大学海都学院', '山东', '综合', '独立学院'),
+(1911, '华中师范大学武汉传媒学院', '------', '艺术', '独立学院'),
+(1912, '重庆人文科技学院', '', '综合', '本科'),
+(1913, '云南艺术学院文华学院', '云南', '艺术', '独立学院'),
+(1914, '新疆财经大学商务学院', '新疆', '财经', '独立学院'),
+(1915, '北京科技大学延庆分校', '北京', '工科', '高职专科'),
+(1916, '张家口学院', '', '师范', '本科'),
+(1917, '江苏职工医科大学', '江苏', '------', '高职专科'),
+(1918, '浙江工业大学浙西分校', '浙江', '工科', '高职专科'),
+(1919, '安徽经济管理干部学院', '安徽', '------', '高职专科'),
+(1920, '福建政法管理干部学院', '福建', '------', '高职专科'),
+(1921, '新余钢铁有限责任公司职工大学', '------', '------', '高职专科'),
+(1922, '南昌钢铁有限责任公司职工大学', '------', '工科', '高职专科'),
+(1923, '山东省聊城教育学院', '山东', '------', '高职专科'),
+(1924, '长沙教育学院', '湖南', '------', '高职专科'),
+(1925, '湘潭教育学院', '------', '师范', '高职专科'),
+(1926, '广西壮族自治区经济管理干部学院', '广西', '------', '高职专科'),
+(1927, '广西壮族自治区卫生管理干部学院', '广西', '------', '高职专科'),
+(1928, '中国工程物理研究院职工工学院', '------', '------', '高职专科'),
+(1929, '北京劳动保障职业学院', '北京', '综合', '高职专科'),
+(1930, '北京社会管理职业学院', '北京', '------', '高职专科'),
+(1931, '天津工艺美术职业学院', '天津', '艺术', '高职专科'),
+(1932, '天津艺术职业学院', '天津', '艺术', '高职专科'),
+(1933, '天津国土资源和房屋职业学院', '天津', '综合', '高职专科'),
+(1934, '河北机电职业技术学院', '河北', '工科', '高职专科'),
+(1935, '河北司法警官职业学院', '河北', '政法', '高职专科'),
+(1936, '廊坊职业技术学院', '------', '工科', '高职专科'),
+(1937, '河北公安警察职业学院', '河北', '政法', '高职专科'),
+(1938, '河北通信职业技术学院', '河北', '------', '高职专科'),
+(1939, '河北女子职业技术学院', '河北', '语言', '高职专科'),
+(1940, '河北旅游职业学院', '河北', '------', '高职专科'),
+(1941, '冀中职业学院', '------', '------', '高职专科'),
+(1942, '石家庄科技工程职业学院', '河北', '------', '高职专科'),
+(1943, '太原电力高等专科学校', '------', '工科', '高职专科'),
+(1944, '运城幼儿师范高等专科学校', '------', '师范', '高职专科'),
+(1945, '山西省财政税务专科学校', '山西', '------', '高职专科'),
+(1946, '晋中职业技术学院', '------', '综合', '高职专科'),
+(1947, '山西运城农业职业技术学院', '山西', '农业', '高职专科'),
+(1948, '太原旅游职业学院', '------', '语言', '高职专科'),
+(1949, '山西管理职业学院', '山西', '财经', '高职专科'),
+(1950, '潞安职业技术学院', '------', '工科', '高职专科'),
+(1951, '山西金融职业学院', '山西', '财经', '高职专科'),
+(1952, '山西体育职业学院', '山西', '体育', '高职专科'),
+(1953, '山西警官职业学院', '山西', '政法', '高职专科'),
+(1954, '山西国际商务职业学院', '山西', '财经', '高职专科'),
+(1955, '忻州职业技术学院', '------', '财经', '高职专科'),
+(1956, '山西经贸职业学院', '山西', '财经', '高职专科'),
+(1957, '朔州职业技术学院', '------', '------', '高职专科'),
+(1958, '包头钢铁职业技术学院', '------', '工科', '高职专科'),
+(1959, '锡林郭勒职业学院', '------', '师范', '高职专科'),
+(1960, '内蒙古交通职业技术学院', '内蒙古', '工科', '高职专科'),
+(1961, '科尔沁艺术职业学院', '------', '艺术', '高职专科'),
+(1962, '通辽职业学院', '------', '师范', '高职专科'),
+(1963, '内蒙古电子信息职业技术学院', '内蒙古', '工科', '高职专科'),
+(1964, '乌兰察布职业学院', '------', '财经', '高职专科'),
+(1965, '乌海职业技术学院', '------', '工科', '高职专科'),
+(1966, '内蒙古机电职业技术学院', '内蒙古', '工科', '高职专科'),
+(1967, '内蒙古化工职业学院', '内蒙古', '工科', '高职专科'),
+(1968, '内蒙古商贸职业学院', '内蒙古', '财经', '高职专科'),
+(1969, '包头铁道职业技术学院', '------', '工科', '高职专科'),
+(1970, '辽宁装备制造职业技术学院', '辽宁', '工科', '高职专科'),
+(1971, '辽河石油职业技术学院', '------', '工科', '高职专科'),
+(1972, '辽宁职业学院', '辽宁', '农业', '高职专科'),
+(1973, '辽宁地质工程职业学院', '辽宁', '------', '高职专科'),
+(1974, '辽宁铁道职业技术学院', '辽宁', '------', '高职专科'),
+(1975, '辽宁建筑职业技术学院', '辽宁', '------', '高职专科'),
+(1976, '松原职业技术学院', '------', '综合', '高职专科'),
+(1977, '吉林铁道职业技术学院', '吉林', '工科', '高职专科'),
+(1978, '白城职业技术学院', '------', '综合', '高职专科'),
+(1979, '长白山职业技术学院', '------', '------', '高职专科'),
+(1980, '齐齐哈尔高等师范专科学校', '------', '师范', '高职专科'),
+(1981, '黑龙江幼儿师范高等专科学校', '黑龙江', '师范', '高职专科'),
+(1982, '黑龙江生物科技职业学院', '黑龙江', '农业', '高职专科'),
+(1983, '黑龙江民族职业学院', '黑龙江', '民族', '高职专科'),
+(1984, '七台河职业学院', '------', '综合', '高职专科'),
+(1985, '黑龙江信息技术职业学院', '黑龙江', '工科', '高职专科'),
+(1986, '黑龙江农垦林业职业技术学院', '黑龙江', '------', '高职专科'),
+(1987, '黑龙江公安警官职业学院', '黑龙江', '政法', '高职专科'),
+(1988, '黑龙江农垦农业职业技术学院', '黑龙江', '农业', '高职专科'),
+(1989, '黑龙江商业职业学院', '黑龙江', '财经', '高职专科'),
+(1990, '黑龙江旅游职业技术学院', '黑龙江', '财经', '高职专科'),
+(1991, '黑龙江煤炭职业技术学院', '黑龙江', '工科', '高职专科'),
+(1992, '黑龙江交通职业技术学院', '黑龙江', '工科', '高职专科'),
+(1993, '哈尔滨科学技术职业学院', '黑龙江', '体育', '高职专科'),
+(1994, '黑龙江粮食职业学院', '黑龙江', '------', '高职专科'),
+(1995, '佳木斯职业学院', '------', '综合', '高职专科'),
+(1996, '上海医药高等专科学校', '上海', '医药', '高职专科'),
+(1997, '上海旅游高等专科学校', '上海', '财经', '高职专科'),
+(1998, '上海工艺美术职业学院', '上海', '艺术', '高职专科'),
+(1999, '上海工会管理职业学院', '上海', '综合', '高职专科'),
+(2000, '上海体育职业学院', '上海', '体育', '高职专科'),
+(2001, '苏州职业大学', '江苏', '工科', '高职专科'),
+(2002, '南通农业职业技术学院', '------', '农业', '高职专科'),
+(2003, '无锡科技职业学院', '------', '工科', '高职专科'),
+(2004, '南京铁道职业技术学院', '------', '工科', '高职专科'),
+(2005, '江苏联合职业技术学院', '江苏', '工科', '高职专科'),
+(2006, '无锡工艺职业技术学院', '------', '工科', '高职专科'),
+(2007, '南京机电职业技术学院', '------', '工科', '高职专科'),
+(2008, '无锡城市职业技术学院', '------', '财经', '高职专科'),
+(2009, '扬州环境资源职业技术学院', '------', '农业', '高职专科'),
+(2010, '健雄职业技术学院', '------', '工科', '高职专科'),
+(2011, '江苏财经职业技术学院', '江苏', '财经', '高职专科'),
+(2012, '苏州工业职业技术学院', '江苏', '工科', '高职专科'),
+(2013, '盐城纺织职业技术学院', '------', '工科', '高职专科'),
+(2014, '扬州工业职业技术学院', '------', '工科', '高职专科'),
+(2015, '江苏城市职业学院', '江苏', '------', '高职专科'),
+(2016, '苏州卫生职业技术学院', '江苏', '------', '高职专科'),
+(2017, '盐城卫生职业技术学院', '------', '------', '高职专科'),
+(2018, '苏州高博软件技术职业学院', '江苏', '工科', '高职专科'),
+(2019, '南京旅游职业学院', '------', '------', '高职专科'),
+(2020, '浙江医学高等专科学校', '浙江', '医药', '高职专科'),
+(2021, '金华职业技术学院', '------', '综合', '高职专科'),
+(2022, '浙江国际海运职业技术学院', '浙江', '综合', '高职专科'),
+(2023, '宁波城市职业技术学院', '------', '综合', '高职专科'),
+(2024, '浙江纺织服装职业技术学院', '浙江', '工科', '高职专科'),
+(2025, '宁波卫生职业技术学院', '', '医药', '高职专科'),
+(2026, '浙江同济科技职业学院', '浙江', '------', '高职专科'),
+(2027, '浙江邮电职业技术学院', '浙江', '------', '高职专科'),
+(2028, '浙江体育职业技术学院', '浙江', '------', '高职专科'),
+(2029, '浙江电力职业技术学院', '浙江', '------', '高职专科'),
+(2030, '台州科技职业学院', '------', '------', '高职专科'),
+(2031, '温州科技职业学院', '------', '------', '高职专科'),
+(2032, '安庆医药高等专科学校', '------', '------', '高职专科'),
+(2033, '安徽工业职业技术学院', '安徽', '工科', '高职专科'),
+(2034, '安徽工商职业学院', '安徽', '财经', '高职专科'),
+(2035, '安徽邮电职业技术学院', '安徽', '工科', '高职专科'),
+(2036, '安徽艺术职业学院', '安徽', '艺术', '高职专科'),
+(2037, '安徽国防科技职业学院', '安徽', '工科', '高职专科'),
+(2038, '安徽林业职业技术学院', '安徽', '林业', '高职专科'),
+(2039, '安徽新闻出版职业技术学院', '安徽', '工科', '高职专科'),
+(2040, '安徽财贸职业学院', '安徽', '财经', '高职专科'),
+(2041, '安徽电气工程职业技术学院', '安徽', '工科', '高职专科'),
+(2042, '安庆职业技术学院', '------', '工科', '高职专科'),
+(2043, '安徽公安职业学院', '安徽', '政法', '高职专科'),
+(2044, '芜湖信息技术职业学院', '------', '工科', '高职专科'),
+(2045, '安徽国际商务职业学院', '安徽', '财经', '高职专科'),
+(2046, '马鞍山职业技术学院', '------', '------', '高职专科'),
+(2047, '徽商职业学院', '------', '------', '高职专科'),
+(2048, '民办安徽旅游职业学院', '------', '------', '高职专科'),
+(2049, '安徽冶金科技职业学院', '安徽', '工科', '高职专科'),
+(2050, '安徽机电职业技术学院', '安徽', '工科', '高职专科'),
+(2051, '安徽审计职业学院', '安徽', '财经', '高职专科'),
+(2052, '亳州职业技术学院', '------', '工科', '高职专科'),
+(2053, '安徽中澳科技职业学院', '安徽', '工科', '高职专科'),
+(2054, '泉州医学高等专科学校', '------', '医药', '高职专科'),
+(2055, '厦门医学高等专科学校', '福建', '------', '高职专科'),
+(2056, '德化陶瓷职业技术学院', '------', '艺术', '高职专科'),
+(2057, '厦门城市职业学院', '福建', '综合', '高职专科'),
+(2058, '福建警官职业学院', '福建', '政法', '高职专科'),
+(2059, '福建生物工程职业技术学院', '福建', '工科', '高职专科'),
+(2060, '福建艺术职业学院', '福建', '艺术', '高职专科'),
+(2061, '福建体育职业技术学院', '福建', '体育', '高职专科'),
+(2062, '宁德职业技术学院', '------', '综合', '高职专科'),
+(2063, '泉州经贸职业技术学院', '------', '财经', '高职专科'),
+(2064, '闽西职业技术学院', '------', '工科', '高职专科'),
+(2065, '三明职业技术学院', '------', '综合', '高职专科'),
+(2066, '湄洲湾职业技术学院', '------', '综合', '高职专科'),
+(2067, '漳州卫生职业学院', '------', '------', '高职专科'),
+(2068, '天津天狮学院', '天津', '综合', '本科'),
+(2069, '保定学院', '------', '师范', '本科'),
+(2070, '上海海洋大学', '上海', '农业', '本科'),
+(2071, '上海海关学院', '上海', '综合', '本科'),
+(2072, '浙江警察学院', '浙江', '政法', '本科'),
+(2073, '宁波大红鹰学院', '浙江', '工科', '本科'),
+(2074, '浙江越秀外国语学院', '浙江', '语言', '本科'),
+(2075, '合肥师范学院', '------', '师范', '本科'),
+(2076, '池州学院', '------', '师范', '本科'),
+(2077, '蚌埠学院', '------', '工科', '本科'),
+(2078, '安徽三联学院', '安徽', '工科', '本科'),
+(2079, '福建警察学院', '福建', '政法', '本科'),
+(2080, '武夷学院', '------', '师范', '本科'),
+(2081, '山东万杰医学院', '山东', '医药', '本科'),
+(2082, '潍坊科技学院', '山东', '综合', '本科'),
+(2083, '山东英才学院', '山东', '综合', '本科'),
+(2084, '河南工程学院', '河南', '工科', '本科'),
+(2085, '郑州华信学院', '河南', '工科', '本科'),
+(2086, '郑州科技学院', '河南', '工科', '本科'),
+(2087, '荆楚理工学院', '------', '工科', '本科'),
+(2088, '湖南第一师范学院', '湖南', '师范', '本科'),
+(2089, '仲恺农业工程学院', '北京', '农业', '本科'),
+(2090, '海口经济学院', '海南', '财经', '本科'),
+(2091, '成都学院', '------', '综合', '本科'),
+(2092, '昆明学院', '------', '综合', '本科'),
+(2093, '西安思源学院', '陕西', '工科', '本科'),
+(2094, '陕西国际商贸学院', '陕西', '财经', '本科'),
+(2095, '保定电力职业技术学院', '河北', '工科', '高职专科'),
+(2096, '保险职业学院', '湖南', '财经', '高职专科'),
+(2097, '北海宏源足球职业学院', '广西', '体育', '高职专科'),
+(2098, '北京工商大学嘉华学院', '北京', '财经', '独立学院'),
+(2099, '北京工业大学耿丹学院', '北京', '综合', '独立学院'),
+(2100, '燕京理工学院', '河北', '综合', '本科'),
+(2101, '北京汇佳职业学院', '北京', '语言', '高职专科'),
+(2102, '北京交通职业技术学院', '北京', '工科', '高职专科'),
+(2103, '北京科技大学天津学院', '天津', '综合', '独立学院'),
+(2104, '北京科技职业学院', '北京', '工科', '高职专科'),
+(2105, '北京理工大学珠海学院', '广东', '综合', '独立学院'),
+(2106, '北京培黎职业学院', '北京', '语言', '高职专科'),
+(2107, '北京现代职业技术学院', '北京', '工科', '高职专科'),
+(2108, '北京邮电大学世纪学院', '北京', '综合', '独立学院'),
+(2109, '北京中医药大学东方学院', '河北', '综合', '独立学院'),
+(2110, '长春理工大学光电信息学院', '吉林', '工科', '独立学院'),
+(2111, '长春税务学院信息经济学院', '吉林', '财经', '独立学院'),
+(2112, '长江大学工程技术学院', '湖北', '工科', '独立学院'),
+(2113, '长江工程职业技术学院', '湖北', '工科', '高职专科'),
+(2114, '长沙理工大学城南学院', '湖南', '工科', '独立学院'),
+(2115, '长沙医学院', '湖南', '医药', '本科'),
+(2116, '成都东软学院', '四川', '工科', '本科'),
+(2117, '四川传媒学院', '四川', '艺术', '本科'),
+(2118, '大连科技学院', '辽宁', '工科', '本科'),
+(2119, '电子科技大学成都学院', '四川', '工科', '独立学院'),
+(2120, '大连财经学院', '辽宁', '财经', '本科'),
+(2121, '大连东软信息学院', '辽宁', '工科', '本科'),
+(2122, '东北农业大学成栋学院', '黑龙江', '农业', '独立学院'),
+(2123, '鄂东职业技术学院', '湖北', '工科', '高职专科'),
+(2124, '广西经贸职业技术学院', '广西', '财经', '高职专科'),
+(2125, '广州南洋理工职业学院', '广东', '综合', '高职专科'),
+(2126, '桂林电子科技大学信息科技学院', '广西', '工科', '独立学院'),
+(2127, '黑龙江外国语学院', '黑龙江', '师范', '本科'),
+(2128, '河北大学工商学院', '河北', '综合', '独立学院'),
+(2129, '河北理工大学轻工学院', '河北', '工科', '独立学院'),
+(2130, '河北传媒学院', '河北', '艺术', '本科'),
+(2131, '河南大学民生学院', '河南', '财经', '独立学院'),
+(2132, '河南科技学院新科学院', '河南', '工科', '独立学院'),
+(2133, '黑龙江北开职业技术学院', '黑龙江', '综合', '高职专科'),
+(2134, '黑龙江三江美术职业学院', '黑龙江', '艺术', '高职专科'),
+(2135, '湖北国土资源职业学院', '湖北', '工科', '高职专科'),
+(2136, '湖北三峡职业技术学院', '湖北', '工科', '高职专科'),
+(2137, '湖北职业技术学院', '湖北', '工科', '高职专科'),
+(2138, '湖南工业大学科技学院', '湖南', '工科', '独立学院'),
+(2139, '湖南科技大学潇湘学院', '湖南', '综合', '独立学院'),
+(2140, '湖南涉外经济学院', '湖南', '综合', '本科'),
+(2141, '华北电力大学科技学院', '河北', '工科', '独立学院'),
+(2142, '华北煤炭医学院冀唐学院', '河北', '医药', '独立学院'),
+(2143, '华南师范大学增城学院', '广东', '综合', '独立学院'),
+(2144, '华中科技大学文华学院', '湖北', '工科', '独立学院'),
+(2145, '吉林大学珠海学院', '广东', '综合', '独立学院'),
+(2146, '长春建筑学院', '吉林', '工科', '本科'),
+(2147, '长春科技学院', '吉林', '农业', '本科'),
+(2148, '集美大学诚毅学院', '福建', '综合', '独立学院'),
+(2149, '江苏大学京江学院', '江苏', '综合', '独立学院'),
+(2150, '江苏科技大学南徐学院', '江苏', '综合', '独立学院'),
+(2151, '江西财经大学现代经济管理学院', '江西', '财经', '独立学院'),
+(2152, '江西大宇职业技术学院', '江西', '综合', '高职专科'),
+(2153, '江西服装学院', '江西', '艺术', '本科'),
+(2154, '南昌工学院', '江西', '民族', '本科'),
+(2155, '江西工业贸易职业技术学院', '江西', '综合', '高职专科'),
+(2156, '江西建设职业技术学院', '江西', '工科', '高职专科'),
+(2157, '江西理工大学应用科学学院', '江西', '工科', '独立学院'),
+(2158, '江西外语外贸职业学院', '江西', '财经', '高职专科'),
+(2159, '江西中医学院科技学院', '江西', '医药', '独立学院'),
+(2160, '景德镇陶瓷学院科技艺术学院', '江西', '工科', '独立学院'),
+(2161, '昆明医学院海源学院', '云南', '医药', '独立学院'),
+(2162, '辽宁对外经贸学院', '辽宁', '财经', '本科'),
+(2163, '辽宁科技学院', '辽宁', '工科', '本科'),
+(2164, '辽宁石油化工大学顺华能源学院', '辽宁', '工科', '独立学院'),
+(2165, '南昌大学共青学院', '江西', '综合', '独立学院'),
+(2166, '南昌大学科学技术学院', '江西', '综合', '独立学院'),
+(2167, '南昌航空大学科技学院', '江西', '工科', '独立学院'),
+(2168, '南昌理工学院', '江西', '综合', '本科'),
+(2169, '南充职业技术学院', '四川', '综合', '高职专科'),
+(2170, '南华大学船山学院', '湖南', '工科', '独立学院'),
+(2171, '南京工业大学浦江学院', '江苏', '综合', '独立学院'),
+(2172, '南京航空航天大学金城学院', '江苏', '工科', '独立学院'),
+(2173, '南京审计学院金审学院', '江苏', '综合', '独立学院'),
+(2174, '南京师范大学泰州学院', '江苏', '师范', '独立学院'),
+(2175, '南京信息工程大学滨江学院', '江苏', '综合', '独立学院'),
+(2176, '南京邮电大学通达学院', '江苏', '综合', '独立学院'),
+(2177, '南开大学滨海学院', '天津', '综合', '独立学院'),
+(2178, '青岛港湾职业技术学院', '山东', '工科', '高职专科'),
+(2179, '青岛恒星职业技术学院', '山东', '综合', '高职专科'),
+(2180, '三亚航空旅游职业学院', '海南', '综合', '高职专科'),
+(2181, '山西财经大学华商学院', '山西', '财经', '独立学院'),
+(2182, '山西旅游职业学院', '山西', '语言', '高职专科'),
+(2183, '陕西电子信息职业技术学院', '陕西', '工科', '高职专科'),
+(2184, '上海电影艺术职业学院', '上海', '艺术', '高职专科'),
+(2185, '上海工商外国语职业学院', '上海', '语言', '高职专科'),
+(2186, '上海托普信息技术职业学院', '上海', '工科', '高职专科'),
+(2187, '沈阳城市学院', '辽宁', '综合', '本科'),
+(2188, '沈阳工程学院', '辽宁', '工科', '本科'),
+(2189, '石家庄经济学院华信学院', '河北', '财经', '独立学院'),
+(2190, '石家庄铁道学院四方学院', '河北', '工科', '独立学院'),
+(2191, '河北外国语学院', '河北', '综合', '本科'),
+(2192, '石家庄医学高等专科学校', '河北', '------', '高职专科'),
+(2193, '石家庄邮电职业技术学院', '河北', '工科', '高职专科'),
+(2194, '四川航天职业技术学院', '四川', '工科', '高职专科'),
+(2195, '四川外语学院重庆南方翻译学院', '重庆', '语言', '独立学院'),
+(2196, '苏州经贸职业技术学院', '江苏', '财经', '高职专科'),
+(2197, '太原理工大学现代科技学院', '山西', '工科', '独立学院'),
+(2198, '天津石油职业技术学院', '天津', '工科', '高职专科'),
+(2199, '天津医科大学临床医学院', '天津', '医药', '独立学院'),
+(2200, '武汉交通职业学院', '湖北', '工科', '高职专科'),
+(2201, '武汉理工大学华夏学院', '湖北', '工科', '独立学院'),
+(2202, '武汉民政职业学院', '湖北', '政法', '高职专科'),
+(2203, '武汉铁路职业技术学院', '湖北', '工科', '高职专科'),
+(2204, '西安财经学院行知学院', '陕西', '财经', '独立学院'),
+(2205, '西安海棠职业学院', '陕西', '工科', '高职专科'),
+(2206, '西安培华学院', '陕西', '综合', '本科'),
+(2207, '西北工业大学明德学院', '陕西', '综合', '独立学院'),
+(2208, '厦门大学嘉庚学院', '福建', '综合', '独立学院'),
+(2209, '厦门演艺职业学院', '福建', '艺术', '高职专科'),
+(2210, '云南大学旅游文化学院', '云南', '综合', '独立学院'),
+(2211, '云南科技信息职业学院', '云南', '工科', '高职专科'),
+(2212, '云南师范大学商学院', '云南', '综合', '独立学院'),
+(2213, '云南师范大学文理学院', '云南', '------', '独立学院'),
+(2214, '浙江传媒学院', '浙江', '语言', '本科'),
+(2215, '郑州经贸职业学院', '河南', '财经', '高职专科'),
+(2216, '中北大学信息商务学院', '山西', '工科', '独立学院'),
+(2217, '中国传媒大学南广学院', '江苏', '艺术', '独立学院'),
+(2218, '中国地质大学长城学院', '河北', '综合', '独立学院'),
+(2219, '中国地质大学江城学院', '湖北', '工科', '独立学院'),
+(2220, '中国环境管理干部学院', '河北', '综合', '其它'),
+(2221, '中国矿业大学徐海学院', '江苏', '工科', '独立学院'),
+(2222, '中国医科大学临床医药学院', '辽宁', '医药', '独立学院'),
+(2223, '武汉长江工商学院', '湖北', '财经', '本科'),
+(2224, '重庆工商大学派斯学院', '重庆', '财经', '独立学院'),
+(2225, '重庆工商大学融智学院', '重庆', '财经', '独立学院'),
+(2226, '云南警官学院', '云南', '政法', '本科'),
+(2227, '湖南人文科技学院', '湖南', '师范', '本科'),
+(2228, '安徽农业大学经济技术学院', '安徽', '综合', '独立学院'),
+(2229, '上海济光职业技术学院', '上海', '综合', '高职专科'),
+(2230, '延安大学西安创新学院', '陕西', '综合', '独立学院'),
+(2231, '江苏海事职业技术学院', '江苏', '工科', '高职专科'),
+(2232, '河北农业大学现代科技学院', '河北', '农业', '独立学院'),
+(2233, '哈尔滨德强商务学院', '黑龙江', '综合', '本科'),
+(2234, '海南经贸职业技术学院', '海南', '财经', '高职专科'),
+(2235, '大连软件职业学院', '辽宁', '工科', '高职专科'),
+(2236, '天津海运职业学院', '天津', '综合', '高职专科'),
+(2237, '山东经济学院燕山学院', '山东', '综合', '独立学院'),
+(2238, '济南工程职业技术学院', '山东', '工科', '高职专科'),
+(2239, '江西科技师范学院理工学院', '江西', '工科', '独立学院'),
+(2240, '贵州大学科技学院', '贵州', '综合', '独立学院'),
+(2241, '安徽建筑工业学院城市建设学院', '安徽', '工科', '独立学院'),
+(2242, '贵阳医学院神奇民族医药学院', '贵州', '医药', '独立学院'),
+(2243, '琼台师范高等专科学校', '海南', '师范', '高职专科'),
+(2244, '昆明理工大学津桥学院', '云南', '工科', '独立学院'),
+(2245, '西北师范大学知行学院', '甘肃', '师范', '独立学院'),
+(2246, '河北科技大学理工学院', '河北', '工科', '独立学院'),
+(2247, '天津大学仁爱学院', '天津', '综合', '独立学院'),
+(2248, '中南林业科技大学涉外学院', '湖南', '农业', '独立学院'),
+(2249, '武汉生物工程学院', '湖北', '工科', '本科'),
+(2250, '吉林建筑工程学院城建学院', '吉林', '工科', '独立学院'),
+(2251, '四川外语学院成都学院', '四川', '语言', '独立学院'),
+(2252, '阜阳科技职业学院', '安徽', '工科', '高职专科'),
+(2253, '泉州纺织服装职业学院', '福建', '综合', '高职专科'),
+(2254, '广西民族大学相思湖学院', '广西', '民族', '独立学院'),
+(2255, '河北工业大学城市学院', '天津', '工科', '独立学院'),
+(2256, '天津铁道职业技术学院', '天津', '工科', '高职专科'),
+(2257, '渤海大学文理学院', '辽宁', '综合', '独立学院'),
+(2258, '中国计量学院现代科技学院', '浙江', '工科', '独立学院'),
+(2259, '山东财政学院东方学院', '山东', '综合', '独立学院'),
+(2260, '四川师范大学文理学院', '四川', '师范', '独立学院'),
+(2261, '江西先锋软件职业技术学院', '江西', '工科', '高职专科'),
+(2262, '常德职业技术学院', '湖南', '综合', '高职专科'),
+(2263, '湖北汽车工业学院科技学院', '湖北', '工科', '独立学院'),
+(2264, '沈阳航空工业学院北方科技学院', '辽宁', '工科', '独立学院'),
+(2265, '天津城市建设管理职业技术学院', '天津', '综合', '高职专科'),
+(2266, '马鞍山师范高等专科学校', '安徽', '师范', '高职专科'),
+(2267, '西安翻译学院', '陕西', '语言', '本科'),
+(2268, '陕西青年职业学院', '陕西', '综合', '高职专科'),
+(2269, '沈阳工学院', '辽宁', '工科', '本科'),
+(2270, '云南大学滇池学院', '云南', '综合', '独立学院'),
+(2271, '天津师范大学津沽学院', '天津', '综合', '独立学院'),
+(2272, '大连枫叶职业技术学院', '辽宁', '综合', '高职专科'),
+(2273, '河北软件职业技术学院', '河北', '综合', '高职专科'),
+(2274, '湖南农业大学东方科技学院', '湖南', '农业', '独立学院'),
+(2275, '沈阳化工大学科亚学院', '辽宁', '工科', '独立学院'),
+(2276, '永城职业学院', '河南', '工科', '高职专科'),
+(2277, '海南政法职业学院', '海南', '政法', '高职专科'),
+(2278, '西京学院', '陕西', '工科', '本科'),
+(2279, '安徽财经大学商学院', '安徽', '财经', '独立学院'),
+(2280, '河北医科大学临床学院', '河北', '医药', '独立学院'),
+(2281, '广西大学行健文理学院', '广西', '综合', '独立学院'),
+(2282, '重庆邮电大学移通学院', '重庆', '工科', '独立学院'),
+(2283, '辽宁财贸学院', '辽宁', '综合', '本科'),
+(2284, '唐山科技职业技术学院', '河北', '工科', '高职专科'),
+(2285, '中南财经政法大学武汉学院', '湖北', '财经', '独立学院'),
+(2286, '福建师范大学协和学院', '福建', '综合', '独立学院'),
+(2287, '武汉工程大学邮电与信息工程学院', '湖北', '工科', '独立学院'),
+(2288, '成都信息工程学院银杏酒店管理学院', '四川', '财经', '独立学院'),
+(2289, '哈尔滨广厦学院', '黑龙江', '综合', '本科'),
+(2290, '太原科技大学华科学院', '山西', '工科', '独立学院'),
+(2291, '厦门华天涉外职业技术学院', '福建', '综合', '高职专科'),
+(2292, '石家庄科技信息职业学院', '河北', '工科', '高职专科'),
+(2293, '天津冶金职业技术学院', '天津', '工科', '高职专科'),
+(2294, '白城医学高等专科学校', '吉林', '医药', '高职专科'),
+(2295, '天津体育学院运动与文化艺术学院', '天津', '体育', '独立学院'),
+(2296, '武昌工学院', '湖北', '工科', '本科'),
+(2297, '福建对外经济贸易职业技术学院', '福建', '财经', '高职专科'),
+(2298, '长春光华学院', '吉林', '综合', '本科'),
+(2299, '淮北煤炭师范学院信息学院', '安徽', '师范', '独立学院'),
+(2300, '长春工业大学人文信息学院', '吉林', '工科', '独立学院'),
+(2301, '河北工程大学科信学院', '河北', '工科', '独立学院'),
+(2302, '宁夏大学新华学院', '宁夏', '综合', '独立学院'),
+(2303, '燕山大学里仁学院', '河北', '工科', '独立学院'),
+(2304, '西安建筑科技大学华清学院', '陕西', '工科', '独立学院'),
+(2305, '山西电力职业技术学院', '山西', '工科', '高职专科'),
+(2306, '哈尔滨远东理工学院', '黑龙江', '工科', '本科'),
+(2307, '中原工学院信息商务学院', '河南', '财经', '独立学院'),
+(2308, '沧州医学高等专科学校', '河北', '医药', '高职专科'),
+(2309, '湖南商学院北津学院', '湖南', '财经', '独立学院'),
+(2310, '江西农业大学南昌商学院', '江西', '综合', '独立学院'),
+(2311, '兰州商学院陇桥学院', '甘肃', '财经', '独立学院'),
+(2312, '武汉科技大学城市学院', '湖北', '工科', '独立学院'),
+(2313, '辽宁中医药大学杏林学院', '辽宁', '医药', '独立学院'),
+(2314, '江西师范大学科学技术学院', '江西', '综合', '独立学院'),
+(2315, '湖南司法警官职业学院', '湖南', '政法', '高职专科'),
+(2316, '商洛学院', '陕西', '综合', '本科'),
+(2317, '天津城市职业学院', '天津', '综合', '高职专科'),
+(2318, '抚州职业技术学院', '江西', '工科', '高职专科'),
+(2319, '湖南工程学院应用技术学院', '湖南', '工科', '独立学院'),
+(2320, '烟台大学文经学院', '山东', '综合', '独立学院'),
+(2321, '岳阳职业技术学院', '湖南', '综合', '高职专科'),
+(2322, '长江大学文理学院', '湖北', '工科', '独立学院'),
+(2323, '山东医学高等专科学校', '山东', '医药', '高职专科'),
+(2324, '河南检察职业学院', '河南', '政法', '高职专科'),
+(2325, '广西中医学院赛恩斯新医药学院', '广西', '医药', '独立学院'),
+(2326, '湖北大学知行学院', '湖北', '工科', '独立学院'),
+(2327, '贵州大学明德学院', '贵州', '综合', '独立学院'),
+(2328, '湖北工业大学商贸学院', '湖北', '财经', '独立学院'),
+(2329, '华东交通大学理工学院', '江西', '工科', '独立学院'),
+(2330, '贵阳中医学院时珍学院', '贵州', '医药', '独立学院'),
+(2331, '青岛求实职业技术学院', '山东', '综合', '高职专科'),
+(2332, '西安工业大学北方信息工程学院', '陕西', '工科', '独立学院'),
+(2333, '新疆医科大学厚博学院', '新疆', '医药', '独立学院'),
+(2334, '河北师范大学汇华学院', '河北', '师范', '独立学院'),
+(2335, '江苏经贸职业技术学院', '江苏', '财经', '高职专科'),
+(2336, '郑州职业技术学院', '河南', '工科', '高职专科'),
+(2337, '山东药品食品职业学院', '山东', '医药', '高职专科'),
+(2338, '天津外国语学院滨海外事学院', '天津', '语言', '独立学院'),
+(2339, '贵州师范大学求是学院', '贵州', '师范', '独立学院'),
+(2340, '天津生物工程职业技术学院', '天津', '工科', '高职专科'),
+(2341, '河北经贸大学经济管理学院', '河北', '财经', '独立学院'),
+(2342, '山西师范大学现代文理学院', '山西', '师范', '独立学院'),
+(2343, '三峡大学科技学院', '湖北', '工科', '独立学院'),
+(2344, '安徽大学江淮学院', '安徽', '综合', '独立学院'),
+(2345, '吉首大学张家界学院', '湖南', '综合', '独立学院'),
+(2346, '安顺学院', '贵州', '综合', '本科'),
+(2347, '辽宁何氏医学院', '辽宁', '医药', '本科'),
+(2348, '天津理工大学中环信息学院', '天津', '综合', '独立学院'),
+(2349, '贵州财经学院商务学院', '贵州', '财经', '独立学院'),
+(2350, '西安电子科技大学长安学院', '陕西', '工科', '独立学院'),
+(2351, '上海思博职业技术学院', '上海', '综合', '高职专科'),
+(2352, '陕西邮电职业技术学院', '陕西', '工科', '高职专科'),
+(2353, '哈尔滨华德学院', '黑龙江', '工科', '本科'),
+(2354, '济南大学泉城学院', '山东', '综合', '独立学院'),
+(2355, '凯里学院', '贵州', '综合', '本科'),
+(2356, '海南万和信息职业技术学院', '海南', '工科', '高职专科'),
+(2357, '新乡医学院三全学院', '河南', '医药', '独立学院'),
+(2358, '石家庄外国语职业学院', '河北', '语言', '高职专科'),
+(2359, '海南外国语职业学院', '海南', '综合', '高职专科'),
+(2360, '陕西警官职业学院', '陕西', '政法', '高职专科'),
+(2361, '江汉大学文理学院', '湖北', '财经', '独立学院'),
+(2362, '渤海石油职业学院', '河北', '工科', '高职专科'),
+(2363, '山东旅游职业学院', '山东', '综合', '高职专科'),
+(2364, '广西工学院鹿山学院', '广西', '工科', '独立学院'),
+(2365, '陕西科技大学镐京学院', '陕西', '工科', '独立学院'),
+(2366, '东北师范大学人文学院', '吉林', '综合', '独立学院'),
+(2367, '江西制造职业技术学院', '江西', '工科', '高职专科'),
+(2368, '沈阳工业大学工程学院', '辽宁', '工科', '独立学院'),
+(2369, '郧阳医学院药护学院', '湖北', '医药', '独立学院'),
+(2370, '山西医科大学晋祠学院', '山西', '医药', '独立学院'),
+(2371, '四川警安职业学院', '四川', '综合', '高职专科'),
+(2372, '青海大学昆仑学院', '青海', '综合', '独立学院'),
+(2373, '兰州商学院长青学院', '甘肃', '财经', '独立学院'),
+(2374, '湖北师范学院文理学院', '湖北', '师范', '独立学院'),
+(2375, '西安铁路职业技术学院', '陕西', '工科', '高职专科'),
+(2376, '上海立信会计学院', '上海', '财经', '本科'),
+(2377, '上海电机学院', '上海', '工科', '本科'),
+(2378, '湖南工学院', '湖南', '工科', '本科'),
+(2379, '毕节学院', '贵州', '师范', '本科'),
+(2380, '贵阳学院', '贵州', '综合', '本科'),
+(2381, '铜仁学院', '贵州', '综合', '本科'),
+(2382, '赤峰学院', '内蒙古', '综合', '本科'),
+(2383, '天津外国语大学', '------', '------', '------'),
+(2384, '河北民族师范学院', '------', '------', '------'),
+(2385, '沧州师范学院', '------', '------', '------'),
+(2386, '红河卫生职业学院', '云南', '医药', '高职专科'),
+(2387, '四川电影电视职业学院', '四川', '艺术', '高职专科'),
+(2388, '大连海洋大学', '------', '------', '------'),
+(2389, '朝阳师范高等专科学校', '------', '------', '------'),
+(2390, '吉林财经大学', '------', '------', '------'),
+(2391, '云南外事外语职业学院', '云南', '语言', '高职专科'),
+(2392, '常州大学', '------', '------', '------'),
+(2393, '浙江农林大学', '------', '------', '------'),
+(2394, '四川三河职业学院', '四川', '综合', '高职专科'),
+(2395, '淮北师范大学', '------', '------', '------'),
+(2396, '宁德师范学院', '------', '------', '------'),
+(2397, '济南幼儿师范高等专科学校', '山东', '师范', '高职专科'),
+(2398, '西南林业大学', '------', '------', '------'),
+(2399, '吕梁学院', '------', '------', '------'),
+(2400, '公安海警学院', '------', '------', '------'),
+(2401, '南华工商学院', '------', '------', '------'),
+(2402, '四川汽车职业技术学院', '四川', '工科', '高职专科'),
+(2403, '南京森林警察学院', '------', '------', '------'),
+(2404, '江西警察学院', '------', '------', '------'),
+(2405, '新余学院', '------', '------', '------'),
+(2406, '湖南女子学院', '------', '------', '------'),
+(2407, '甘肃民族师范学院', '------', '------', '------'),
+(2408, '河南城建学院', '------', '------', '------'),
+(2409, '河南警察学院', '------', '------', '------'),
+(2410, '郑州师范学院', '------', '------', '------'),
+(2411, '浙江农林大学天目学院', '------', '------', '------'),
+(2412, '哈尔滨石油学院', '', '工科', '本科'),
+(2413, '无锡太湖学院', '------', '------', '------'),
+(2414, '齐齐哈尔理工职业学院', '黑龙江', '工科', '高职专科'),
+(2415, '郑州成功财经学院', '', '财经', '本科'),
+(2416, '北京卫生职业学院', '北京', '医药', '高职专科'),
+(2417, '中国人民解放军炮兵学院', '------', '------', '------'),
+(2418, '中国人民解放军第二军医大学', '------', '------', '------'),
+(2419, '中国人民解放军海军飞行学院', '------', '------', '------'),
+(2420, '河北外国语职业学院', '------', '------', '------'),
+(2421, '运城护理职业学院', '山西', '医药', '高职专科'),
+(2422, '大同煤炭职业技术学院', '------', '------', '------'),
+(2423, '山西职业技术学院', '------', '------', '------'),
+(2424, '绍兴职业技术学院', '------', '------', '------'),
+(2425, '广东舞蹈戏剧职业学院', '广东', '艺术', '高职专科'),
+(2426, '山东职业学院（原济南铁道职业技术', '------', '------', '------'),
+(2427, '湖南冶金职业技术学院', '------', '------', '------'),
+(2428, '惠州卫生职业技术学院', '广东', '医药', '高职专科'),
+(2429, '北京人民警察学院', '------', '------', '------'),
+(2430, '江西管理职业学院', '------', '------', '------'),
+(2431, '齐鲁师范学院', '------', '------', '------'),
+(2432, '潍坊工程职业学院', '------', '------', '------'),
+(2433, '开封文化艺术职业学院', '------', '------', '------'),
+(2434, '广东第二师范学院', '------', '------', '------'),
+(2435, '陕西学前师范学院', '陕西', '师范', '本科'),
+(2436, '甘肃机电职业技术学院', '------', '------', '------'),
+(2437, '山西青年职业学院', '------', '------', '------'),
+(2438, '福建江夏学院', '------', '------', '------'),
+(2439, '白银矿冶职业技术学院', '------', '------', '------'),
+(2440, '上海健康职业技术学院', '------', '------', '------'),
+(2441, '山东青年政治学院', '------', '------', '------'),
+(2442, '沈阳北软信息职业技术学院', '辽宁', '工科', '高职专科'),
+(2443, '川北幼儿师范高等专科学校', '四川', '工科', '高职专科'),
+(2444, '上海民航职业技术学院', '上海', '工科', '高职专科'),
+(2445, '安阳幼儿师范高等专科学校', '河南', '师范', '高职专科'),
+(2446, '泉州幼儿师范高等专科学校', '福建', '师范', '高职专科'),
+(2447, '四川卫生康复职业学院', '四川', '医药', '高职专科'),
+(2448, '广西现代职业技术学院', '------', '------', '------'),
+(2449, '柳州铁道职业技术学院', '------', '------', '------'),
+(2450, '江苏建康职业学院', '------', '------', '------'),
+(2451, '衢州学院', '------', '------', '------'),
+(2452, '共青科技职业学院', '江西', '工科', '高职专科'),
+(2453, '哈尔滨工业大学(威海)', '------', '------', '------'),
+(2454, '合肥科技职业学院', '安徽', '工科', '高职专科'),
+(2455, '河北联合大学轻工学院', '------', '------', '------'),
+(2456, '哈尔滨江南职业技术学院', '------', '------', '------'),
+(2457, '河北联合大学冀唐学院', '------', '------', '------'),
+(2458, '景德镇陶瓷职业技术学院', '江西', '工科', '高职专科'),
+(2459, '石家庄铁道大学四方学院', '------', '------', '------'),
+(2460, '天津职业技术师范大学', '------', '------', '------'),
+(2461, '郑州升达经贸管理学院', '河南', '财经', '本科'),
+(2462, '辽宁政法职业学院', '辽宁', '政法', '高职专科'),
+(2463, '武警福州指挥学院', '------', '------', '------'),
+(2464, '河北联合大学', '河北', '综合', '本科'),
+(2465, '淮北师范大学信息学院', '------', '------', '------'),
+(2466, '天津外国语大学滨海外事学院', '------', '------', '------'),
+(2467, '合肥幼儿师范高等专科学校', '安徽', '师范', '高职专科'),
+(2468, '湖北医药学院药护学院', '------', '------', '------'),
+(2469, '中国人民解放军第三军医大学', '------', '------', '------'),
+(2470, '澳门大学', '------', '------', '------'),
+(2471, '天津广播影视职业学院', '------', '------', '------'),
+(2472, '河北劳动关系职业学院', '------', '------', '------'),
+(2473, '泊头职业学院', '------', '------', '------'),
+(2474, '宣化科技职业学院', '------', '------', '------'),
+(2475, '山西轻工职业技术学院', '------', '------', '------'),
+(2476, '乌兰察布医学高等专科学校', '内蒙古', '林业', '高职专科'),
+(2477, '鄂尔多斯职业学院', '------', '------', '------'),
+(2478, '辽宁现代服务职业技术学院', '------', '------', '------'),
+(2479, '四平职业大学', '------', '------', '------'),
+(2480, '杭州科技职业技术学院', '------', '------', '------'),
+(2481, '江西冶金职业技术学院', '------', '------', '------'),
+(2482, '江西新闻出版职业技术学院', '------', '------', '------'),
+(2483, '郑州理工职业学院', '------', '------', '------'),
+(2484, '山东理工职业学院', '------', '------', '------'),
+(2485, '山东文化产业职业学院', '------', '------', '------'),
+(2486, '安阳职业技术学院', '------', '------', '------'),
+(2487, '新乡职业技术学院', '------', '------', '------'),
+(2488, '驻马店职业技术学院', '------', '------', '------'),
+(2489, '三峡旅游职业技术学院', '------', '------', '------'),
+(2490, '湖南生物机电职业技术学院', '------', '------', '------'),
+(2491, '广州番禺职业技术学院', '------', '------', '------'),
+(2492, '广西幼儿师范高等专科学校', '广西', '师范', '高职专科'),
+(2493, '重庆航天职业技术学院', '', '------', '------'),
+(2494, '重庆商务职业学院', '', '------', '------'),
+(2495, '四川幼儿师范高等专科学校', '四川', '师范', '高职专科'),
+(2496, '廊坊东方职业技术学院', '------', '------', '------'),
+(2497, '石家庄人民医学高等专科学校', '河北', '医药', '高职专科'),
+(2498, '石家庄科技职业学院', '------', '------', '------'),
+(2499, '石家庄理工职业学院', '------', '------', '------'),
+(2500, '运城职业技术学院', '------', '------', '------'),
+(2501, '大连航运职业技术学院', '------', '------', '------'),
+(2502, '大连装备制造职业技术学院', '------', '------', '------'),
+(2503, '大连汽车职业技术学院', '------', '------', '------'),
+(2504, '苏州信息职业技术学院', '------', '------', '------'),
+(2505, '浙江横店影视职业学院', '------', '------', '------'),
+(2506, '浙江汽车职业技术学院', '------', '------', '------'),
+(2507, '安徽矿业职业技术学院', '------', '------', '------'),
+(2508, '合肥信息技术职业学院', '------', '------', '------'),
+(2509, '民办合肥滨湖职业技术学院', '------', '------', '------'),
+(2510, '安徽现代信息工程职业学院', '------', '------', '------'),
+(2511, '泉州泰山航海职业学院', '------', '------', '------'),
+(2512, '泉州轻工职业学院', '------', '------', '------'),
+(2513, '厦门安防科技职业学院', '------', '------', '------'),
+(2514, '漯河食品职业学院', '------', '------', '------'),
+(2515, '郑州城市职业学院（原郑州布瑞达理', '------', '------', '------'),
+(2516, '广西经济职业学院', '------', '------', '------'),
+(2517, '三亚理工职业学院', '------', '------', '------'),
+(2518, '重庆传媒职业学院', '', '------', '------'),
+(2519, '重庆能源职业学院', '', '------', '------'),
+(2520, '西安医学高等专科学校', '陕西', '医药', '高职专科'),
+(2521, '北京第二外国语学院中瑞酒店管理学', '------', '------', '------'),
+(2522, '常州大学怀德学院', '------', '------', '------'),
+(2523, '上海财经大学浙江学院', '------', '------', '------'),
+(2524, '西南交通大学希望学院', '------', '------', '------'),
+(2525, '东莞职业技术学院', '------', '------', '------'),
+(2526, '山东女子学院', '------', '------', '------'),
+(2527, '北京交通运输职业学院', '------', '------', '------'),
+(2528, '北京新圆明职业学院', '------', '------', '------'),
+(2529, '北京体育职业学院', '------', '------', '------'),
+(2530, '承德护理职业学院', '------', '------', '------'),
+(2531, '廊坊燕京职业技术学院', '------', '------', '------'),
+(2532, '阳泉师范高等专科学校', '山西', '师范', '高职专科'),
+(2533, '辽宁卫生职业技术学院', '------', '------', '------'),
+(2534, '吉林科技职业技术学院', '------', '------', '------'),
+(2535, '宿迁泽达职业技术学院', '------', '------', '------'),
+(2536, '桐城师范高等专科学校', '------', '------', '------'),
+(2537, '安徽汽车职业技术学院', '------', '------', '------'),
+(2538, '皖西卫生职业学院', '------', '------', '------'),
+(2539, '滁州城市职业学院', '------', '------', '------'),
+(2540, '青岛远洋船员职业学院', '------', '------', '------'),
+(2541, '焦作工贸职业学院', '------', '------', '------'),
+(2542, '河南化工职业学院', '------', '------', '------'),
+(2543, '河南艺术职业学院', '------', '------', '------'),
+(2544, '许昌陶瓷职业学院', '------', '------', '------'),
+(2545, '辽宁理工职业学院', '------', '------', '------'),
+(2546, '晋中师范高等专科学校', '山西', '师范', '高职专科'),
+(2547, '内蒙古工业职业学院', '内蒙古', '工科', '高职专科'),
+(2548, '呼伦贝尔职业技术学院', '------', '------', '------'),
+(2549, '满洲里俄语职业学院', '------', '------', '------'),
+(2550, '辽宁冶金职业技术学院', '------', '------', '------'),
+(2551, '辽宁工程职业学院', '------', '------', '------'),
+(2552, '辽宁城市建设职业技术学院', '------', '------', '------'),
+(2553, '铁岭卫生职业学院', '------', '------', '------'),
+(2554, '黑龙江护理高等专科学校', '------', '------', '------'),
+(2555, '黑龙江农垦科技职业学院', '------', '------', '------'),
+(2556, '苏州工业园区服务外包职业学院', '------', '------', '------'),
+(2557, '郑州信息工程职业学院', '------', '------', '------'),
+(2558, '长垣烹饪职业技术学院', '------', '------', '------'),
+(2559, '武汉城市职业学院', '------', '------', '------'),
+(2560, '湖南高尔夫旅游职业学院', '------', '------', '------'),
+(2561, '湖南工商职业学院', '------', '------', '------'),
+(2562, '广州华商职业学院', '------', '------', '------'),
+(2563, '广东南方职业学院', '', '------', '------'),
+(2564, '广州华夏职业学院', '------', '------', '------'),
+(2565, '广东环境保护工程职业学院', '------', '------', '------'),
+(2566, '广西科技职业学院', '------', '------', '------'),
+(2567, '广西卫生职业技术学院', '------', '------', '------'),
+(2568, '海南工商职业学院', '------', '------', '------'),
+(2569, '重庆房地产职业学院', '', '------', '------'),
+(2570, '重庆电讯职业学院', '', '------', '------'),
+(2571, '重庆化工职业学院', '', '------', '------'),
+(2572, '重庆交通职业学院', '', '------', '------'),
+(2573, '重庆旅游职业学院', '', '------', '------'),
+(2574, '陕西工商职业学院', '------', '------', '------'),
+(2575, '榆林职业技术学院', '------', '------', '------');
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `tweets`
+--
+
+CREATE TABLE `tweets` (
+  `id` int(10) NOT NULL,
+  `user` int(10) NOT NULL,
+  `content` text,
+  `visibility` tinyint(2) DEFAULT NULL,
+  `photos` text,
+  `read` tinyint(1) DEFAULT NULL,
+  `created_at` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `user`
+--
+
+CREATE TABLE `user` (
+  `uid` int(10) NOT NULL,
+  `phonenum` varchar(32) NOT NULL,
+  `password` varchar(32) NOT NULL,
+  `permission` tinyint(1) DEFAULT NULL,
+  `online` tinyint(2) DEFAULT NULL,
+  `created_at` double DEFAULT NULL,
+  `last_login` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `user_ext`
+--
+
+CREATE TABLE `user_ext` (
+  `uid` int(10) NOT NULL,
+  `content` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `user_meta`
+--
+
+CREATE TABLE `user_meta` (
+  `uid` int(10) NOT NULL,
+  `nickname` varchar(32) DEFAULT NULL,
+  `realname` varchar(32) DEFAULT NULL,
+  `avatar` text,
+  `small_avatar` text,
+  `gender` tinyint(2) DEFAULT NULL,
+  `age` tinyint(3) DEFAULT NULL,
+  `height` double DEFAULT NULL,
+  `birthday` double DEFAULT NULL,
+  `horoscope` tinyint(3) DEFAULT NULL,
+  `hometown_province` int(9) DEFAULT NULL,
+  `hometown_city` int(9) DEFAULT NULL,
+  `hometown_addr` text,
+  `workplace_province` int(9) DEFAULT NULL,
+  `workplace_city` int(9) DEFAULT NULL,
+  `workplace_addr` text,
+  `contact` text,
+  `motto` text,
+  `show_name` tinyint(1) DEFAULT NULL,
+  `show_contact` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `user_school`
+--
+
+CREATE TABLE `user_school` (
+  `uid` int(10) NOT NULL,
+  `school_name` text,
+  `degree` int(9) DEFAULT NULL,
+  `major` int(9) DEFAULT NULL,
+  `school_id` int(10) DEFAULT NULL,
+  `school_province` int(10) DEFAULT NULL,
+  `school_city` int(10) DEFAULT NULL,
+  `auth_photo` text,
+  `pass` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `wall`
+--
+
+CREATE TABLE `wall` (
+  `uid` int(10) NOT NULL,
+  `cover` text,
+  `title` text,
+  `content` text,
+  `filter` text,
+  `upvotes` int(10) DEFAULT NULL,
+  `created_at` double DEFAULT NULL,
+  `modified_at` double DEFAULT NULL,
+  `published` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `wallupvotes`
+--
+
+CREATE TABLE `wallupvotes` (
+  `id` int(10) NOT NULL,
+  `uid` int(10) DEFAULT NULL,
+  `target` int(10) DEFAULT NULL,
+  `new` tinyint(1) DEFAULT NULL,
+  `time` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `abuse_report`
+--
+ALTER TABLE `abuse_report`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `blacklist`
+--
+ALTER TABLE `blacklist`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `chatmsg`
+--
+ALTER TABLE `chatmsg`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `city`
+--
+ALTER TABLE `city`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `friends`
+--
+ALTER TABLE `friends`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `friend_group`
+--
+ALTER TABLE `friend_group`
+  ADD PRIMARY KEY (`user`);
+
+--
+-- Indexes for table `horoscope`
+--
+ALTER TABLE `horoscope`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `license`
+--
+ALTER TABLE `license`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `major`
+--
+ALTER TABLE `major`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `messages`
+--
+ALTER TABLE `messages`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `msgreplies`
+--
+ALTER TABLE `msgreplies`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `notification`
+--
+ALTER TABLE `notification`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `pageview`
+--
+ALTER TABLE `pageview`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `photos`
+--
+ALTER TABLE `photos`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `province`
+--
+ALTER TABLE `province`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `replies`
+--
+ALTER TABLE `replies`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `school`
+--
+ALTER TABLE `school`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tweets`
+--
+ALTER TABLE `tweets`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`uid`);
+
+--
+-- Indexes for table `user_ext`
+--
+ALTER TABLE `user_ext`
+  ADD PRIMARY KEY (`uid`);
+
+--
+-- Indexes for table `user_meta`
+--
+ALTER TABLE `user_meta`
+  ADD PRIMARY KEY (`uid`);
+
+--
+-- Indexes for table `user_school`
+--
+ALTER TABLE `user_school`
+  ADD PRIMARY KEY (`uid`);
+
+--
+-- Indexes for table `wall`
+--
+ALTER TABLE `wall`
+  ADD PRIMARY KEY (`uid`);
+
+--
+-- Indexes for table `wallupvotes`
+--
+ALTER TABLE `wallupvotes`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `abuse_report`
+--
+ALTER TABLE `abuse_report`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+--
+-- AUTO_INCREMENT for table `blacklist`
+--
+ALTER TABLE `blacklist`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `chatmsg`
+--
+ALTER TABLE `chatmsg`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `city`
+--
+ALTER TABLE `city`
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=392;
+--
+-- AUTO_INCREMENT for table `friends`
+--
+ALTER TABLE `friends`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `horoscope`
+--
+ALTER TABLE `horoscope`
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+--
+-- AUTO_INCREMENT for table `license`
+--
+ALTER TABLE `license`
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `messages`
+--
+ALTER TABLE `messages`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `msgreplies`
+--
+ALTER TABLE `msgreplies`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `notification`
+--
+ALTER TABLE `notification`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+--
+-- AUTO_INCREMENT for table `pageview`
+--
+ALTER TABLE `pageview`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `photos`
+--
+ALTER TABLE `photos`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `province`
+--
+ALTER TABLE `province`
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+--
+-- AUTO_INCREMENT for table `replies`
+--
+ALTER TABLE `replies`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `school`
+--
+ALTER TABLE `school`
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2576;
+--
+-- AUTO_INCREMENT for table `tweets`
+--
+ALTER TABLE `tweets`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `user`
+--
+ALTER TABLE `user`
+  MODIFY `uid` int(10) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `wallupvotes`
+--
+ALTER TABLE `wallupvotes`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
