@@ -7,4 +7,5 @@ upload/*.*
 .DS_Store		
 *.swp
 www/static/upload
-www/static/upload/.gitkeep
+!www/static/upload/.gitkeep
+www/config/config_default.py
