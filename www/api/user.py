@@ -273,3 +273,20 @@ def set_user_login_state(uid, state):
 
     db.session.commit()
     return u
+
+def update_user_age():
+    print('Running user age check')
+    all_users = UserMeta.query.all()
+    for user_meta in all_users:
+        if (user_meta.birthday == None):
+            continue
+        from datetime import datetime
+        user_meta.age = int(calculate_age(datetime.fromtimestamp(user_meta.birthday)))
+
+    db.session.commit()
+    return {'status':200}
+
+def calculate_age(born):
+    from datetime import date
+    today = date.today()
+    return today.year - born.year - ((today.month, today.day) < (born.month, born.day))

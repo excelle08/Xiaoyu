@@ -4,7 +4,6 @@ from urls import app
 from config.config import configs
 from api import datetime_filter
 
-
 def get_mysql_conn_str():
     db_user = configs.db.user
     db_pass = configs.db.password

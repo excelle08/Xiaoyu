@@ -20,6 +20,7 @@ nopriv_allowed = [
     '/api/common/.*',
     '/api/user/verify',
     '/api/user/login',
+    '/api/user/cron',
     '/api/register',
     '/api/test/.*',
     '/test.*'
@@ -366,6 +367,10 @@ def api_edit_password():
     vcode = request.form['vcode']
     api.user.set_user_password(uid, original, new, vcode)
     return redirect(url_for('.index'))
+
+@app.route('/api/user/cron', methods=['GET'])
+def api_user_cron_tasks():
+    return return_json(api.user.update_user_age())
 
 
 #    ------------------FRIENDS----------------
