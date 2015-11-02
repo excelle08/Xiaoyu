@@ -121,7 +121,7 @@ def pageview_recorder(req):
     uid = session['uid'] if 'uid' in session else 0
     path = request.path
     ip = request.remote_addr
-    api.statistics.pageview(uid, path, ip)
+    api.statistics.pageview(uid, ip, path)
     return req
 
 #  ---------------Front-end view rendering route--------------
