@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, Response
-from flask import jsonify, session, request, jsonify
+from flask import jsonify, session, request
 from flask import render_template, make_response
 from flask import redirect, url_for
 from api import APIError, check_admin
@@ -23,7 +23,8 @@ nopriv_allowed = [
     '/api/user/cron',
     '/api/register',
     '/api/test/.*',
-    '/test.*'
+    '/test.*',
+    '/api/ua'
 ]
 
 blocked_allowed = [
@@ -645,7 +646,7 @@ def api_upload_to_album():
     try:
         photo = request.files['photo']
         desc = request.form['desc'] if 'desc' in request.form else ''
-        return json.dumps(api.album.upload_photo(photo, desc, request.args).json)
+        return api.album.upload_photo(photo, desc, request.args).json
     except KeyError, e:
         raise APIError(e.message)
 
@@ -850,6 +851,17 @@ def get_school():
 def get_major():
     return return_json(api.common.get_majors())
 
+
+@app.route('/api/ua/check_uc', methods=['GET','POST'])
+def check_if_uc():
+    ua = request.headers.get('User-Agent')
+    if not ua:
+        return jsonify({'code':-1})
+    if ua.find('UC') != -1:
+        return jsonify({'code':1})
+    else:
+        return jsonify({'code':-1})
+
 #############################################################
 ##########  TEST admin API goes here#########################
 ##########  Remove code below later #########################
@@ -869,3 +881,4 @@ def test_admin_pass_user_school_info():
     if (request.form['password'] != TEST_ADMIN_PASSWORD):
         return return_json({'error':'Invalid password.'})
     return return_json(json.loads(api.user.pass_user_school(int(request.form['uid'])).json))
+
