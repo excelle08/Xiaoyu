@@ -232,5 +232,5 @@ def get_guest_wall_items(uid):
     if self_wall.published==True:
         user_list.insert(0, self_meta)
 
-    return user_list
+    return user_list[:30]
 
