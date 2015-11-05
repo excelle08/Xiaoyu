@@ -209,33 +209,28 @@ def filter_users(uid):
 def get_guest_wall_items(uid):
     initial = filter_users(uid)
 
-    self_wall = Wall.query.filter(Wall.uid==session['uid']).first()
-    if self_wall.published == 1:
-        initial.insert(0, UserMeta.query.filter_by(uid=session['uid']).first())
+    wall_list = []
+    for user_info in initial:
+        wall_info = Wall.query.filter_by(uid=user_info.uid, published=True).first()
+        if wall_info:
+            wall_list.append(wall_info)
 
-    if initial.__len__() >= 7 and initial.__len__() <= 30 :
-        return initial
+    if (len(wall_list) < 7):
+        walls_to_append = Wall.query.filter_by(published=True).limit(7)
+        wall_list.extend([wall for wall in walls_to_append if not wall in wall_list])
 
-    if initial.__len__() > 30:
-        return initial[:30]
+    for wall_info in wall_list:
+        wall_info.upvote_count = WallUpvote.query.filter_by(target=wall_info.uid).count()
+    wall_list = sorted(wall_list, key=lambda wall_info: wall_info.upvote_count, reverse=True)
 
-    items_to_remove = []
-    for item in initial:
-        w = Wall.query.filter(Wall.uid==item.uid, Wall.published==1).first()
-        if not w:
-            items_to_remove.append(item)
-    initial = [item for item in initial if not item in items_to_remove]
+    user_list = [UserMeta.query.filter_by(uid=wall.uid).first() for wall in wall_list]
 
-    numbers = 7 - initial.__len__()
-    ids = [ item.uid for item in Wall.query.filter(Wall.published==1).order_by(Wall.created_at.desc()).limit(numbers)]
-    #if session['uid'] in ids:
-    #    ids.remove(session['uid'])
+    self_wall = Wall.query.filter_by(uid=uid).first()
+    self_meta = UserMeta.query.filter_by(uid=uid).first()
+    if (self_meta in user_list):
+        user_list.remove(self_meta)
+    if self_wall.published==True:
+        user_list.insert(0, self_meta)
 
-    result = []
-
-    for i in ids:
-        result.append(UserMeta.query.filter_by(uid=i).first())
-    initial.extend(result)
-
-    return initial
+    return user_list
 
