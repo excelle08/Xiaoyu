@@ -867,7 +867,7 @@ def check_if_qq():
     ua = request.headers.get('User-Agent')
     if not ua:
         return jsonify({'code':-1})
-    if ua.find('QQBrowser') != 1:
+    if ua.find('QQ') != -1:
         return jsonify({'code':1})
     else:
         return jsonify({'code':-1})
