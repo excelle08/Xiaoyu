@@ -6,11 +6,13 @@ from werkzeug.datastructures import FileStorage
 from PIL import Image
 import time, hashlib, random
 
-accepted_mime = ['image/jpeg', 'image/gif', 'image/png', 'image/tiff']
-suffix = ['jpg', 'gif', 'png', 'tiff']
+accepted_mime = ['image/jpeg', 'image/gif', 'image/png', 'image/tiff', 'application/octet-stream']
+suffix = ['jpg', 'gif', 'png', 'tiff', 'jpg']
 
 # imagedata should be a FileStorage object
 def upload_photo(imgdata, args={}):
+    print(imgdata.mimetype)
+
     if not isinstance(imgdata, FileStorage):
         raise APIError('Field "imgdata" is supposed to be a FileStorage object')
     if not imgdata.mimetype in accepted_mime:
