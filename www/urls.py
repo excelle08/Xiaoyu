@@ -862,6 +862,16 @@ def check_if_uc():
     else:
         return jsonify({'code':-1})
 
+@app.route('/api/ua/check_qq', methods=['GET','POST'])
+def check_if_qq():
+    ua = request.headers.get('User-Agent')
+    if not ua:
+        return jsonify({'code':-1})
+    if ua.find('QQBrowser') != 1:
+        return jsonify({'code':1})
+    else:
+        return jsonify({'code':-1})
+
 #############################################################
 ##########  TEST admin API goes here#########################
 ##########  Remove code below later #########################
