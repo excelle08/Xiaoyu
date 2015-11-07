@@ -1,0 +1,112 @@
+
+{% extends 'admin/base.html' %}
+
+{% block title %}统计{% endblock %}
+
+{% block beforehead %}
+
+
+
+<script type="text/javascript">
+
+var queryArgs = getArgs();
+var page_index = 1;
+if(queryArgs.page) {
+    page_index = parseInt(queryArgs.page);
+}
+
+$(function() {
+    getApi('/api/admin/stat?page=' + page_index , function (err, results) {
+        if (err) {
+            return showError(err);
+        }
+        $('#div-loading').hide();
+        initVM(results);
+    });
+});
+
+function initVM(data) {
+    $('#div-').show();
+    var vm = new Vue({
+        el: '#div-stat',
+        data: {
+            numbers: data.numbers,
+            pvs: data.pvs,
+            page: data.page
+        },
+        methods: {
+            previous: function () {
+                gotoPage(page_index -= 1);
+            },
+            next: function () {
+                gotoPage(page_index += 1);
+            }
+        }
+    });
+}
+
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="uk-width-1-1" id="div-stat">
+    <div class="uk-width-1-1 uk-margin-bottom">
+        <div class="uk-alert uk-alert-danger uk-hidden"></div>
+    </div>
+
+    <div>
+        <h3>统计数据</h3>
+        <dl class="uk-description-list-horizontal">
+            <dt>在线人数</dt>
+            <dd v-text="numbers.onlines"></dd>
+            <dt>24小时内访问量</dt>
+            <dd v-text="numbers.today_pv"></dd>
+            <dt>7日访问量</dt>
+            <dd v-text="numbers.week_pv"></dd>
+            <dt>30日访问量</dt>
+            <dd v-text="numbers.month_pv"></dd>
+            <dt>总访问量</dt>
+            <dd v-text="numbers.total_pv"></dd>
+            <dt>开启筛选器用户数</dt>
+            <dd v-text="numbers.user_with_filter"></dd>
+        </dl>
+    </div>
+
+    <div class="uk-width-1-1">
+        <table class="uk-table">
+            <caption>用户访问详情</caption>
+            <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>用户昵称</th>
+                    <th>访问路径</th>
+                    <th>IP地址</th>
+                    <th>访问时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-repeat="pv: pvs">
+                    <td v-text="pv.id"></td>
+                    <td v-text="pv.user"></td>
+                    <td v-text="pv.path"></td>
+                    <td v-text="pv.ip_addr"></td>
+                    <td v-text="pv.time"></td>
+                </tr>
+            </tbody>
+        </table>
+        <br />
+        <div class="uk-width-1-1 uk-text-center">
+            <ul class="uk-pagination">
+                <li v-if="! page.has_previous" class="uk-disabled"><span><i class="uk-icon-angle-double-left"></i></span></li>
+                <li v-if="page.has_previous"><a v-on="click: previous()" href="#0"><i class="uk-icon-angle-double-left"></i></a></li>
+                <li class="uk-active"><span v-text="page.page_index"></span></li>
+                <li v-if="! page.has_next" class="uk-disabled"><span><i class="uk-icon-angle-double-right"></i></span></li>
+                <li v-if="page.has_next"><a v-on="click: next()" href="#0"><i class="uk-icon-angle-double-right"></i></a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

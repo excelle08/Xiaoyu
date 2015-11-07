@@ -6,9 +6,10 @@ from flask import render_template, make_response
 from flask import redirect, url_for
 from api import APIError, check_admin
 from model import db, UserPermission
+import api.admin
 import api.common, api.user, api.tweets, api.message, api.friends
 import api.photo, api.album, api.wall, api.chat, api.notify, api.abuse_report, api.statistics
-import json, re
+import json, re, time
 
 app = Flask(__name__)
 db.init_app(app)
@@ -123,6 +124,14 @@ def pageview_recorder(req):
     uid = session['uid'] if 'uid' in session else 0
     path = request.path
     ip = request.remote_addr
+    # ignore static and api requests
+    if re.search(r'\/static', request.path):
+        return req
+    if re.search(r'\/api\/common', request.path):
+        return req
+    if re.search(r'\/api\/chat', request.path):
+        return req
+
     api.statistics.pageview(uid, ip, path)
     return req
 
@@ -205,9 +214,20 @@ def notification():
     return render_html('notification.html')
 
 
-@app.route('/admin/pub_note', methods=['GET', 'POST'])
+@app.route('/admin', methods=['GET', 'POST'])
 def admin_publish_nofitication():
-    return render_html('pub_note.html')
+    return render_template('admin/index.html')
+
+
+@app.route('/admin/notification', methods=['GET', 'POST'])
+def admin_notifications():
+    return render_template('admin/notification.html')
+
+
+@app.route('/admin/stat', methods=['GET', 'POST'])
+def admin_stat():
+    return render_template('admin/stat.html')
+
 
 ### This is for test.
 ### Will be removed in production mode
@@ -781,6 +801,14 @@ def api_abuse_report():
 
 
 # -------------------Admin back-side operations----------------
+@app.route('/api/admin/notification/get', methods=['GET', 'POST'])
+def api_admin_notifs_get():
+    page = request.args['page'] if 'page' in request.args else 1
+    notifs, pagecount = api.admin.get_notifications(page)
+    return return_json({"notifications": [i.json for i in notifs], "page": {"page_index": page, "has_previous": int(page) > 1, "has_next": int(page) < pagecount}})
+
+
+
 @app.route('/api/admin/notification/send', methods=['POST'])
 def api_send_notification():
     try:
@@ -818,6 +846,23 @@ def api_mark_report_as_read():
     return api.abuse_report.mark_as_read(r_id)
 
 
+@app.route('/api/admin/send_msg', methods=['GET', 'POST'])
+def api_admin_send_message():
+    try:
+        content = request.form['content']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return return_json(api.admin.send_global_message())
+
+
+@app.route('/api/admin/stat', methods=['GET', 'POST'])
+def api_admin_get_stat():
+    page = request.args['page'] if 'page' in request.args else 1
+    return return_json(api.admin.get_stat_info(page))
+
+
+# -----------------Common-------------------------
 @app.route('/api/common/license', methods=['GET', 'POST'])
 def get_license():
     return return_json(api.common.get_license())

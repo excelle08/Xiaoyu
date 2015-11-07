@@ -15,6 +15,7 @@ def pageview(uid, ip, path):
     p.user = uid
     p.ip_addr = ip
     p.path = path
+    p.time = time.time()
 
     db.session.add(p)
     db.session.commit()

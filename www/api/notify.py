@@ -15,6 +15,8 @@ def send_notification(title, content):
     db.session.add(notification)
     db.session.commit()
 
+    return notification
+
 
 def get_notifications(later_than):
     return Notification.query.filter(Notification.created_at >= later_than).order_by(Notification.created_at.desc()).all()
