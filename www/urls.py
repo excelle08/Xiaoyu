@@ -118,23 +118,6 @@ def blockeds_interceptor():
         if not auth_flag:
             raise APIError('您被封禁，无法使用此功能。')
 
-
-@app.after_request
-def pageview_recorder(req):
-    uid = session['uid'] if 'uid' in session else 0
-    path = request.path
-    ip = request.remote_addr
-    # ignore static and api requests
-    if re.search(r'\/static', request.path):
-        return req
-    if re.search(r'\/api\/common', request.path):
-        return req
-    if re.search(r'\/api\/chat', request.path):
-        return req
-
-    api.statistics.pageview(uid, ip, path)
-    return req
-
 #  ---------------Front-end view rendering route--------------
 @app.route('/', methods=['GET', 'POST'])
 def index():
