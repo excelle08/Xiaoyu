@@ -72,14 +72,14 @@ function initVM(data) {
             },
             previous: function() {
                 var v = this;
-                getList(page.page_index - 1, function(data) {
+                getList(page_index -= 1, function(data) {
                     v.users = data.users;
                     v.page = data.page;
                 });
             },
             next: function() {
                 var v = this;
-                getList(page.page_index + 1, function(data) {
+                getList(page_index += 1, function(data) {
                     v.users = data.users;
                     v.page = data.page;
                 })

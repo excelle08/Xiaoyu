@@ -40,14 +40,14 @@ function initVM(data) {
         methods: {
             previous: function () {
                 var v = this;
-                getList(page.page_index - 1, function(r) {
+                getList(page_index -= 1, function(r) {
                     v.items = r.reports;
                     v.page = r.page;
                 });
             },
             next: function () {
                 var v = this;
-                getList(page.page_index + 1, function(r) {
+                getList(page_index += 1, function(r) {
                     v.items = r.reports;
                     v.page = r.page;
                 })
