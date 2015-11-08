@@ -50,6 +50,7 @@ function initVM(data) {
         },
         methods: {
             query: function(e) {
+		e.preventDefault();
                 if(!this.phone) {
                     return;
                 }
@@ -228,8 +229,8 @@ $(getUserList(page_index, q_phone));
     <div class="uk-width-medium-1-1">
         <form class="uk-form">
             搜索用户：
-            <input class="uk-width-1-2" type="text" v-model="phone" value="" v-on="change: query" placeholder="请输入手机号码">
-            <button type="" onclick="void(0);" class="uk-button uk-button-primary"><i class="uk-icon-search"></i></button>
+            <input class="uk-width-1-2" type="text" v-model="phone" value=""  placeholder="请输入手机号码">
+            <button type="" v-on="click: query" class="uk-button uk-button-primary"><i class="uk-icon-search"></i></button>
 
             <button type="" v-on="click: addUser" class="uk-button uk-button-primary uk-align-right"><i class="uk-icon-plus"></i> 添加用户</button>
 
