@@ -27,7 +27,7 @@ def get_reports(page, lines=10):
     if not check_admin():
         raise APIError('You are not the admin.')
 
-    return AbuseReport.query.filter_by(read=False).order_by(AbuseReport.created_at.desc()).offset(lines*(page-1)).limit(lines).all()
+    return AbuseReport.query.filter_by(read=0).order_by(AbuseReport.created_at.desc()).offset(lines*(page-1)).limit(lines).all()
 
 
 def mark_as_read(id):
@@ -37,7 +37,7 @@ def mark_as_read(id):
     rp = AbuseReport.query.filter_by(id=id).first()
     if not rp:
         raise APIError('此条信息不存在。')
-    rp.read = True
+    rp.read = 1
 
     db.session.commit()
     return rp

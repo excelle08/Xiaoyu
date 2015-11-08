@@ -62,7 +62,7 @@ function initVM(data) {
             },
             previous: function() {
                 var v = this;
-                return new_data = getUserList(this.page.page_index - 1, this.phone, function(r) {
+                return new_data = getUserList(page_index -= 1, this.phone, function(r) {
                     v.users = r.users;
                     v.metas = r.metas;
                     v.page = r.page; 
@@ -71,7 +71,7 @@ function initVM(data) {
             },
             next: function() {
                 var v = this;
-                new_data = getUserList(this.page.page_index + 1, this.phone, function(r) {
+                new_data = getUserList(page_index += 1, this.phone, function(r) {
                     v.users = r.users;
                     v.metas = r.metas;
                     v.page =  r.page;  

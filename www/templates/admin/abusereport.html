@@ -103,7 +103,7 @@ function initVM(data) {
                     <a class="uk-article-meta" target="_bladnk" v-attr="href: #" v-text="item.created_at"></a>
                     <hr class="uk-article-divider" style="margin-bottom: 0px; margin-top: 0px">
                     <p v-text="item.content"></p>
-                    <img v-if="item.photo" v-attr="src: item.photo" alt="">
+                    <img v-if="item.photo" v-attr="src: '/'+item.photo+'?full=1'" alt="">
                     <a href="#0" v-on="click: markAsRead(item)"><i class="uk-icon-check"> 标记为已读</i></a>
                  </article>
              </div>

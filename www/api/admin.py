@@ -201,9 +201,10 @@ def get_abuse_reports(page, lines=10):
     reports = api.abuse_report.get_reports(page, lines)
     res = []
 
-    for item in res:
+    for item in reports:
         from_user = User.query.filter_by(uid=item.msg_from).first()
         from_meta = UserMeta.query.filter_by(uid=item.msg_from).first()
+	contents = json.loads(item.content)
         res.append({
             "id": item.id,
             "from": {
@@ -212,7 +213,8 @@ def get_abuse_reports(page, lines=10):
                 "nickname": from_meta.nickname
             },
             "photo": item.photo,
-            "content": item.content,
+            "content": contents["content"],
+            "target": contents["target_uid"],
             "read": item.read,
             "created_at": datetime.datetime.fromtimestamp(item.created_at).strftime('%Y-%m-%d %H:%M:%S')
         })

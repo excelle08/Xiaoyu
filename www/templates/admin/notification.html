@@ -15,7 +15,18 @@ if(queryArgs.page) {
     page_index = parseInt(queryArgs.page);
 }
 
-$(getList(page_index));
+$(function() {
+    getApi('/api/admin/notification/get?page=' + page_index , function (err, results) {
+        if (err) {
+            return showError(err);
+        }
+        $('#div-loading').hide();
+        for(var i = 0; i < results.notifications.length; i++) {
+            results.notifications[i] = JSON.parse(results.notifications[i]);
+        }
+        initVM(results);
+    });
+});
 
 function getList(page, callback) {
     getApi('/api/admin/notification/get?page=' + page_index , function(err, r){
