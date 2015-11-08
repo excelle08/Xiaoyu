@@ -67,6 +67,24 @@ function initVM(data) {
                         }
                     });
                 });
+            },
+            showPhoto: function(item) {
+                this.picurl = item.photo;
+                var modal = $.UIkit.modal('#modal-auth-photo');
+                modal.show();
+            },
+            blockTarget: function(item) {
+                var v = this;
+                var uid = item.target.uid
+                showConfirm('确认操作', '你确实要封禁用户[UID=' + uid + ']吗？', function() {
+                    getApi('/api/admin/user/chmod?uid=' + uid + '&mode=-1', {}, function(err, r) {
+                        if(err) {
+                            showError(err.message);
+                        } else {
+                            alert('操作完成！');
+                        }
+                    });
+                });
             }
         }
     });
@@ -96,15 +114,25 @@ function initVM(data) {
     </div>
 
     <div class="uk-width-1-1"  id="div-reports">
+        <div class="uk-modal" id="modal-auth-photo">
+            <div class="uk-modal-dialog uk-modal-dialog-lightbox">
+                <a href="" title="" class="uk-modal-close uk-close uk-close-alt"></a>
+                <img v-attr="src: '/'+picurl+'?full=1'" alt="" width="640">
+            </div>
+        </div>
+
         <div v-repeat="item: items">
             <div class="uk-panel uk-panel-box">
                  <article class="uk-article">
-                    <p class="uk-article-title" v-text="'来源：' + item.from.uid + ' / ' + item.from.phone + ' / ' + item.from.nickname" style="font-size: 24px; margin-top: 0px; margin-bottom: 0px"></p>
+                    <p class="uk-article-title" v-text="'来源：' + item.from.phone + '(' + item.from.nickname + ')'" style="font-size: 24px; margin-top: 0px; margin-bottom: 0px"></p>
                     <a class="uk-article-meta" target="_bladnk" v-attr="href: #" v-text="item.created_at"></a>
                     <hr class="uk-article-divider" style="margin-bottom: 0px; margin-top: 0px">
+                    <p v-text="'举报对象：' + item.target.phone + '(' + item.target.nickname + ')'"></p>
                     <p v-text="item.content"></p>
-                    <img v-if="item.photo" v-attr="src: '/'+item.photo+'?full=1'" alt="">
-                    <a href="#0" v-on="click: markAsRead(item)"><i class="uk-icon-check"> 标记为已读</i></a>
+                    <hr class="uk-article-divider" style="margin-bottom: 0px; margin-top: 0px">
+                    <a href="#0" v-on="click: blockTarget(item)"><i class="uk-icon-stop"></i> 封禁目标</a> |
+                    <a href="#0" v-on="click: showPhoto(item)"><i class="uk-icon-photo"></i> 查看证明图片</a> | 
+                    <a href="#0" v-on="click: markAsRead(item)"><i class="uk-icon-check"></i> 标记为已读</a>
                  </article>
              </div>
              <br />

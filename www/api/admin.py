@@ -82,9 +82,11 @@ def get_users(page, phone, lines=10):
     metas = []
 
     for item in us:
+        meta = UserMeta.query.filter_by(uid=item.uid).first()
         user = {
             "uid": item.uid,
             "phone": item.phone,
+            "nickname": meta.nickname,
             "permission": permissionStr[item.permission+1],
             "created_at": datetime.datetime.fromtimestamp(item.created_at).strftime('%Y-%m-%d %H:%M:%S'),
             "last_login": datetime.datetime.fromtimestamp(item.last_login).strftime('%Y-%m-%d %H:%M:%S')
@@ -204,7 +206,10 @@ def get_abuse_reports(page, lines=10):
     for item in reports:
         from_user = User.query.filter_by(uid=item.msg_from).first()
         from_meta = UserMeta.query.filter_by(uid=item.msg_from).first()
-	contents = json.loads(item.content)
+        contents = json.loads(item.content)
+        target_id = contents["target_uid"]
+        target_user = User.query.filter_by(uid=target_id).first()
+        target_meta = UserMeta.query.filter_by(uid=target_id).first()
         res.append({
             "id": item.id,
             "from": {
@@ -214,7 +219,11 @@ def get_abuse_reports(page, lines=10):
             },
             "photo": item.photo,
             "content": contents["content"],
-            "target": contents["target_uid"],
+            "target": {
+                "uid": target_id,
+                "phone": target_user.phone,
+                "nickname": target_meta.nickname
+            },
             "read": item.read,
             "created_at": datetime.datetime.fromtimestamp(item.created_at).strftime('%Y-%m-%d %H:%M:%S')
         })

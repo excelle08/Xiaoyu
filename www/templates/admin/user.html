@@ -244,6 +244,7 @@ $(getUserList(page_index, q_phone));
                 <tr>
                     <th>UID</th>
                     <th>手机号码</th>
+                    <th>昵称</th>
                     <th>权限等级</th>
                     <th>创建时间</th>
                     <th>最近登录</th>
@@ -254,6 +255,7 @@ $(getUserList(page_index, q_phone));
                 <tr v-repeat="user: users">
                     <td v-text="user.uid"></td>
                     <td v-text="user.phone"></td>
+                    <td v-text="user.nickname"></td>
                     <td v-text="user.permission"></td>
                     <td v-text="user.created_at"></td>
                     <td v-text="user.last_login"></td>
