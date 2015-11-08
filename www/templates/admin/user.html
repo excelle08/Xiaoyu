@@ -1,23 +1,280 @@
-{% extends 'base.html' }
+{% extends 'admin/base.html' %}
 
 {% block title %}用户管理{% endblock %}
 
 {% block beforehead %}
 
 <script type="text/javascript">
-    
+
+var permissionStr = [ "封禁", "未认证", "认证中", "已通过", "管理员" ];
+var queryArgs = getArgs();
+var page_index = 1;
+var q_phone = '';
+if(queryArgs.page) {
+    page_index = parseInt(queryArgs.page);
+}
+
+if(queryArgs.phone) {
+    q_phone = queryArgs.phone;
+}
+
+function getUserList(page, phone, callback) {
+    if(!page) {
+        page = '1';
+    }
+    if(!phone) {
+        phone = '';
+    }
+
+    getApi('/api/admin/user/get?page=' + page + '&phone=' + phone, function(err, result) {
+        if(err) {
+            return showError(err.message);
+        } else {
+            if(callback) {
+                return callback && callback(result);
+            } else {
+                return initVM(result);
+            }
+        }
+    })
+}
+
+function initVM(data) {
+    var vm = new Vue({
+        el: '#div-users',
+        data: {
+            users: data.users,
+            metas: data.metas,
+            page: data.page,
+            phone: ''
+        },
+        methods: {
+            query: function(e) {
+                if(!this.phone) {
+                    return;
+                }
+                var v = this;
+                return getUserList(this.page.page_index, this.phone, function(r) {
+                    v.users = r.users;
+                    v.metas = r.metas;
+                    v.page = r.page;
+                });
+            },
+            previous: function() {
+                var v = this;
+                return new_data = getUserList(this.page.page_index - 1, this.phone, function(r) {
+                    v.users = r.users;
+                    v.metas = r.metas;
+                    v.page = r.page; 
+                });
+           
+            },
+            next: function() {
+                var v = this;
+                new_data = getUserList(this.page.page_index + 1, this.phone, function(r) {
+                    v.users = r.users;
+                    v.metas = r.metas;
+                    v.page =  r.page;  
+                });           
+            },
+            resetPwd: function(uid) {
+                showConfirm('确认操作', '你确定要将该用户[UID=' + uid + ']的密码重置为"12345678"吗？',
+                    function() {
+                        getApi('/api/admin/user/resetpwd?uid=' + uid, {}, function(err, r) {
+                            if(err){
+                                showError(err.message);
+                            } else {
+                                alert('密码重置成功！');
+                            }
+                        });
+                    }
+                );
+            },
+            deleteUser: function(user) {
+                var v = this;
+                showConfirm('确认操作', '你确实要删除此用户吗？',
+                    function() {
+                        getApi('/api/admin/user/delete?uid=' + user.uid, {}, function(err, r) {
+                            if(err) {
+                                showError(err.message)
+                            } else {
+                                for(var i = 0; i < v.users.length; i++) {
+                                    if(v.users[i].uid == user.uid) {
+                                        v.users.splice(i, 1);
+                                        break;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                );
+            },
+            changePerm: function(user) {
+                var v = this;
+                changeMod(user, function(p) {
+                    for(var i=0; i<v.users; i++) {
+                        if(v.users[i].uid == user.uid) {
+                            v.users[i].permission = permissionStr[p+1];
+                            break;
+                        }
+                    }
+                });
+            },
+            addUser: function() {
+                var v = this;
+                addUser(function(r) {
+                    v.users.push(r);
+                });
+            }
+        }
+    });
+}
+
+function changeMod(user, callback) {
+    var modal = $.UIkit.modal('#modal-permission-set');
+    modal.show();
+    var vm2 = new Vue({
+        el: '#modal-permission-set',
+        data: {
+            uid: user.uid,
+            permission: 0
+        },
+        methods: {
+            chMod: function() {
+                var v = this;
+                getApi('/api/admin/user/chmod?uid=' + this.uid + '&mode=' + this.permission, function(err, r) {
+                    if(err) {
+                        showError(err.message);
+                    } else {
+                        return callback && callback(v.permission);
+                    }
+                })
+            }
+        }
+    });
+}
+
+function addUser(callback) {
+    var modal = $.UIkit.modal('#modal-newuser');
+    modal.show();
+    var vm3 = new Vue({
+        el: '#modal-newuser',
+        data: {
+            phonenum: '',
+            pwd: ''
+        },
+        methods: {
+            registerUser: function() {
+                getApi('/api/admin/user/add?phone=' + this.phonenum + '&password=' + this.pwd, function(err, r) {
+                    if(err) {
+                        showError(err.message);
+                    } else {
+                        return callback && callback(r);
+                    }
+                })
+            }
+        }
+    })
+}
+
+$(getUserList(page_index, q_phone));
+
 </script>
 
 {% endblock %}
 
 {% block content %}
 
-<div class="uk-width-3-10">
+<div class="uk-width-2-10">
     <div class="uk-nav-side uk-nav" data-uk-nav="">
         <li class="uk-nav-header">用户管理</li>
         <li class="uk-active"><a href="#">用户列表</a></li>
-        <li class="uk-nav-header"></li>
+        <li><a href="/admin/school">学校审核</a> </li>
+        <li><a href="/admin/message">群发消息</a> </li>
+        <li><a href="/admin/abusereport">举报处理</a></li>
     </div>
+</div>
+
+<div id="modal-permission-set" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <form class="uk-form">
+            <input type="hidden" name="uid" v-model="uid" value="">
+            <select name="permission" v-model="permission">
+                <option value="-1">封号</option>
+                <option value="0">未验证用户</option>
+                <option value="1">验证中用户</option>
+                <option value="2">已验证</option>
+                <option value="3">管理员</option>
+            </select>
+            <button type="submit" v-on="click: chMod" class="uk-button uk-button-primary"> <i class="uk-icon-check"></i> 确定</button>
+        </form>
+    </div>    
+</div>
+
+<div id="modal-newuser" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <form class="uk-form">
+            <input type="text" value="" v-model="phonenum" placeholder="手机号码/用户名">
+            <input type="password" name="" value="" v-model="pwd" placeholder="密码">
+            <button type="submit" v-on="click: registerUser" class="uk-button uk-button-primary"> <i class="uk-icon-check"></i> 添加</button>
+        </form>
+    </div>
+</div>
+
+<div class="uk-width-8-10" id="div-users">
+    <div class="uk-width-1-1 uk-margin-bottom">
+        <div class="uk-alert uk-alert-danger uk-hidden"></div>
+    </div>
+    <div class="uk-width-medium-1-1">
+        <form class="uk-form">
+            搜索用户：
+            <input class="uk-width-1-2" type="text" v-model="phone" value="" v-on="change: query" placeholder="请输入手机号码">
+            <button type="" onclick="void(0);" class="uk-button uk-button-primary"><i class="uk-icon-search"></i></button>
+
+            <button type="" v-on="click: addUser" class="uk-button uk-button-primary uk-align-right"><i class="uk-icon-plus"></i> 添加用户</button>
+
+        </form>
+    </div>
+
+    <br />
+
+    <div class="uk-width-1-1">
+        <table class="uk-table">
+            <thead>
+                <tr>
+                    <th>UID</th>
+                    <th>手机号码</th>
+                    <th>权限等级</th>
+                    <th>创建时间</th>
+                    <th>最近登录</th>
+                    <th>其他操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-repeat="user: users">
+                    <td v-text="user.uid"></td>
+                    <td v-text="user.phone"></td>
+                    <td v-text="user.permission"></td>
+                    <td v-text="user.created_at"></td>
+                    <td v-text="user.last_login"></td>
+                    <td><a href="#" v-on="click: changePerm(user)">设置权限</a> | 
+                    <a href="#" v-on="click: resetPwd(user.uid)">重置密码</a> | 
+                    <a href="#" v-on="click: deleteUser(user)" >删除用户</a></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="uk-width-1-1 uk-text-center">
+            <ul class="uk-pagination">
+                <li v-if="! page.has_previous" class="uk-disabled"><span><i class="uk-icon-angle-double-left"></i></span></li>
+                <li v-if="page.has_previous"><a v-on="click: previous()" href="#0"><i class="uk-icon-angle-double-left"></i></a></li>
+                <li class="uk-active"><span v-text="page.page_index"></span></li>
+                <li v-if="! page.has_next" class="uk-disabled"><span><i class="uk-icon-angle-double-right"></i></span></li>
+                <li v-if="page.has_next"><a v-on="click: next()" href="#0"><i class="uk-icon-angle-double-right"></i></a></li>
+            </ul>
+        </div>
+    </div>
+
+
 </div>
 
 {% endblock %}

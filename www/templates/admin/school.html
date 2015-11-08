@@ -1,0 +1,180 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}用户管理{% endblock %}
+
+{% block beforehead %}
+
+<script type="text/javascript">
+
+
+var queryArgs = getArgs();
+var page_index = 1;
+if(queryArgs.page) {
+    page_index = parseInt(queryArgs.page);
+}
+
+function getList(page, callback) {
+    getApi('/api/admin/user/school/inprogresses?page=' + page , function(err, r){
+        if(err){
+            return showError(err.message);
+        } else {
+            if(callback) {
+                return callback && callback(r);
+            } else {
+                return initVM(r);
+            }
+        }
+    });
+}
+
+
+function initVM(data) {
+    var vm = new Vue({
+        el: '#div-school',
+        data: {
+            users: data.users,
+            page: data.page
+        },
+        methods: {
+            pass: function(uid) {
+                var v = this;
+                showConfirm('确认操作', '通过该用户的学校认证？', function(){
+                    getApi('/api/admin/user/school/pass?uid=' + uid, function(err, r) {
+                        if(err) {
+                            showError(err.message);
+                        } else {
+                            for(var i=0; i<v.users.length; i++) {
+                                if(v.users[i].uid == uid) {
+                                    v.users.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                });
+            },
+            reject: function(uid) {
+                var v = this;
+                showConfirm('确认操作', '拒绝该用户的学校认证？', function() {
+                    getApi('/api/admin/user/school/reject?uid=' + uid, function(err, r) {
+                        if(err) {
+                            showError(err.message);
+                        } else {
+                            for(var i=0; i<v.users.length; i++) {
+                                if(v.users[i].uid == uid) {
+                                    v.users.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                });
+            },
+            previous: function() {
+                var v = this;
+                getList(page.page_index - 1, function(data) {
+                    v.users = data.users;
+                    v.page = data.page;
+                });
+            },
+            next: function() {
+                var v = this;
+                getList(page.page_index + 1, function(data) {
+                    v.users = data.users;
+                    v.page = data.page;
+                })
+            }
+            showPhoto: function(user){
+                showAuthPhoto(user.photo);
+            }
+        }
+    });
+}
+
+function showAuthPhoto(url) {
+    var modal = $.UIkit.modal('#modal-auth-photo');
+    modal.show();
+    var vm2 = new Vue({
+        el: '#modal-auth-photo',
+        data: {
+            picurl: url
+        },
+        methods: {
+
+        }
+    });
+}
+
+$(getList(page_index));
+
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="uk-width-2-10">
+    <div class="uk-nav-side uk-nav" data-uk-nav="">
+        <li class="uk-nav-header">用户管理</li>
+        <li><a href="/admin/user">用户列表</a></li>
+        <li class="uk-active"><a href="#">学校审核</a></li>
+        <li><a href="/admin/message">群发消息</a></li>
+        <li><a href="/admin/abusereport">举报处理</a></li>
+    </div>
+</div>
+
+<div class="uk-modal" id="modal-auth-photo">
+    <div class="uk-modal-dialog uk-modal-dialog-lightbox">
+        <a href="" title="" class="uk-modal-close uk-close uk-close-alt"></a>
+        <img v-attr="src: picurl" alt="Auth photo">
+    </div>
+</div>
+
+<div class="uk-width-8-10" id="div-school">
+    <div class="uk-width-1-1 uk-margin-bottom">
+        <div class="uk-alert uk-alert-danger uk-hidden"></div>
+    </div>
+
+    <div class="uk-width-1-1">
+        <table class="uk-table">
+            <thead>
+                <tr>
+                    <th>UID</th>
+                    <th>手机号码</th>
+                    <th>昵称</th>
+                    <th>学校名称</th>
+                    <th>专业</th>
+                    <th>学历</th>
+                    <th>证件照片</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-repeat="user: users">
+                    <td v-text="user.uid"></td>
+                    <td v-text="user.phone"></td>
+                    <td v-text="user.nickname"></td>
+                    <td v-text="user.school"></td>
+                    <td v-text="user.major"></td>
+                    <td v-text="user.degree"></td>
+                    <td><a href="#" v-on="click: showPhoto(user)"><i class="uk-icon-small uk-icon-photo"></i></a></button> </td>
+                    <td><a href="#" v-on="click: pass(user.uid)">通过</a> | 
+                    <a href="#" v-on="click: reject(user.uid)">拒绝</a></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="uk-width-1-1 uk-text-center">
+            <ul class="uk-pagination">
+                <li v-if="! page.has_previous" class="uk-disabled"><span><i class="uk-icon-angle-double-left"></i></span></li>
+                <li v-if="page.has_previous"><a v-on="click: previous()" href="#0"><i class="uk-icon-angle-double-left"></i></a></li>
+                <li class="uk-active"><span v-text="page.page_index"></span></li>
+                <li v-if="! page.has_next" class="uk-disabled"><span><i class="uk-icon-angle-double-right"></i></span></li>
+                <li v-if="page.has_next"><a v-on="click: next()" href="#0"><i class="uk-icon-angle-double-right"></i></a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

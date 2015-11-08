@@ -15,18 +15,23 @@ if(queryArgs.page) {
     page_index = parseInt(queryArgs.page);
 }
 
-$(function() {
-    getApi('/api/admin/notification/get?page=' + page_index , function (err, results) {
-        if (err) {
-            return showError(err);
+$(getList(page_index));
+
+function getList(page, callback) {
+    getApi('/api/admin/notification/get?page=' + page_index , function(err, r){
+        if(err){
+            return showError(err.message);
+        } else {
+            if(callback) {
+                return callback && callback(r);
+            } else {
+                return initVM(r);
+            }
         }
-        $('#div-loading').hide();
-        for(var i = 0; i < results.notifications.length; i++) {
-            results.notifications[i] = JSON.parse(results.notifications[i]);
-        }
-        initVM(results);
     });
-});
+}
+
+
 
 function initVM(data) {
     $('#div-').show();

@@ -229,6 +229,26 @@ def admin_stat():
     return render_template('admin/stat.html')
 
 
+@app.route('/admin/user', methods=['GET', 'POST'])
+def admin_user():
+    return render_template('admin/user.html')
+
+
+@app.route('/admin/school', methods=['GET', 'POST'])
+def admin_school():
+    return render_template('admin/school.html')
+
+
+@app.route('/admin/abusereport', methods=['GET', 'POST'])
+def admin_abuse_report():
+    return render_template('admin/abusereport.html')
+
+
+@app.route('/admin/message', methods=['GET', 'POST'])
+def admin_global_message():
+    return render_template('admin/message.html')
+
+
 ### This is for test.
 ### Will be removed in production mode
 
@@ -832,8 +852,8 @@ def api_delete_notification():
 
 @app.route('/api/admin/abuse_report/get', methods=['GET', 'POST'])
 def api_process_abuse_report():
-    filter_read = request.args['filter_read'] if 'filter_read' in request.args else True
-    return return_json(api.abuse_report.get_reports(filter_read), default=lambda obj: obj.dict)
+    page = request.args['page'] if 'page' in request.args else 1
+    return return_json(api.admin.get_abuse_reports(page))
 
 
 @app.route('/api/admin/abuse_report/read', methods=['GET', 'POST'])
@@ -846,20 +866,98 @@ def api_mark_report_as_read():
     return api.abuse_report.mark_as_read(r_id)
 
 
-@app.route('/api/admin/send_msg', methods=['GET', 'POST'])
+@app.route('/api/admin/send_msg', methods=['POST'])
 def api_admin_send_message():
     try:
+        users = request.form['users']
+        is_global = request.form['is_global']
         content = request.form['content']
+        is_mutual = request.form['is_mutual']
     except KeyError, e:
         raise APIError(e.message)
 
-    return return_json(api.admin.send_global_message())
+    return return_json(api.admin.group_message(users, is_global, content, is_mutual))
 
 
 @app.route('/api/admin/stat', methods=['GET', 'POST'])
 def api_admin_get_stat():
     page = request.args['page'] if 'page' in request.args else 1
     return return_json(api.admin.get_stat_info(page))
+
+
+@app.route('/api/admin/user/get', methods=['GET', 'POST'])
+def api_admin_get_users():
+    page = request.args['page'] if 'page' in request.args else 1
+    phone = request.args['phone'] if 'phone' in request.args else ''
+    return return_json(api.admin.get_users(page, phone))
+
+
+@app.route('/api/admin/user/resetpwd', methods=['GET', 'POST'])
+def api_admin_reset_pwd():
+    try:
+        uid = request.args['uid']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return return_json(api.admin.reset_user_pwd(uid))
+
+
+@app.route('/api/admin/user/delete', methods=['GET', 'POST'])
+def api_admin_delete_user():
+    try:
+        uid = request.args['uid']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return return_json(api.admin.delete_user(uid))
+
+
+@app.route('/api/admin/user/chmod', methods=['GET', 'POST'])
+def api_admin_user_chmod():
+    try:
+        uid = request.args['uid']
+        mode = request.args['mode']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return return_json(api.admin.chmod(uid, mode))
+
+
+@app.route('/api/admin/user/add', methods=['GET', 'POST'])
+def api_admin_user_add():
+    try:
+        phone = request.args['phone']
+        password = request.args['password']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return return_json(api.admin.useradd(phone, password))
+
+
+@app.route('/api/admin/user/school/inprogresses', methods=['GET', 'POST'])
+def api_admin_school_inprogress_list():
+    page = request.args['page'] if 'page' in request.args else 1
+    return return_json(api.admin.get_users_in_progress(page))
+
+
+@app.route('/api/admin/user/school/pass', methods=['GET', 'POST'])
+def api_admin_school_pass():
+    try:
+        uid = request.args['uid']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return return_json(api.admin.pass_user_school(uid, True))
+
+
+@app.route('/api/admin/user/school/reject', methods=['GET', 'POST'])    
+def api_admin_school_reject():
+    try:
+        uid = request.args['uid']
+    except KeyError, e:
+        raise APIError(e.message)
+
+    return return_json(api.admin.pass_user_school(uid, False))
 
 
 # -----------------Common-------------------------

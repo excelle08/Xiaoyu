@@ -22,11 +22,12 @@ def report_abuse(msg_from, photo, content):
     return areport
 
 
-def get_reports(filter_read = True):
+def get_reports(page, lines=10):
+    page = int(page)
     if not check_admin():
         raise APIError('You are not the admin.')
 
-    return AbuseReport.query.filter_by(read=(not filter_read)).order_by(AbuseReport.created_at.desc()).all()
+    return AbuseReport.query.filter_by(read=False).order_by(AbuseReport.created_at.desc()).offset(lines*(page-1)).limit(lines).all()
 
 
 def mark_as_read(id):

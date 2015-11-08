@@ -33,7 +33,7 @@ def generate_vcode():
     return rand_char
 
 
-def user_register(phone, password, vcode):
+def user_register(phone, password, vcode, autologin=True):
     if not _PHONENUM.match(phone.strip()):
         raise APIError('请输入正确的手机号码')
     if vcode.lower() != session['vcode']:
@@ -84,9 +84,10 @@ def user_register(phone, password, vcode):
     del session['vcode']
 
     # login
-    session['uid'] = user.uid
-    session['phone'] = phone.strip()
-    session['password'] = user.password
+    if autologin:
+        session['uid'] = user.uid
+        session['phone'] = phone.strip()
+        session['password'] = user.password
     return user
 
 
@@ -217,6 +218,8 @@ def set_user_school(uid, school_id, major, degree, auth_photo):
 
 def pass_user_school(uid):
     school = UserSchool.query.filter_by(uid=uid).first()
+    if not school:
+        raise APIError('不存在此用户')
     school.auth_pass = True
     user = User.query.filter_by(uid=uid).first()
     user.permission = UserPermission.Validated

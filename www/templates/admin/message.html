@@ -1,0 +1,111 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}用户管理{% endblock %}
+
+{% block beforehead %}
+
+<script type="text/javascript">
+
+function showInfo(msg) {
+    var alert = $('#info');
+    if (msg) {
+        alert.text(msg).removeClass('uk-hidden').show();
+        try {
+            if (alert.offset().top < ($(window).scrollTop() - 41)) {
+                $('html,body').animate({scrollTop: alert.offset().top - 41});
+            }
+        }
+        catch (e) {}
+    }
+    else {
+        alert.addClass('uk-hidden').hide().text('');
+    }
+}
+
+$(function() {
+    var vm = new Vue({
+        el: '#div-msg',
+        data: {
+            users: '',
+            isglobal: false,
+            content: '',
+            ismutual: false
+        },
+        methods: {
+            submit: function(e) {
+                e.preventDefault();
+                showInfo();
+                if(!this.users && !this.isglobal) {
+                    showError('请输入用户的手机号码');
+                }
+                postApi('/api/admin/send_msg', {
+                    users: this.users,
+                    is_global: this.isglobal,
+                    content: this.content,
+                    is_mutual: this.ismutual
+                }, function(err, r) {
+                    if(err) {
+                        showError(err.message);
+                    } else {
+                        showInfo('成功发送了' + r.OK + '条信息');
+                    }
+                });
+            }
+        }
+    });
+})
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="uk-width-2-10">
+    <div class="uk-nav-side uk-nav" data-uk-nav="">
+        <li class="uk-nav-header">用户管理</li>
+        <li><a href="/admin/user">用户列表</a></li>
+        <li><a href="/admin/school">学校审核</a></li>
+        <li class="uk-active"><a href="#">群发消息</a></li>
+        <li><a href="/admin/abusereport">举报处理</a></li>
+    </div>
+</div>
+
+<div class="uk-width-8-10">
+    <div class="uk-width-1-1 uk-margin-bottom">
+        <div class="uk-alert uk-alert-danger uk-hidden"></div>
+    </div>
+     <div class="uk-width-1-1 uk-margin-bottom">
+        <div class="uk-alert uk-alert-success uk-hidden"  id="info"></div>
+    </div>   
+    <div class="uk-width-1-1" id="div-msg">
+        <form class="uk-form uk-form-horizontal">
+            <div class="uk-form-row">
+                <label class="uk-form-label">目标用户</label>
+                <input type="text" class="uk-width-1-1" v-model="users" value="" placeholder="请输入发送的目标用户的手机号码，多个用户用逗号(,)间隔">
+            </div>
+
+            <div class="uk-form-row">
+                <label class="uk-form-label width-1-2">广播（向全体注册用户发送）</label>
+                <input type="checkbox" v-model="isglobal" value="">
+            </div>
+
+            <div class="uk-form-row">
+                <label class="uk-form-label">消息内容</label>
+                <textarea v-model="content" rows="10" class="uk-width-1-1"></textarea>
+            </div>
+
+            <div class="uk-form-row">
+                <label class="uk-form-label">仅用户自己可见</label>
+                <input type="checkbox" v-model="ismutual" value="">
+            </div>
+
+            <div class="uk-form-row">
+                <button class="uk-button uk-button-primary" v-on="click: submit" type="submit"><i class="uk-icon-check"></i> 发送</button>
+                <button class="uk-button uk-button-danger" type="reset"> <i class="uk-icon-recycle"></i> 重置</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
