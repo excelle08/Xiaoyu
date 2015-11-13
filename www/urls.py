@@ -25,7 +25,8 @@ nopriv_allowed = [
     '/api/register',
     '/api/test/.*',
     '/test.*',
-    '/api/ua'
+    '/api/ua',
+    '/api/user/autologin'
 ]
 
 blocked_allowed = [
@@ -1018,3 +1019,14 @@ def test_admin_pass_user_school_info():
         return return_json({'error':'Invalid password.'})
     return return_json(json.loads(api.user.pass_user_school(int(request.form['uid'])).json))
 
+
+###########################################################
+################ Auto login redirection ###################
+###########################################################
+
+@app.route('/api/user/autologin', methods=['GET'])
+def user_check_autologin():
+    if ('uid' in session and 'phone' in session):
+        return redirect('/app.html')
+    else:
+        return redirect('/index.html')
