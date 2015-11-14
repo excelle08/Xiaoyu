@@ -25,6 +25,7 @@ def upload_photo(imgdata, args={}):
     imgdata.save(name)
     try:
         image = Image.open(name)
+        image = correctOrientation(image)
         width, height = image.size
         crop_left = int(args['crop_left']) if 'crop_left' in args else 0
         crop_right = int(args['crop_right']) if 'crop_right' in args else width
@@ -41,3 +42,22 @@ def upload_photo(imgdata, args={}):
     except Exception, e:
         raise APIError(e.message)
 
+
+def correctOrientation(image):
+    try:
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation]=='Orientation':
+                break
+        exif=dict(image._getexif().items())
+    
+        if exif[orientation] == 3:
+            image=image.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            image=image.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            image=image.rotate(90, expand=True)
+        return image
+
+    except (AttributeError, KeyError, IndexError):
+        # cases: image don't have getexif
+        pass
