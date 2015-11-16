@@ -196,11 +196,16 @@ def filter_users(uid):
     else:
         users_onwall = [ item.uid for item in Wall.query.all() ]
 
-        if session['uid'] in users_onwall:
-            users_onwall.remove(session['uid'])
+        users_verified = User.query.filter(User.permission >= UserPermission.Validated).all()
+        users_verified_ids = [ item.uid for item in users_verified ]
+
+        user_ids = list(set.intersection(set(users_onwall), set(users_verified_ids)))
+
+        if session['uid'] in user_ids:
+            user_ids.remove(session['uid'])
 
         result = []
-        for uid in users_onwall:
+        for uid in user_ids:
             result.append(UserMeta.query.filter_by(uid=uid).first())
 
         return result
