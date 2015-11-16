@@ -2,7 +2,7 @@
 
 from api.statistics import get_pv_counts
 from api import APIError
-from model import User, UserMeta, Notification, PageView, Wall, db, UserSchool, School, Major
+from model import User, UserMeta, Notification, PageView, Wall, db, UserSchool, School, Major, AbuseReport
 import api.user, api.abuse_report, api.message
 import time, json, datetime, hashlib
 
@@ -77,7 +77,7 @@ def get_users(page, phone, lines=10):
         u_query = u_query.filter_by(phone=phone)
 
     us = u_query.offset(lines*(int(page)-1)).limit(lines).all()
-    page_count = us.__len__() / lines + 1
+    page_count = User.query.count() / lines + 1
     users = []
     metas = []
 
@@ -173,7 +173,7 @@ def get_users_in_progress(page, lines=10):
             "photo": school.auth_photo
         })
 
-    page_count = users.__len__() / lines + 1
+    page_count = User.query.filter(User.permission == 1).count() / lines + 1
 
     return {
         "users": u,
@@ -228,7 +228,7 @@ def get_abuse_reports(page, lines=10):
             "created_at": datetime.datetime.fromtimestamp(item.created_at).strftime('%Y-%m-%d %H:%M:%S')
         })
 
-    page_count = res.__len__() / lines + 1
+    page_count = AbuseReport.query.count() / lines + 1
 
     return {
         "reports": res,
