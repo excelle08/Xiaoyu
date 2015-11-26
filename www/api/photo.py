@@ -5,6 +5,7 @@ from api import APIError
 from werkzeug.datastructures import FileStorage
 from PIL import Image
 import time, hashlib, random
+from PIL import ExifTags
 
 accepted_mime = ['image/jpeg', 'image/gif', 'image/png', 'image/tiff', 'application/octet-stream']
 suffix = ['jpg', 'gif', 'png', 'tiff', 'jpg']
