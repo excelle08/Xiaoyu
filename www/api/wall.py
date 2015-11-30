@@ -160,8 +160,10 @@ def filter_users(uid):
     
         user2 = User.query.filter(User.last_login >= 0)
     
-        if condition['last_active']:
-            user2 = user2.filter(User.last_login >= condition['last_active']).all()
+        if condition['last_active'] and int(condition['last_active']) > 0:
+            user2 = user2.filter(User.last_login >= time.time() - int(condition['last_active'])*60*60*24)
+
+        user2 = user2.all()
     
         uid1 = [ user.uid for user in user2 ]
     

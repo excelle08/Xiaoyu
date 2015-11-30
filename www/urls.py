@@ -341,6 +341,7 @@ def api_get_user_meta():
     uid = request.args['uid'].strip() if "uid" in request.args else session['uid']
     userMeta = json.loads(api.user.get_user_meta(uid).json)
     userMeta['online'] = User.query.filter_by(uid=uid).first().online
+    userMeta['last_login'] = User.query.filter_by(uid=uid).first().last_login
     return return_json(userMeta)
 
 
@@ -380,8 +381,11 @@ def api_edit_user_school():
 
 @app.route('/api/user/school/get', methods=['GET'])
 def api_get_user_school():
-    uid = request.args['uid'] if 'uid' in request.args else session['uid']
-    return Response(api.user.get_user_school(uid).json, mimetype='text/json')
+    uid = int(request.args['uid']) if 'uid' in request.args else session['uid']
+    user_school = json.loads(api.user.get_user_school(uid).json)
+    if not check_admin() and uid != session['uid']:
+        user_school['auth_photo'] = ''
+    return jsonify(user_school)
 
 
 @app.route('/api/user/password/edit', methods=['POST'])

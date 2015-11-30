@@ -101,7 +101,9 @@ def user_login(phone, password, remember):
         raise APIError('该用户不存在或密码错误')
 
     user.last_login = time.time()
-    user.online = UserStatus.Online
+    if user.online != 3 and user.online != 4:
+        user.online = UserStatus.Online
+    db.session.commit()
 
     if remember:
         session.permanent = True
@@ -137,7 +139,8 @@ def user_logout():
         user = User.query.filter_by(phone=session['phone']).first()
         if not user:
             return
-        user.online = UserStatus.Offline
+        if user.online != 3 and user.online != 4:
+            user.online = UserStatus.Offline
         db.session.commit()
         del session['phone']
         del session['password']
@@ -176,7 +179,6 @@ def get_user(uid):
 
 def get_user_meta(uid):
     return UserMeta.query.filter_by(uid=uid).first()
-
 
 def get_user_extension(uid):
     return json.loads(UserExt.query.filter_by(uid=uid).first().content)
