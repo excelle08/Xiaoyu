@@ -61,4 +61,4 @@ def correctOrientation(image):
 
     except (AttributeError, KeyError, IndexError):
         # cases: image don't have getexif
-        pass
+        return image

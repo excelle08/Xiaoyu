@@ -147,19 +147,19 @@ def user_logout():
 
 
 def get_online_users(offset=0, limit=10):
-    users = User.query.filter_by(online=UserStatus.Online).offset(offset).all()
+    users = User.query.filter_by(online=UserStatus.Online).all()
     filters = filter_users(session['uid'])
     onlines = [UserMeta.query.filter_by(uid=item.uid).first() for item in users]
     res = [user for user in onlines if user in filters]
-    return res[0:int(limit)]
+    return res[int(offset):int(limit)]
 
 
 def get_recent_logins(offset=0, limit=10):
-    users = User.query.order_by(User.last_login.desc()).offset(offset).all()
+    users = User.query.order_by(User.last_login.desc()).all()
     recents = [ UserMeta.query.filter_by(uid=item.uid).first() for item in users ]
     filters = filter_users(session['uid'])
     res = [user for user in recents if user in filters]
-    return res[0:int(limit)]
+    return res[int(offset):int(limit)]
 
 
 def get_hot_users(offset=0, limit=10):
@@ -167,7 +167,7 @@ def get_hot_users(offset=0, limit=10):
     hots = [ UserMeta.query.filter_by(uid=item.uid).first() for item in walls ]
     filters = filter_users(session['uid'])
     res = [user for user in hots if user in filters]
-    return res[0:int(limit)]
+    return res[int(offset):int(limit)]
 
 
 def get_user(uid):
