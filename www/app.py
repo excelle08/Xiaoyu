@@ -14,8 +14,11 @@ def get_mysql_conn_str():
     return 'mysql+mysqlconnector://' + db_user + ':' + db_pass + '@' + db_host + ':' + str(db_port) + '/' + db_name
 
 
-if __name__=='__main__':
+def run_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = get_mysql_conn_str()
     app.config.from_object('config.config')
     app.jinja_env.filters['datetime'] = datetime_filter
     app.run(debug=False, host='0.0.0.0')
+
+if __name__=='__main__':
+    run_app()
