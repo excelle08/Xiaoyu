@@ -21,4 +21,7 @@ def run_app(environ, start_response):
     return app(environ, start_response)
 
 if __name__=='__main__':
-    run_app(None, None)
+    app.config['SQLALCHEMY_DATABASE_URI'] = get_mysql_conn_str()
+    app.config.from_object('config.config')
+    app.jinja_env.filters['datetime'] = datetime_filter
+    app.run(debug=True, host='0.0.0.0', port=5000)
