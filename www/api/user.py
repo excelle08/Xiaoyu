@@ -47,6 +47,8 @@ def generate_vcode():
 def user_register(phone, password, vcode, autologin=True):
     if not _PHONENUM.match(phone.strip()):
         raise APIError('请输入正确的手机号码')
+    if (not 'vcode' in session) or (not 'vcode_phone' in session):
+        raise APIError('短信验证码错误')
     if vcode.lower() != session['vcode'] or phone != session['vcode_phone']:
         raise APIError('短信验证码错误')
     exist = User.query.filter_by(phone=phone.strip()).first()
@@ -272,6 +274,8 @@ def set_user_password(phone, new, vcode):
         user = User.query.filter_by(phone=phone.strip()).first()
         if not user:
             raise APIError('该手机号未被注册')
+        if (not 'vcode' in session) or (not 'vcode_phone' in session):
+            raise APIError('短信验证码错误')
         if not vcode == session['vcode'] or phone != session['vcode_phone']:
             raise APIError('短信验证码错误')
         user.password = hashlib.md5(new.strip()).hexdigest()
