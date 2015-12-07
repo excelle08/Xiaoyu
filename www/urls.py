@@ -21,6 +21,7 @@ nopriv_allowed = [
     '/api/common/.*',
     '/api/user/verify',
     '/api/user/login',
+    '/api/user/password/edit',
     '/api/user/cron',
     '/api/register',
     '/api/test/.*',
@@ -246,6 +247,7 @@ def test_user_register():
 @app.route('/api/test/verify', methods=['POST'])
 def test_verify():
     phone = request.form['phone']
+    session['vcode_phone'] = phone
     return return_json({"vcode": api.user.generate_vcode()})
 
 ### end
@@ -256,7 +258,8 @@ def test_verify():
 def api_send_verification_sms():
     try:
         phone = request.form['phone']
-        return Response(api.user.send_message(phone), mimetype="text/json")
+        sms_type = int(request.form['type']) if 'type' in request.form else 0
+        return Response(api.user.send_message(phone, sms_type), mimetype="text/json")
     except KeyError, e:
         raise APIError(e.message)
 
@@ -390,12 +393,10 @@ def api_get_user_school():
 
 @app.route('/api/user/password/edit', methods=['POST'])
 def api_edit_password():
-    uid = session['uid']
-    original = request.form['original']
+    phone = request.form['phone']
     new = request.form['new']
     vcode = request.form['vcode']
-    api.user.set_user_password(uid, original, new, vcode)
-    return redirect(url_for('.index'))
+    return jsonify(api.user.set_user_password(phone, new, vcode))
 
 @app.route('/api/user/cron', methods=['GET'])
 def api_user_cron_tasks():

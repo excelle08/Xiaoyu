@@ -4,6 +4,10 @@ from urls import app
 from config.config import configs
 from api import datetime_filter
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 def get_mysql_conn_str():
     db_user = configs.db.user
     db_pass = configs.db.password

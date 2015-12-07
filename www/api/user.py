@@ -10,19 +10,30 @@ import re, json, requests, random, time, hashlib
 
 _PHONENUM = re.compile(r'^[0-9\-]+$')
 _MD5 = re.compile(r'^[0-9A-Fa-f]{32}$')
-sms_apikey = 'c6745a3a14ab7d3227a7adf1a2800dbc'
-sms_url = 'http://yunpian.com/v1/sms/send.json'
+sms_appkey = '23279977'
+sms_secret = 'fabfae89de7206ff74d0eb43d223dbbf'
 
 
-def send_message(phone):
-    code = generate_vcode()
-    post_data = {
-        "apikey" : sms_apikey,
-        "mobile" : phone,
-        "text" : "【云片网】您的验证码是%s" % code
-    }
-    resp = requests.post(sms_url, data=post_data)
-    return resp.content
+def send_message(phone, sms_type):
+    import top.api
+    req=top.api.AlibabaAliqinFcSmsNumSendRequest()
+    req.set_app_info(top.appinfo(sms_appkey,sms_secret))
+    req.extend="123456"
+    req.sms_type="normal"
+    req.sms_param= json.dumps({'code' : generate_vcode(), 'product' : '校遇'})
+    req.rec_num=phone
+    if sms_type == 0:
+        req.sms_template_code="SMS_3005317"
+        req.sms_free_sign_name='注册验证'
+    elif sms_type == 1:
+        req.sms_template_code="SMS_3005315"
+        req.sms_free_sign_name='变更验证'
+    try:
+        resp= req.getResponse()
+        session['vcode_phone'] = phone
+    except Exception:
+        pass
+    return '{"status":"success"}'
 
 
 def generate_vcode():
@@ -36,7 +47,7 @@ def generate_vcode():
 def user_register(phone, password, vcode, autologin=True):
     if not _PHONENUM.match(phone.strip()):
         raise APIError('请输入正确的手机号码')
-    if vcode.lower() != session['vcode']:
+    if vcode.lower() != session['vcode'] or phone != session['vcode_phone']:
         raise APIError('短信验证码错误')
     exist = User.query.filter_by(phone=phone.strip()).first()
     if exist:
@@ -82,6 +93,7 @@ def user_register(phone, password, vcode, autologin=True):
     db.session.add(fgroup)
     db.session.commit()
     del session['vcode']
+    del session['vcode_phone']
 
     # login
     if autologin:
@@ -255,19 +267,18 @@ def set_user_ext(uid, args):
     return uext
 
 
-def set_user_password(uid, new, new_2, vcode):
+def set_user_password(phone, new, vcode):
     try:
-        user = User.query.filter_by(uid=uid).first()
-        if not vcode == session['vcode']:
+        user = User.query.filter_by(phone=phone.strip()).first()
+        if not user:
+            raise APIError('该手机号未被注册')
+        if not vcode == session['vcode'] or phone != session['vcode_phone']:
             raise APIError('短信验证码错误')
-        if not _MD5.match(new):
-            raise APIError('密码Hash值格式不正确')
-        if not new.strip().lower() == new_2.strip().lower():
-            raise APIError('两次密码不一样')
-        user.password = new
+        user.password = hashlib.md5(new.strip()).hexdigest()
         db.session.commit()
         del session['vcode']
-        user_logout()
+        del session['vcode_phone']
+        return {'status':'success'}
     except KeyError, e:
         raise APIError(e.message)
 
