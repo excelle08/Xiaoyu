@@ -56,7 +56,7 @@ def set_my_filter(uid, args):
     }
     wall = Wall.query.filter_by(uid=uid).first()
     wall.wall_filter = json.dumps(condition)
-    wall.modified_at = time.time()
+    #wall.modified_at = time.time()
 
     db.session.commit()
     return wall
