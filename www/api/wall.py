@@ -122,12 +122,18 @@ def get_all_my_upvotes(uid):
     return WallUpvote.query.filter_by(target=uid).order_by(WallUpvote.time.desc()).all()
 
 
-def filter_users(uid):
+def filter_users(uid, ignore_exclude_sex=False):
     wall = Wall.query.filter_by(uid=uid).first()
 
     condition = json.loads(wall.wall_filter.replace('\\', ''))
 
     if('on' in condition and condition['on']):
+
+        if ignore_exclude_sex:
+            users_query = UserMeta.query
+            if 'gender' in condition and condition['gender'] != -1:
+                users_query = users_query.filter(UserMeta.gender == condition['gender'])
+            return users_query.all()
 
         # User filter
         users_query = UserMeta.query.filter(UserMeta.age >= (condition['age_min'] if 'age_min' in condition else 0), 
@@ -168,7 +174,7 @@ def filter_users(uid):
         uid1 = [ user.uid for user in user2 ]
     
         # School filter
-        schools_query = UserSchool.query.filter(UserSchool.auth_pass == True)
+        schools_query = UserSchool.query
     
         if condition['school'] != -1:
             schools_query = schools_query.filter(UserSchool.school_id == condition['school'])
@@ -192,13 +198,14 @@ def filter_users(uid):
 
         result = []
         for uid in result_ids:
-            result.append(UserMeta.query.filter_by(uid=uid).first())
+            if (User.query.filter_by(uid=uid).first().permission >= UserPermission.InProgress):
+                result.append(UserMeta.query.filter_by(uid=uid).first())
     
         return result
     else:
         users_onwall = [ item.uid for item in Wall.query.all() ]
 
-        users_verified = User.query.filter(User.permission >= UserPermission.Validated).all()
+        users_verified = User.query.filter(User.permission >= UserPermission.InProgress).all()
         users_verified_ids = [ item.uid for item in users_verified ]
 
         user_ids = list(set.intersection(set(users_onwall), set(users_verified_ids)))

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from model import db
-from model import ChatMessage, Friend, BlackList
+from model import ChatMessage, Friend, BlackList, User
 from flask import session
 from api import APIError
 import api.friends
@@ -53,6 +53,9 @@ def receive_all(uid, new, limit=10):
 
     for i in messages:
         i.read = True
+
+    current_user = User.query.filter_by(uid=session['uid']).first()
+    current_user.last_login = time.time()
 
     db.session.commit()
 

@@ -300,21 +300,21 @@ def api_user_logout():
 def api_get_online_users():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
-    return return_json(api.user.get_online_users(offset, limit), default=lambda obj: obj.dict)
+    return return_json(api.user.get_online_users(offset, limit))
 
 
 @app.route('/api/user/hot', methods=['GET', 'POST'])
 def api_get_hot_users():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
-    return return_json(api.user.get_hot_users(offset, limit), default=lambda obj: obj.dict)
+    return return_json(api.user.get_hot_users(offset, limit))
 
 
 @app.route('/api/user/recent_login', methods=['GET', 'POST'])
 def api_get_recent_logins():
     offset = request.args['offset'].strip() if 'offset' in request.args else 0
     limit = request.args['limit'].strip() if 'limit' in request.args else 10
-    return return_json(api.user.get_recent_logins(offset, limit), default=lambda obj: obj.dict)
+    return return_json(api.user.get_recent_logins(offset, limit))
 
 
 @app.route('/api/user', methods=['GET', 'POST'])
@@ -345,6 +345,7 @@ def api_get_user_meta():
     userMeta = json.loads(api.user.get_user_meta(uid).json)
     userMeta['online'] = User.query.filter_by(uid=uid).first().online
     userMeta['last_login'] = User.query.filter_by(uid=uid).first().last_login
+    userMeta['permission'] = User.query.filter_by(uid=uid).first().permission
     return return_json(userMeta)
 
 

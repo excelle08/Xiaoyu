@@ -7,6 +7,7 @@ from flask import session
 from api import APIError
 from api.wall import filter_default, filter_users
 import re, json, requests, random, time, hashlib
+from sqlalchemy import or_, and_
 
 _PHONENUM = re.compile(r'^[0-9\-]+$')
 _MD5 = re.compile(r'^[0-9A-Fa-f]{32}$')
@@ -153,7 +154,7 @@ def user_logout():
         user = User.query.filter_by(phone=session['phone']).first()
         if not user:
             return
-        if user.online != 3 and user.online != 4:
+        if user.online != 3 and user.online != 4 and user.online != 2:
             user.online = UserStatus.Offline
         db.session.commit()
         del session['phone']
@@ -162,29 +163,58 @@ def user_logout():
     except KeyError, e:
         raise APIError(e.message)
 
+def get_visible_online_users():
+    friend_list = get_friends(session['uid'])
+    visible_friends = []
+    for friend in friend_list:
+        friend_info = User.query.filter_by(uid=friend.to).first()
+        if friend_info.online == UserStatus.HideToStrangers:
+            visible_friends.append(UserMeta.query.filter_by(uid=friend_info.uid).first())
+    friend_uid_list = [friend.to for friend in friend_list]
+    hide_to_friends_list = User.query.filter_by(online=UserStatus.HideToFriends).all()
+    for user in hide_to_friends_list:
+        if (not user.uid in friend_uid_list):
+            visible_friends.append(UserMeta.query.filter_by(uid=user.uid).first())
+    return visible_friends
+
 
 def get_online_users(offset=0, limit=10):
     users = User.query.filter_by(online=UserStatus.Online).all()
     filters = filter_users(session['uid'])
     onlines = [UserMeta.query.filter_by(uid=item.uid).first() for item in users]
     res = [user for user in onlines if user in filters]
-    return res[int(offset):int(limit)]
+    res.extend(get_visible_online_users())
+    res = res[int(offset):int(limit)]
+    res = [user.dict for user in res]
+    for user_meta in res:
+        user_meta['permission'] = User.query.filter_by(uid=user_meta['uid']).first().permission
+    return res
 
 
 def get_recent_logins(offset=0, limit=10):
-    users = User.query.order_by(User.last_login.desc()).all()
+    users = User.query.filter(User.online != UserStatus.Online).order_by(User.last_login.desc()).all()
     recents = [ UserMeta.query.filter_by(uid=item.uid).first() for item in users ]
     filters = filter_users(session['uid'])
     res = [user for user in recents if user in filters]
-    return res[int(offset):int(limit)]
+    visible_online_users = get_visible_online_users()
+    res = [user for user in res if not user in visible_online_users]
+    res = res[int(offset):int(limit)]
+    res = [user.dict for user in res]
+    for user_meta in res:
+        user_meta['permission'] = User.query.filter_by(uid=user_meta['uid']).first().permission
+    return res
 
 
 def get_hot_users(offset=0, limit=10):
     walls = Wall.query.order_by(Wall.upvotes.desc()).offset(offset).all()
     hots = [ UserMeta.query.filter_by(uid=item.uid).first() for item in walls ]
-    filters = filter_users(session['uid'])
+    filters = filter_users(session['uid'], True)
     res = [user for user in hots if user in filters]
-    return res[int(offset):int(limit)]
+    res = res[int(offset):int(limit)]
+    res = [user.dict for user in res]
+    for user_meta in res:
+        user_meta['permission'] = User.query.filter_by(uid=user_meta['uid']).first().permission
+    return res
 
 
 def get_user(uid):
@@ -302,6 +332,10 @@ def update_user_age():
             continue
         from datetime import datetime
         user_meta.age = int(calculate_age(datetime.fromtimestamp(user_meta.birthday)))
+
+    expired_login_users = User.query.filter(and_(User.last_login < (time.time() - 5*60), User.online == 1)).all()
+    for user in expired_login_users:
+        user.online = 0
 
     db.session.commit()
     return {'status':200}
