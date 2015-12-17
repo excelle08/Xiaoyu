@@ -333,7 +333,7 @@ def update_user_age():
         from datetime import datetime
         user_meta.age = int(calculate_age(datetime.fromtimestamp(user_meta.birthday)))
 
-    expired_login_users = User.query.filter(and_(User.last_login < (time.time() - 5*60), User.online == 1)).all()
+    expired_login_users = User.query.filter(and_(User.last_login < (time.time() - 5*60), or_(User.online == 1, User.online == 2, User.online == 3))).all()
     for user in expired_login_users:
         user.online = 0
 
