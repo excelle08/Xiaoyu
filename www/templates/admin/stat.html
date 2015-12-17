@@ -62,21 +62,15 @@ function initVM(data) {
         <dl class="uk-description-list-horizontal">
             <dt>在线人数</dt>
             <dd v-text="numbers.onlines"></dd>
-            <dt>24小时内访问量</dt>
-            <dd v-text="numbers.today_pv"></dd>
-            <dt>7日访问量</dt>
-            <dd v-text="numbers.week_pv"></dd>
-            <dt>30日访问量</dt>
-            <dd v-text="numbers.month_pv"></dd>
-            <dt>总访问量</dt>
-            <dd v-text="numbers.total_pv"></dd>
             <dt>开启筛选器用户数</dt>
             <dd v-text="numbers.users_with_filter"></dd>
         </dl>
     </div>
 
-    <div class="uk-width-1-1">
-        <table class="uk-table">
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256993633'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s95.cnzz.com/stat.php%3Fid%3D1256993633%26online%3D1' type='text/javascript'%3E%3C/script%3E"));</script>
+
+    <div class="uk-width-1-1" style="display:none;">
+        <table class="uk-table" >
             <caption>用户访问详情</caption>
             <thead>
                 <tr>
