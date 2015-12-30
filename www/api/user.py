@@ -192,12 +192,12 @@ def get_online_users(offset=0, limit=10):
 
 
 def get_recent_logins(offset=0, limit=10):
-    users = User.query.filter(User.online != UserStatus.Online).order_by(User.last_login.desc()).all()
+    users = User.query.filter(User.online == UserStatus.Offline).order_by(User.last_login.desc()).all()
     recents = [ UserMeta.query.filter_by(uid=item.uid).first() for item in users ]
     filters = filter_users(session['uid'])
     res = [user for user in recents if user in filters]
-    visible_online_users = get_visible_online_users()
-    res = [user for user in res if not user in visible_online_users]
+    #visible_online_users = get_visible_online_users()
+    #res = [user for user in res if not user in visible_online_users]
     res = res[int(offset):int(limit)]
     res = [user.dict for user in res]
     for user_meta in res:
