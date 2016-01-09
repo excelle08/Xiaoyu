@@ -2,7 +2,7 @@
 
 from api.statistics import get_pv_counts
 from api import APIError
-from model import User, UserMeta, Notification, PageView, Wall, db, UserSchool, School, Major, AbuseReport
+from model import *
 import api.user, api.abuse_report, api.message
 import time, json, datetime, hashlib
 
@@ -121,6 +121,30 @@ def delete_user(uid):
     u = User.query.filter_by(uid=uid).first()
     if not u:
         raise APIError('用户不存在')
+    wall = Wall.query.filter_by(uid=uid).first()
+    user_meta = UserMeta.query.filter_by(uid=uid).first()
+    school = UserSchool.query.filter_by(uid=uid).first()
+    ext = UserExt.query.filter_by(uid=uid).first()
+    friends = Friend.query.filter_by(to=uid).all()
+    black_list = BlackList.filter_by(to=uid).all()
+    relpies = Reply.filter_by(user=uid).all()
+    messages = Message.filter_by(user=uid).all()
+    message_replies = MessageReply.filter_by(user=uid).all()
+
+    db.session.delete(wall)
+    db.session.delete(user_meta)
+    db.session.delete(school)
+    db.session.delete(ext)
+    if friends != None:
+        db.session.delete(friends)
+    if black_list != None:
+        db.session.delete(black_list)
+    if replies != None:
+        db.session.delete(replies)
+    if messages != None:
+        db.session.delete(messages)
+    if message_replies != None:
+        db.session.delete(message_replies)
 
     db.session.delete(u)
     db.session.commit()

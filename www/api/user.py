@@ -187,7 +187,10 @@ def get_online_users(offset=0, limit=10):
     res = res[int(offset):int(limit)]
     res = [user.dict for user in res]
     for user_meta in res:
-        user_meta['permission'] = User.query.filter_by(uid=user_meta['uid']).first().permission
+        try:
+            user_meta['permission'] = User.query.filter_by(uid=user_meta['uid']).first().permission
+        except Exception:
+            continue
     return res
 
 
@@ -201,7 +204,10 @@ def get_recent_logins(offset=0, limit=10):
     res = res[int(offset):int(limit)]
     res = [user.dict for user in res]
     for user_meta in res:
-        user_meta['permission'] = User.query.filter_by(uid=user_meta['uid']).first().permission
+        try:
+            user_meta['permission'] = User.query.filter_by(uid=user_meta['uid']).first().permission
+        except Exception:
+            continue
     return res
 
 
@@ -213,7 +219,10 @@ def get_hot_users(offset=0, limit=10):
     res = res[int(offset):int(limit)]
     res = [user.dict for user in res]
     for user_meta in res:
-        user_meta['permission'] = User.query.filter_by(uid=user_meta['uid']).first().permission
+        try:
+            user_meta['permission'] = User.query.filter_by(uid=user_meta['uid']).first().permission
+        except Exception:
+            continue
     return res
 
 
