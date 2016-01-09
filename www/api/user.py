@@ -293,7 +293,7 @@ def set_user_meta(uid, args):
             # Skip empty items
             if not value:
                 continue
-            print 'key=' + key + ';value=' + value
+            #print 'key=' + key + ';value=' + value
             umeta.__setattr__(key, value)
         db.session.commit()
         return umeta
