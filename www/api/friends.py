@@ -9,7 +9,7 @@ import json
 def get_friend_groups():
     uid = session['uid']
     group = FriendGroup.query.filter_by(user=uid).first()
-    print group.content
+    #print group.content
     group = json.loads(group.content)
     return group
 

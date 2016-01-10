@@ -334,7 +334,7 @@ def set_user_login_state(uid, state):
     return u
 
 def update_user_age():
-    print('Running user age check')
+    #print('Running user age check')
     all_users = UserMeta.query.all()
     for user_meta in all_users:
         if (user_meta.birthday == None):
